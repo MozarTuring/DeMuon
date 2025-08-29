@@ -15,7 +15,11 @@ from graph import connected_cycle_weights, exponential_graph_weights, complete_g
 
 from copy import deepcopy
 from typing import Union
+import os
 # ---------- decoder‑only Transformer ---------------------
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class MiniGPT(nn.Module):
     def __init__(self, vocab_size, d_model=256, n_layer=2, n_head=4, max_len=128):
         super().__init__()
@@ -63,7 +67,7 @@ def eval_loss(model, loader, loss_fn):
     model.eval()
     tot, ntok = 0.0, 0
     for x, y in loader:
-        x, y = x.cuda(), y.cuda()
+        x, y = x.to(device), y.to(device)
         logits = model(x)
         loss   = loss_fn(logits.view(-1, logits.size(-1)), y.view(-1))
         n      = y.numel()
@@ -161,8 +165,10 @@ def sclip(
 
 # ---------- main ----------------------------------------------
 def main():
+    if not os.path.exists("graphs"):
+        os.mkdir("graphs")
     parser = argparse.ArgumentParser()
-    parser.add_argument("--n_workers", type=int, default=4)
+    parser.add_argument("--n_workers", type=int, default=8)
     parser.add_argument("--epochs",    type=int, default=3)
     parser.add_argument("--batch_size",type=int, default=8)
     parser.add_argument("--block_size",type=int, default=64)
@@ -198,6 +204,7 @@ def main():
     val_tokens = []
     for eng, _de in Multi30k(split="train", language_pair=("en","de")):
         tokens.extend(vocab(tok(eng.lower())))
+        # vocab maps token to integer and note that it's extend rather than append
     for eng, _ in Multi30k(split="valid", language_pair=("en","de")):   # ← official dev set
         val_tokens.extend(vocab(tok(eng.lower())))
     random.shuffle(tokens)
@@ -229,20 +236,20 @@ def main():
     
     if args.network == "ring":
         weights = connected_cycle_weights(filename=f"graphs/ring_{args.n_workers}.npy", n=args.n_workers, degree=1)
-        mixing = torch.from_numpy(weights).float().cuda()
+        mixing = torch.from_numpy(weights).float().to(device)
         # ring: 0.804737854124365
     elif args.network == "exp":
         weights = exponential_graph_weights(filename=f"graphs/exp_{args.n_workers}.npy", n=args.n_workers)
-        mixing = torch.from_numpy(weights).float().cuda()
+        mixing = torch.from_numpy(weights).float().to(device)
         # exp:  0.5999999999999998 
     elif args.network == "complete":
         weights = complete_graph_weights(filename=f"graphs/complete_{args.n_workers}.npy", n=args.n_workers)
-        mixing = torch.from_numpy(weights).float().cuda()
+        mixing = torch.from_numpy(weights).float().to(device)
         # complete: 
     
     workers = []
     for _ in range(args.n_workers):
-        m = MiniGPT(vocab_size, args.d_model, args.n_layer, args.n_head, args.max_len).cuda()
+        m = MiniGPT(vocab_size, args.d_model, args.n_layer, args.n_head, args.max_len).to(device)
         workers.append(m)
     
     if args.alg == 'dsgd':
@@ -292,7 +299,7 @@ def main():
                 iters[wid] = iter(loaders[wid]) # reset the loader
                 x, y = next(iters[wid])
 
-            x, y = x.cuda(), y.cuda()
+            x, y = x.to(device), y.to(device)
 
             # ----- forward/backward -----
             model.train()
@@ -345,7 +352,7 @@ def main():
                         m = m_list[wid][name]
                         y = y_list[wid][name]
                         # buffer update
-                        m_temp = m.mul(mom).add(g, alpha=1-mom)
+                        m_temp = m.mul(mom).add(g, alpha=1-mom) # get v^t
                         y.add_(m_temp).add_(m, alpha=-1.0)
                         y_list[wid][name] = y
                         m_list[wid][name] = m_temp 

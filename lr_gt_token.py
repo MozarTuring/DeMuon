@@ -12,7 +12,7 @@ import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
 from scipy.stats import levy_stable
-from torchlevy import LevyStable, stable_dist # a user-defined package for Levy stable distribution 
+# from torchlevy import LevyStable, stable_dist # a user-defined package for Levy stable distribution 
 
 from toolbox import smooth_clipping, dump_pickle
 from optim_network import * 
@@ -259,4 +259,5 @@ def run_datasets_alg_network(dataset: str, noise: str, noise_scale: float, alg: 
             stats[0] = (rep * stats[0] + x_errs) / (rep + 1)
             stats[1] = np.minimum(stats[1], x_errs)
             stats[2] = np.maximum(stats[2], x_errs)
+        plt.plot(np.arange(len(x_errs))*eval_interval, x_errs, markevery=10, lw=0.5,linestyle='-', label=f'alpha{paras[1]}_beta{paras[2]}_{alg}')
     return stats
