@@ -16,6 +16,7 @@ from graph import connected_cycle_weights, exponential_graph_weights, complete_g
 from copy import deepcopy
 from typing import Union
 import os
+import time
 # ---------- decoder‑only Transformer ---------------------
 
 
@@ -165,12 +166,11 @@ def sclip(
 
 # ---------- main ----------------------------------------------
 def main():
-    if not os.path.exists("graphs"):
-        os.mkdir("graphs")
+    os.makedirs("graphs", exist_ok=True)
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_workers", type=int, default=8)
-    parser.add_argument("--epochs",    type=int, default=3)
-    parser.add_argument("--batch_size",type=int, default=8)
+    parser.add_argument("--epochs",    type=int, default=12)
+    parser.add_argument("--batch_size",type=int, default=64)
     parser.add_argument("--block_size",type=int, default=64)
     parser.add_argument("--d_model",   type=int, default=256)
     parser.add_argument("--n_layer",   type=int, default=2)
@@ -178,14 +178,17 @@ def main():
     parser.add_argument("--max_len",   type=int, default=128)
     parser.add_argument("--runname",   type=str, default="")
     parser.add_argument("--network", type=str, default="ring")
-    parser.add_argument("--alg",       type=str, default="gt_nsgdm")
-    parser.add_argument("--lr",        type=float, default=1e-2)
+    # parser.add_argument("--alg",       type=str, default="gt_nsgdm")
+    parser.add_argument("--alg",       type=str, default="muon")
+    parser.add_argument("--lr",        type=float, default=1e-1)
     parser.add_argument("--mom",       type=float, default=0.8)
     parser.add_argument("--l2_clip_bd", type=float, default=1.0)
     parser.add_argument("--phi", type=float, default=1.0)
     parser.add_argument("--tau", type=float, default=1.0)
     parser.add_argument("--random_seed", type=int, default=42)
     args = parser.parse_args()
+
+    os.makedirs(f"output/{args.network}", exist_ok=True)
 
     random.seed(args.random_seed)
     np.random.seed(args.random_seed)
@@ -250,7 +253,9 @@ def main():
     workers = []
     for _ in range(args.n_workers):
         m = MiniGPT(vocab_size, args.d_model, args.n_layer, args.n_head, args.max_len).to(device)
+        # print(m.tok_emb(torch.tensor([0]))) # check whether they have the same initial tok_emb. they are not the same after checking.
         workers.append(m)
+    # return "done"
     
     if args.alg == 'dsgd':
         lr = args.lr
@@ -263,7 +268,7 @@ def main():
             # use last m in the memory
             y_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
             g_prev_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
-    elif args.alg == "gt_nsgdm":
+    elif args.alg in ["gt_nsgdm", "muon"]:
         lr, mom = args.lr, args.mom
         y_list, m_list = [], []
         for _ in range(args.n_workers):
@@ -342,7 +347,7 @@ def main():
                         y.add_(g).add_(g_prev, alpha=-1.0)
                         y_list[wid][name] = y
                         g_prev_list[wid][name] = g
-            elif args.alg == "gt_nsgdm": 
+            elif args.alg in ["gt_nsgdm","muon"]: 
                 with torch.no_grad():
                     # update buffers block by block
                     for (name, p) in model.named_parameters():
@@ -385,24 +390,44 @@ def main():
                             continue
                         p.data -= lr * y_list[wid][name]
             mix_params(workers, mixing)
-        elif args.alg == "gt_nsgdm":
+        elif args.alg in ["gt_nsgdm", "muon"]:
             # mix y_list
             y_list = mix_y_list(y_list, mixing)
             # use normalized y_list to update parameters on each worker
+            svd_time=0.0
             for wid, model in enumerate(workers):
                 # normalize model's y globally
-                normalized_y = normalize_tensor_dict(y_list[wid])
+                if args.alg == "gt_nsgdm":
+                    normalized_y = normalize_tensor_dict(y_list[wid])
+                elif args.alg == "muon":
+                    normalized_y = dict()
+                    for name in y_list[wid]:
+                        tmp=y_list[wid][name].squeeze()
+                        if tmp.ndim==1 or name in ["tok_emb","pos_emg"]:
+                            normalized_y[name] = tmp/torch.norm(tmp)
+                        elif tmp.ndim==2:
+                            tmp_start = time.time()
+                            U, S, Vt = torch.linalg.svd(tmp, full_matrices=False)
+                            svd_time+=time.time()-tmp_start
+                            normalized_y[name] = U @ Vt
+                        else:
+                            print(f"Error: not implemented for {name} {tmp.shape} ndim>2")
+                            return "error"
                 with torch.no_grad():
                     # update parameters block by block
                     for (name, p) in model.named_parameters():
                         if p.grad is None:
                             continue
+                        # if name == "pos_emb":
+                        #     print(p.data.shape,normalized_y[name].shape)
+                        #     return None
                         p.data -= lr * normalized_y[name]
             mix_params(workers, mixing)
         elif args.alg == 'sen':
             mix_params(workers, mixing)
        
         # logging
+        # print(f"svd_time={svd_time:.4f}")
         if r % 100 == 0 or r == total_rounds:
             val_losses = [eval_loss(m, val_loader, loss_fn) for m in workers]
             loss_table.append([r] + val_losses + round_losses)
@@ -416,8 +441,8 @@ def main():
         out_csv = Path(f"output/{args.network}/{args.network}_dsgd_gclip_decay_lr{args.lr}_l2_clip_bd{args.l2_clip_bd}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
     elif args.alg == "gt_dsgd":
         out_csv = Path(f"output/{args.network}/{args.network}_gt_dsgd_lr{lr}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
-    elif args.alg == "gt_nsgdm":
-        out_csv = Path(f"output/{args.network}/{args.network}_gt_nsgdm_lr{lr}_mom{mom}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
+    elif args.alg in ["gt_nsgdm", "muon"]:
+        out_csv = Path(f"output/{args.network}/{args.network}_{args.alg}_lr{lr}_mom{mom}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
     elif args.alg == 'sen':
         out_csv = Path(f"output/{args.network}/{args.network}_sen_lr{lr}_mom{mom}_phi{args.phi}_tau{args.tau}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
     with out_csv.open("w", newline="") as f:
