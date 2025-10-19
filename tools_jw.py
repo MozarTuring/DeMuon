@@ -10,7 +10,5 @@ mpl.rcParams['lines.linestyle'] = '-'
 
 all_markers = list(Line2D.markers.keys())
 # Sample e.g. 8 markers randomly (excluding None and ' ')
-valid_markers = [m for m in all_markers if m not in [None, " ", ""]]
-sampled = random.sample(valid_markers, 11)
-color_sampled=plt.cm.tab20.colors[:11]
-plt.rcParams['axes.prop_cycle'] = cycler(color=color_sampled, marker=sampled)
+markers = ["o", "s", "D", "^", "v"]
+valid_markers = markers + [m for m in all_markers if m not in [None, " ", ""]+markers]

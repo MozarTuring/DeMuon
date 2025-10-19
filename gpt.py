@@ -10,15 +10,31 @@ from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 
 import numpy as np
-
 from graph import connected_cycle_weights, exponential_graph_weights, complete_graph_weights
 
 from copy import deepcopy
 from typing import Union
 import os
 import time
+import wandb
+
 # ---------- decoder‑only Transformer ---------------------
 
+import sys, logging
+
+# 1) Remove any existing handlers (Jupyter often adds one)
+for h in logging.root.handlers[:]:
+    logging.root.removeHandler(h)
+
+# 2) Build a fresh console handler to stdout
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(logging.Formatter('%(asctime)s - %(pathname)s - LINE%(lineno)d - \n%(message)sMSG-END', '%Y-%m-%d %H:%M:%S'))
+
+# 3) Attach to root and set levels
+root = logging.getLogger()
+root.setLevel(logging.INFO)
+root.addHandler(handler)
+jwp = logging.info
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class MiniGPT(nn.Module):
@@ -166,7 +182,6 @@ def sclip(
 
 # ---------- main ----------------------------------------------
 def main():
-    os.makedirs("graphs", exist_ok=True)
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_workers", type=int, default=8)
     parser.add_argument("--epochs",    type=int, default=12)
@@ -178,16 +193,16 @@ def main():
     parser.add_argument("--max_len",   type=int, default=128)
     parser.add_argument("--runname",   type=str, default="")
     parser.add_argument("--network", type=str, default="ring")
-    # parser.add_argument("--alg",       type=str, default="gt_nsgdm")
-    parser.add_argument("--alg",       type=str, default="muon")
-    parser.add_argument("--lr",        type=float, default=1e-1)
-    parser.add_argument("--mom",       type=float, default=0.8)
-    parser.add_argument("--l2_clip_bd", type=float, default=1.0)
+    parser.add_argument("--alg",       type=str, default="dsgd_gclip_decay")
     parser.add_argument("--phi", type=float, default=1.0)
     parser.add_argument("--tau", type=float, default=1.0)
     parser.add_argument("--random_seed", type=int, default=42)
-    args = parser.parse_args()
-
+    args = parser.parse_args([])
+    
+    wandb.init(project="my-kaggle-project", name=f'{args.alg}_{args.network}')
+    artifact = wandb.Artifact("my_model", type="model")
+    
+    os.makedirs("graphs", exist_ok=True)
     os.makedirs(f"output/{args.network}", exist_ok=True)
 
     random.seed(args.random_seed)
@@ -200,7 +215,7 @@ def main():
     vocab = build_vocab_from_iterator(yield_tokens("train", tok), specials=["<pad>", "<unk>"])
     vocab.set_default_index(vocab["<unk>"])
     vocab_size = len(vocab)
-    print(f"Vocab size = {vocab_size}")
+    jwp(f"Vocab size = {vocab_size}")
 
     # 2) Tokenise entire train split into one flat list (quick & dirty)
     tokens = []
@@ -213,12 +228,12 @@ def main():
     random.shuffle(tokens)
 
     # 3) Partition tokens equally among workers
-    print(f"total train tokens = {len(tokens)}")
+    jwp(f"total train tokens = {len(tokens)}")
     part_len = len(tokens) // args.n_workers
-    print(f"each worker has {part_len} train tokens")
+    jwp(f"each worker has {part_len} train tokens")
     partitions = [tokens[i*part_len:(i+1)*part_len] for i in range(args.n_workers)]
 
-    print(f"total val tokens = {len(val_tokens)}")
+    jwp(f"total val tokens = {len(val_tokens)}")
     val_ds     = SeqDataset(val_tokens, args.block_size)
     val_loader = DataLoader(val_ds,
                             batch_size=args.batch_size,
@@ -233,7 +248,7 @@ def main():
         rounds_per_epoch.append(len(loaders[partid]))
     iters = [iter(loader) for loader in loaders]
     max_round_per_epoch = max(rounds_per_epoch) # to finish one epoch for all workers, we need to run the longest loader for max_round_per_epoch steps
-    print(f"max_round_per_epoch = {max_round_per_epoch}") 
+    jwp(f"max_round_per_epoch = {max_round_per_epoch}") 
 
     # 5) Instantiate models & per‑worker momentum buffers (no built‑in optim)
     
@@ -251,15 +266,22 @@ def main():
         # complete: 
     
     workers = []
+    base_model = MiniGPT(vocab_size, args.d_model, args.n_layer, args.n_head, args.max_len)
     for _ in range(args.n_workers):
-        m = MiniGPT(vocab_size, args.d_model, args.n_layer, args.n_head, args.max_len).to(device)
-        # print(m.tok_emb(torch.tensor([0]))) # check whether they have the same initial tok_emb. they are not the same after checking.
+        m = MiniGPT(vocab_size, args.d_model, args.n_layer, args.n_head, args.max_len)
+        m.load_state_dict(base_model.state_dict())
+        # jwp(m.tok_emb(torch.tensor([0])))
+        m.to(device)
         workers.append(m)
+    del base_model
     # return "done"
     
     if args.alg == 'dsgd':
+        args.lr=1e-2
         lr = args.lr
     elif args.alg == 'dsgd_gclip_decay':
+        args.lr=10
+        args.l2_clip_bd=0.1
         lr, l2_clip_bd = args.lr, args.l2_clip_bd
     elif args.alg == 'gt_dsgd':
         lr = args.lr
@@ -269,6 +291,8 @@ def main():
             y_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
             g_prev_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
     elif args.alg in ["gt_nsgdm", "muon"]:
+        args.lr=1e-1
+        args.mom=0.8
         lr, mom = args.lr, args.mom
         y_list, m_list = [], []
         for _ in range(args.n_workers):
@@ -281,7 +305,7 @@ def main():
         for _ in range(args.n_workers):
             m_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
     total_params = sum(p.numel() for p in workers[0].parameters())
-    print(f"total_params = {total_params}")
+    jwp(f"total_params = {total_params}")
     loss_fn = nn.CrossEntropyLoss(ignore_index=vocab["<pad>"])
 
     # 6) Example mixing matrix: uniform average
@@ -295,6 +319,10 @@ def main():
 
     total_rounds = args.epochs * max_round_per_epoch
     for r in range(1, total_rounds+1):
+        if r == 1:
+            val_losses = [eval_loss(m, val_loader, loss_fn) for m in workers]
+            jwp(f"Initial validation losses: " +
+                    ", ".join(f"{l:.4f}" for l in val_losses))
         round_losses = []
         # one local step per worker
         for wid, model in enumerate(workers):
@@ -411,7 +439,7 @@ def main():
                             svd_time+=time.time()-tmp_start
                             normalized_y[name] = U @ Vt
                         else:
-                            print(f"Error: not implemented for {name} {tmp.shape} ndim>2")
+                            jwp(f"Error: not implemented for {name} {tmp.shape} ndim>2")
                             return "error"
                 with torch.no_grad():
                     # update parameters block by block
@@ -419,7 +447,7 @@ def main():
                         if p.grad is None:
                             continue
                         # if name == "pos_emb":
-                        #     print(p.data.shape,normalized_y[name].shape)
+                        #     jwp(p.data.shape,normalized_y[name].shape)
                         #     return None
                         p.data -= lr * normalized_y[name]
             mix_params(workers, mixing)
@@ -427,11 +455,11 @@ def main():
             mix_params(workers, mixing)
        
         # logging
-        # print(f"svd_time={svd_time:.4f}")
-        if r % 100 == 0 or r == total_rounds:
+        # jwp(f"svd_time={svd_time:.4f}")
+        if r % 100 == 0 or r == total_rounds or r == 1:
             val_losses = [eval_loss(m, val_loader, loss_fn) for m in workers]
             loss_table.append([r] + val_losses + round_losses)
-            print(f"Round {r}/{total_rounds}: " +
+            jwp(f"Round {r}/{total_rounds}: " +
                     ", ".join(f"{l:.4f}" for l in round_losses))
             
     # after the for‑round loop
@@ -449,7 +477,12 @@ def main():
         writer = csv.writer(f)
         writer.writerows(loss_table)
 
-    print(f"Done. Losses saved to {out_csv}")
+    artifact.add_file(str(out_csv))
+    wandb.log_artifact(artifact)
 
-if __name__ == "__main__":
-    main()
+    jwp(f"Done. Losses saved to {out_csv}")
+
+# if __name__ == "__main__":
+main()
+
+# P100 slower than T4
