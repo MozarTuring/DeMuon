@@ -1,6 +1,4 @@
-import math, random, argparse, csv
-from pathlib import Path
-from tqdm import tqdm
+# !pip install -r requirements_gpt.txt
 
 import torch
 import torch.nn as nn
@@ -9,32 +7,13 @@ from torchtext.datasets import Multi30k
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 
-import numpy as np
-from graph import connected_cycle_weights, exponential_graph_weights, complete_graph_weights
 
-from copy import deepcopy
-from typing import Union
-import os
-import time
-import wandb
+
+from utils import *
 
 # ---------- decoder‑only Transformer ---------------------
 
-import sys, logging
 
-# 1) Remove any existing handlers (Jupyter often adds one)
-for h in logging.root.handlers[:]:
-    logging.root.removeHandler(h)
-
-# 2) Build a fresh console handler to stdout
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(logging.Formatter('%(asctime)s - %(pathname)s - LINE%(lineno)d - \n%(message)sMSG-END', '%Y-%m-%d %H:%M:%S'))
-
-# 3) Attach to root and set levels
-root = logging.getLogger()
-root.setLevel(logging.INFO)
-root.addHandler(handler)
-jwp = logging.info
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class MiniGPT(nn.Module):
@@ -91,115 +70,24 @@ def eval_loss(model, loader, loss_fn):
         tot   += loss.item()*n
         ntok  += n
     return tot/ntok
-# ---------- mixing utility ------------------------------------
-def mix_params(workers, mixing):
-    with torch.no_grad():
-        # snapshot all params first
-        states = [dict(w.state_dict()) for w in workers]
 
-        for i, w in enumerate(workers):
-            new_state = {}
-            for k, p0 in w.state_dict().items():
-                stacked = torch.stack([s[k].float() for s in states])  # [P, …]
-
-                # add enough singleton dims for broadcasting
-                weight = mixing[i].view(-1, *([1] * (stacked.dim() - 1)))
-
-                new_state[k] = torch.sum(weight * stacked, dim=0).type_as(p0)
-            w.load_state_dict(new_state)
-
-def normalize_tensor_dict(tensor_dict):
-    """
-    Normalize a dictionary of tensors so that the global L2 norm is 1.0.
-    
-    Args:
-        tensor_dict (dict): A dictionary {name: tensor}
-        
-    Returns:
-        dict: A new dictionary with same keys, values normalized
-    """
-    normed_dict = deepcopy(tensor_dict)
-
-    # Compute global L2 norm
-    norm = torch.sqrt(sum((v ** 2).sum() for v in normed_dict.values()))
-    
-    # Normalize if norm is non-zero
-    if norm > 0:
-        for name in normed_dict:
-            normed_dict[name] /= norm
-    
-    return normed_dict
-
-def mix_y_list(y_list, mixing):
-    """
-    Mix a list of dictionaries of tensors.
-    
-    Args:
-        y_list (list): A list of dictionaries {name: tensor}
-        mixing (torch.Tensor): A mixing matrix of shape (n_workers, n_workers)
-        
-    Returns:
-        list: A new list of dictionaries with same keys, values mixed
-    """ 
-    mixed_y_list = []
-    for i, y in enumerate(y_list):
-        mixed_y = {}
-        for name in y: # mixing block by block
-            stacked = torch.stack([s[name].float() for s in y_list])
-            weight = mixing[i].view(-1, *([1] * (stacked.dim() - 1)))
-            mixed_y[name] = torch.sum(weight * stacked, dim=0).type_as(y[name])
-        mixed_y_list.append(mixed_y)
-    return mixed_y_list
-
-def sclip(
-    y: torch.Tensor,
-    phi: Union[float, torch.Tensor],
-    t:   Union[float, torch.Tensor],
-    tau: Union[float, torch.Tensor],
-) -> torch.Tensor:
-    """
-    Apply  f(y) = y*phi / sqrt( y^2 * (t+1) + tau * (t+1)^1.6 )
-    component‑wise to a tensor y.
-
-    Args
-    ----
-    y   : torch.Tensor          (any shape)
-    phi : float or 0‑D tensor
-    t   : float or 0‑D tensor
-    tau : float or 0‑D tensor
-
-    Returns
-    -------
-    torch.Tensor  (same shape as y)
-    """
-    # make sure parameters are tensors on the same device / dtype as y
-    phi = torch.as_tensor(phi, dtype=y.dtype, device=y.device)
-    t   = torch.as_tensor(t,   dtype=y.dtype, device=y.device)
-    tau = torch.as_tensor(tau, dtype=y.dtype, device=y.device)
-
-    denom = torch.sqrt( y**2 * (t + 1.0) + tau * (t + 1.0)**1.6 )
-    return y * phi / denom
 
 # ---------- main ----------------------------------------------
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--n_workers", type=int, default=8)
-    parser.add_argument("--epochs",    type=int, default=12)
-    parser.add_argument("--batch_size",type=int, default=64)
+    # parameters defaulted setting
+    parser = comoon_args()
     parser.add_argument("--block_size",type=int, default=64)
     parser.add_argument("--d_model",   type=int, default=256)
     parser.add_argument("--n_layer",   type=int, default=2)
     parser.add_argument("--n_head",    type=int, default=4)
     parser.add_argument("--max_len",   type=int, default=128)
-    parser.add_argument("--runname",   type=str, default="")
-    parser.add_argument("--network", type=str, default="ring")
-    parser.add_argument("--alg",       type=str, default="dsgd_gclip_decay")
-    parser.add_argument("--phi", type=float, default=1.0)
-    parser.add_argument("--tau", type=float, default=1.0)
-    parser.add_argument("--random_seed", type=int, default=42)
-    args = parser.parse_args([])
-    
-    wandb.init(project="my-kaggle-project", name=f'{args.alg}_{args.network}')
+
+    # args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','512','--network','','--alg','cenmuon','--epochs','12', '--log_interval','600'])
+
+    args = parser.parse_args(['--n_workers','8','--train_batch_size','64','--eval_batch_size','512','--network','ring','--alg','muon','--epochs','12', '--log_interval','100'])
+
+    # parameters recording and monitoring
+    wandb.init(project="my-kaggle-project", name=f'gpt_{args.alg}_{args.network}')
     artifact = wandb.Artifact("my_model", type="model")
     
     os.makedirs("graphs", exist_ok=True)
@@ -236,7 +124,7 @@ def main():
     jwp(f"total val tokens = {len(val_tokens)}")
     val_ds     = SeqDataset(val_tokens, args.block_size)
     val_loader = DataLoader(val_ds,
-                            batch_size=args.batch_size,
+                            batch_size=args.eval_batch_size,
                             shuffle=False)
 
     # 4) Prepare data loaders
@@ -244,7 +132,7 @@ def main():
     rounds_per_epoch = []
     for partid, part in enumerate(partitions):
         ds = SeqDataset(part, args.block_size)
-        loaders.append(DataLoader(ds, batch_size=args.batch_size, shuffle=True))
+        loaders.append(DataLoader(ds, batch_size=args.train_batch_size, shuffle=True))
         rounds_per_epoch.append(len(loaders[partid]))
     iters = [iter(loader) for loader in loaders]
     max_round_per_epoch = max(rounds_per_epoch) # to finish one epoch for all workers, we need to run the longest loader for max_round_per_epoch steps
@@ -290,7 +178,7 @@ def main():
             # use last m in the memory
             y_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
             g_prev_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
-    elif args.alg in ["gt_nsgdm", "muon"]:
+    elif args.alg in ["gt_nsgdm", "muon", 'cenmuon']:
         args.lr=1e-1
         args.mom=0.8
         lr, mom = args.lr, args.mom
@@ -375,7 +263,7 @@ def main():
                         y.add_(g).add_(g_prev, alpha=-1.0)
                         y_list[wid][name] = y
                         g_prev_list[wid][name] = g
-            elif args.alg in ["gt_nsgdm","muon"]: 
+            elif args.alg in ["gt_nsgdm","muon",'cenmuon']: 
                 with torch.no_grad():
                     # update buffers block by block
                     for (name, p) in model.named_parameters():
@@ -418,16 +306,17 @@ def main():
                             continue
                         p.data -= lr * y_list[wid][name]
             mix_params(workers, mixing)
-        elif args.alg in ["gt_nsgdm", "muon"]:
+        elif args.alg in ["gt_nsgdm", "muon", 'cenmuon']:
             # mix y_list
-            y_list = mix_y_list(y_list, mixing)
+            if args.alg in ['gt_nsgdm','muon']:
+                y_list = mix_y_list(y_list, mixing)
             # use normalized y_list to update parameters on each worker
             svd_time=0.0
             for wid, model in enumerate(workers):
                 # normalize model's y globally
                 if args.alg == "gt_nsgdm":
                     normalized_y = normalize_tensor_dict(y_list[wid])
-                elif args.alg == "muon":
+                elif args.alg in ["muon", 'cenmuon']:
                     normalized_y = dict()
                     for name in y_list[wid]:
                         tmp=y_list[wid][name].squeeze()
@@ -450,39 +339,22 @@ def main():
                         #     jwp(p.data.shape,normalized_y[name].shape)
                         #     return None
                         p.data -= lr * normalized_y[name]
-            mix_params(workers, mixing)
+            if args.alg in ['gt_nsgdm','muon']:
+                mix_params(workers, mixing)
         elif args.alg == 'sen':
             mix_params(workers, mixing)
        
         # logging
         # jwp(f"svd_time={svd_time:.4f}")
-        if r % 100 == 0 or r == total_rounds or r == 1:
+        if r % args.log_interval == 0 or r == total_rounds or r == 1:
             val_losses = [eval_loss(m, val_loader, loss_fn) for m in workers]
             loss_table.append([r] + val_losses + round_losses)
-            jwp(f"Round {r}/{total_rounds}: " +
-                    ", ".join(f"{l:.4f}" for l in round_losses))
+            jwp(f"Round {r}/{total_rounds}: {round_losses},{val_losses}")
             
     # after the for‑round loop
-    if args.alg == 'dsgd':
-        out_csv = Path(f"output/{args.network}/{args.network}_dsgd_lr{lr}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
-    elif args.alg == 'dsgd_gclip_decay':
-        out_csv = Path(f"output/{args.network}/{args.network}_dsgd_gclip_decay_lr{args.lr}_l2_clip_bd{args.l2_clip_bd}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
-    elif args.alg == "gt_dsgd":
-        out_csv = Path(f"output/{args.network}/{args.network}_gt_dsgd_lr{lr}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
-    elif args.alg in ["gt_nsgdm", "muon"]:
-        out_csv = Path(f"output/{args.network}/{args.network}_{args.alg}_lr{lr}_mom{mom}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
-    elif args.alg == 'sen':
-        out_csv = Path(f"output/{args.network}/{args.network}_sen_lr{lr}_mom{mom}_phi{args.phi}_tau{args.tau}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
-    with out_csv.open("w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerows(loss_table)
+    end(args=args, artifact=artifact, loss_table=loss_table)
 
-    artifact.add_file(str(out_csv))
-    wandb.log_artifact(artifact)
-
-    jwp(f"Done. Losses saved to {out_csv}")
-
-# if __name__ == "__main__":
-main()
+if __name__ == "__main__":
+    main()
 
 # P100 slower than T4
