@@ -1,4 +1,7 @@
-# !pip install -r requirements_gpt.txt
+# %pip install -r requirements_gpt.txt
+# exit()
+# in kaggle notebook, !pip may not be pip attached to the current python environment
+# sometimes need to restart the kernel after pip install
 
 import torch
 import torch.nn as nn
@@ -11,6 +14,8 @@ from torchtext.vocab import build_vocab_from_iterator
 
 from utils import *
 
+jwp(f"{torch.__version__},{np.__version__}") # check whether pip install succeeded, if not restart the kernel and re‑run
+
 # ---------- decoder‑only Transformer ---------------------
 
 
@@ -19,7 +24,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class MiniGPT(nn.Module):
     def __init__(self, vocab_size, d_model=256, n_layer=2, n_head=4, max_len=128):
         super().__init__()
-        self.tok_emb = nn.Embedding(vocab_size, d_model)
+        self.tok_emb = nn.Embedding(vocab_size, d_model)                                
         self.pos_emb = nn.Parameter(torch.zeros(1, max_len, d_model))
         self.blocks  = nn.ModuleList(
             nn.TransformerDecoderLayer(d_model, n_head, dim_feedforward=4*d_model, batch_first=True)
@@ -82,9 +87,9 @@ def main():
     parser.add_argument("--n_head",    type=int, default=4)
     parser.add_argument("--max_len",   type=int, default=128)
 
-    # args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','512','--network','','--alg','cenmuon','--epochs','12', '--log_interval','600'])
+    args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','512','--network','','--alg','cenmuon','--epochs','12', '--log_interval','600'])
 
-    args = parser.parse_args(['--n_workers','8','--train_batch_size','64','--eval_batch_size','512','--network','ring','--alg','muon','--epochs','12', '--log_interval','100'])
+    # args = parser.parse_args(['--n_workers','8','--train_batch_size','64','--eval_batch_size','512','--network','ring','--alg','muon','--epochs','12', '--log_interval','100'])
 
     # parameters recording and monitoring
     wandb.init(project="my-kaggle-project", name=f'gpt_{args.alg}_{args.network}')
