@@ -39,7 +39,7 @@ from timm.models import VisionTransformer, create_model
 
 
 
-
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def batch_flip_lr(inputs):
     flip_mask = (torch.rand(len(inputs), device=inputs.device) < 0.5).view(-1, 1, 1, 1)
@@ -78,7 +78,9 @@ class CifarLoader:
             labels = torch.tensor(dset.targets)
             torch.save({'images': images, 'labels': labels, 'classes': dset.classes}, data_path)
 
-        data = torch.load(data_path, map_location=torch.device('cuda'))
+        data = torch.load(data_path, map_location=device)
+        jwp(list(data.keys()))
+        jwp(data['images'].shape)
         self.images, self.labels, self.classes = data['images'], data['labels'], data['classes']
         # It's faster to load+process uint8 data than to load preprocessed fp16 data
         self.images = (self.images.half() / 255).permute(0, 3, 1, 2).to(memory_format=torch.channels_last)
@@ -298,7 +300,7 @@ def get_dataloaders_ordered_splits(
         test_set = torchvision.datasets.CIFAR100(
             root=data_dir, train=False, download=True, transform=test_transform
         )
-    elif args.datatype.lower() == 'cifar10':
+    elif args.datatype.lower() == 'mycifar10':
         train_transform = T.Compose([
             T.RandomCrop(32, padding=4),
             T.RandomHorizontalFlip(),
@@ -433,7 +435,7 @@ def save_checkpoint(state: dict, is_best: bool, out_dir: str):
 
 
 class Muon(torch.optim.Optimizer):
-    def __init__(self, params, lr=1e-3, momentum=0, nesterov=False):
+    def __init__(self, named_params, lr=1e-3, momentum=0, nesterov=False):
         if lr < 0.0:
             raise ValueError(f"Invalid learning rate: {lr}")
         if momentum < 0.0:
@@ -441,7 +443,9 @@ class Muon(torch.optim.Optimizer):
         if nesterov and momentum <= 0:
             raise ValueError("Nesterov momentum requires a momentum")
         defaults = dict(lr=lr, momentum=momentum, nesterov=nesterov)
+        params = [p for _, p in named_params]
         super().__init__(params, defaults)
+        self.param_to_name = {p: n for n, p in named_params}
 
     def step(self):
         for group in self.param_groups:
@@ -459,9 +463,20 @@ class Muon(torch.optim.Optimizer):
                 buf.mul_(momentum).add_(g)
                 g = g.add(buf, alpha=momentum) if group['nesterov'] else buf
 
+                if self.param_to_name[p]=='layers.1.norm1.bias':
+                    jwp(p.data)
                 p.data.mul_(len(p.data)**0.5 / p.data.norm()) # normalize the weight
                 update = zeropower_via_newtonschulz5(g.reshape(len(g), -1)).view(g.shape) # whiten the update
+
+                if self.param_to_name[p]=='layers.1.norm1.bias':
+                    jwp(p.data)
+                
                 p.data.add_(update, alpha=-lr) # take a step
+                if self.param_to_name[p]=='layers.1.norm1.bias':
+                    jwp(lr)
+                    jwp(update)
+                    jwp(p.data)
+                    1/0
 
 if __name__ == '__main__':
     jwp("Starting training")
@@ -487,7 +502,9 @@ if __name__ == '__main__':
     
     # args = parser.parse_args(['--n_workers','8','--train_batch_size','128','--eval_batch_size','3500','--network','ring','--alg','muon','--epochs','200'])
 
-    args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','3500','--network','','--alg','stdcenmuon','--epochs','8', '--log_interval','50','--datatype','cifar10', '--modeltype','cifarnet'])
+    # args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','3500','--network','','--alg','stdcenmuon','--epochs','8', '--log_interval','50','--datatype','cifar10', '--modeltype','cifarnet'])
+
+    args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','3500','--network','','--alg','stdcenmuon_nosgd','--epochs','8', '--log_interval','50','--datatype','stdcifar10', '--modeltype','cifarnet'])
 
     # args = parser.parse_args(['--n_workers','8','--train_batch_size','64','--eval_batch_size','3500','--network','ring','--alg','gt_nsgdm','--epochs','100', '--log_interval','100'])
 
@@ -507,7 +524,7 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    if args.modeltype=='cifarnet':
+    if args.datatype=='stdcifar10':
         batch_size = 2000
         val_loader = CifarLoader('cifar10', train=False, batch_size=2000)
         train_loader = CifarLoader('cifar10', train=True, batch_size=batch_size, aug=dict(flip=True, translate=2))
@@ -602,6 +619,17 @@ if __name__ == '__main__':
             for group in opt.param_groups:
                 group["initial_lr"] = group["lr"]
 
+
+    elif args.alg == 'stdcenmuon_nosgd':
+        model=workers[0]
+        # filter_params = [(n,p) for n,p in model.named_parameters() if p.requires_grad]
+        filter_params = list(model.named_parameters())
+        optimizer2 = Muon(filter_params, lr=0.24, momentum=0.6, nesterov=True)
+        optimizers = [optimizer2]
+        for opt in optimizers:
+            for group in opt.param_groups:
+                group["initial_lr"] = group["lr"]
+
         
 
     # if args.alg == 'adamw':
@@ -639,7 +667,7 @@ if __name__ == '__main__':
 
             # ----- forward/backward -----
             model.train()
-            if args.alg == 'stdcenmuon':
+            if args.modeltype == 'cifarnet':
                 logits = model(x, whiten_bias_grad=(r < whiten_bias_train_steps))
             else:
                 logits = model(x)
@@ -716,6 +744,13 @@ if __name__ == '__main__':
                     group["lr"] = group["initial_lr"] * (1 - r / total_rounds)
                 for opt in optimizers:
                     opt.step()
+
+            elif args.alg == 'stdcenmuon_nosgd':
+                for group in optimizer2.param_groups:
+                    group["lr"] = group["initial_lr"] * (1 - r / total_rounds)
+                for opt in optimizers:
+                    opt.step()
+
             round_losses.append(loss.item())
 
         
@@ -797,7 +832,12 @@ if __name__ == '__main__':
                     #     return None
                     p.data -= lr * normalized_y[name]
 
-       
+        for name, p in model.named_parameters():
+            if torch.isnan(p).any() or torch.isinf(p).any():
+                jwp(f"{p.grad}")
+                jwp(f"NaN or Inf detected in parameter {name} after mixing at round {r}")
+                1/0
+        
         # logging
         # jwp(f"svd_time={svd_time:.4f}")
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
