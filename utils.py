@@ -26,6 +26,11 @@ handler.setFormatter(logging.Formatter('%(asctime)s - %(pathname)s - LINE%(linen
 root = logging.getLogger()
 root.setLevel(logging.INFO)
 root.addHandler(handler)
+def jwp(*args):
+    total = ''
+    for ele in args:
+        total.join(f'{ele}, ')
+    logging.info(total)
 jwp = logging.info
 
 wandb.login(key='44605eadd683b5ce6dd038f6678b22fbbe392f3f')
@@ -166,6 +171,8 @@ def end(args, artifact, loss_table):
         out_csv = Path(f"output/{args.network}/{args.network}_{args.alg}_lr{args.lr}_mom{args.mom}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
     elif args.alg == 'sen':
         out_csv = Path(f"output/{args.network}/{args.network}_sen_lr{lr}_mom{mom}_phi{args.phi}_tau{args.tau}_epoch{args.epochs}_seed{args.random_seed}_worker_losses.csv")
+    else:
+        out_csv = Path(f"output/{args.network}_{args.alg}_losses.csv")
     with out_csv.open("w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(loss_table)

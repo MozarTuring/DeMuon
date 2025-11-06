@@ -504,9 +504,13 @@ if __name__ == '__main__':
 
     # args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','3500','--network','','--alg','stdcenmuon','--epochs','8', '--log_interval','50','--datatype','cifar10', '--modeltype','cifarnet'])
 
-    args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','3500','--network','','--alg','stdcenmuon_nosgd','--epochs','8', '--log_interval','50','--datatype','stdcifar10', '--modeltype','cifarnet'])
+    # args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','3500','--network','','--alg','stdcenmuon_nosgd','--epochs','8', '--log_interval','50','--datatype','stdcifar10', '--modeltype','cifarnet'])
 
     # args = parser.parse_args(['--n_workers','8','--train_batch_size','64','--eval_batch_size','3500','--network','ring','--alg','gt_nsgdm','--epochs','100', '--log_interval','100'])
+
+    # args = parser.parse_args(['--n_workers','8','--train_batch_size','128','--eval_batch_size','2000','--network','complete','--alg','dadam','--epochs','90', '--log_interval','100', '--modeltype','vitsmall', '--datatype','cifar100'])
+    args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','4000','--network','','--alg','adamw','--epochs','150', '--log_interval','500', '--modeltype','vitsmall', '--datatype','cifar100'])
+
 
 
     wandb.init(project="my-kaggle-project", name=f'{args.alg}_{args.network}_vitsmall')
@@ -519,6 +523,23 @@ if __name__ == '__main__':
     np.random.seed(args.random_seed)
     torch.manual_seed(args.random_seed)
     torch.cuda.manual_seed(args.random_seed)
+
+    def get_schedule(num_steps_per_epoch, args, optim):
+        warmup_lr_scheduler = torch.optim.lr_scheduler.LinearLR(
+            optim,
+            start_factor=args.warmup_decay,
+            total_iters=num_steps_per_epoch * args.warmup_epochs
+        )
+        main_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optim,
+            T_max=num_steps_per_epoch * (args.epochs - args.warmup_epochs),
+            eta_min=1e-5
+        )
+        return torch.optim.lr_scheduler.SequentialLR(
+            optim,
+            schedulers=[warmup_lr_scheduler, main_scheduler],
+            milestones=[num_steps_per_epoch * args.warmup_epochs]
+                )
     
 
 
@@ -534,6 +555,10 @@ if __name__ == '__main__':
         loaders, val_loader = get_dataloaders_ordered_splits('./', args, 8)
     iters = [iter(loader) for loader in loaders]
 
+    max_round_per_epoch = len(loaders[0])
+    total_rounds = args.epochs * max_round_per_epoch
+    whiten_bias_train_steps = 3 * max_round_per_epoch
+
 
     if args.network == "ring":
         weights = connected_cycle_weights(filename=f"graphs/ring_{args.n_workers}.npy", n=args.n_workers, degree=1)
@@ -547,32 +572,7 @@ if __name__ == '__main__':
         weights = complete_graph_weights(filename=f"graphs/complete_{args.n_workers}.npy", n=args.n_workers)
         mixing = torch.from_numpy(weights).float().to(device)
         # complete: 
-    
-    workers = []
-    if args.modeltype=='cifarnet':
-        base_model = CifarNet()
-        base_model.reset()
-        base_model.init_whiten(train_images)
-    elif args.modeltype=='vitsmall':
-        base_model = vit_small()
-    else:
-        pass
-    for _ in range(args.n_workers):
-        if args.modeltype=='cifarnet':
-            m = CifarNet()
-        elif args.modeltype=='vitsmall':
-            m = vit_small()
-        else:
-            pass
-        m.load_state_dict(base_model.state_dict())
-        # jwp(m.tok_emb(torch.tensor([0])))
-        m.to(device)
-        workers.append(m)
-    del base_model
-    aa=[(ele[0], ele[1].shape) for ele in workers[0].named_parameters()]
-    jwp(aa)
-    # return "done"
-    
+
     if args.alg == 'dsgd':
         args.lr=1e-2
         lr = args.lr
@@ -583,54 +583,104 @@ if __name__ == '__main__':
     elif args.alg == 'gt_dsgd':
         lr = args.lr
         y_list, g_prev_list = [], []
-        for _ in range(args.n_workers):
-            # use last m in the memory
-            y_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
-            g_prev_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
     elif args.alg in ["gt_nsgdm", "muon", "cenmuon"]:
         args.lr=1e-1
         args.mom=0.8
         lr, mom = args.lr, args.mom
         y_list, m_list = [], []
-        for _ in range(args.n_workers):
-            # use last m in the memory
-            y_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
-            m_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
+    elif args.alg in ["dadam"]:
+        args.lr = 0.0024
+        args.beta1 = 0.974
+        args.beta2 = 0.999
+        args.eps = 1e-8
+        args.weight_decay = 3e-5
+        args.warmup_decay = 0.01
+        args.warmup_epochs = 5
+        v_list, m_list, x_list, opt_list, schedule_list = [], [], [], [], []
     elif args.alg == 'sen':
         lr, mom, phi, tau = args.lr, args.mom, args.phi, args.tau
         m_list = []
-        for _ in range(args.n_workers):
+
+
+
+
+
+
+    workers = []
+    # if args.modeltype=='cifarnet':
+    #     base_model = CifarNet()
+    #     base_model.reset()
+    #     base_model.init_whiten(train_images)
+    # elif args.modeltype=='vitsmall':
+    #     base_model = vit_small()
+    # else:
+    #     pass
+    for _ in range(args.n_workers):
+        if args.modeltype=='cifarnet':
+            m = CifarNet()
+            m.reset()
+            m.init_whiten(train_images)
+        elif args.modeltype=='vitsmall':
+            m = vit_small()
+        else:
+            exit('unknown modeltype')
+        if len(workers) > 0:
+            m.load_state_dict(workers[0].state_dict())
+        # jwp(m.tok_emb(torch.tensor([0])))
+        m.to(device)
+        workers.append(m)
+
+        if args.alg == 'gt_dsgd':
+            y_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
+            g_prev_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
+        elif args.alg in ["gt_nsgdm", "muon", "cenmuon"]:
+            y_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
             m_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
-    elif args.alg == 'stdcenmuon':
-        batch_size = 2000
-        bias_lr = 0.053
-        head_lr = 0.67
-        wd = 2e-6 * batch_size
-        model=workers[0]
-        filter_params = [p for p in model.parameters() if len(p.shape) == 4 and p.requires_grad]
-        norm_biases = [p for n, p in model.named_parameters() if 'norm' in n and p.requires_grad]
-        param_configs = [dict(params=[model.whiten.bias], lr=bias_lr, weight_decay=wd/bias_lr),
-                        dict(params=norm_biases, lr=bias_lr, weight_decay=wd/bias_lr),
-                        dict(params=[model.head.weight], lr=head_lr, weight_decay=wd/head_lr)]
-        optimizer1 = torch.optim.SGD(param_configs, momentum=0.85, nesterov=True, fused=True)
-        optimizer2 = Muon(filter_params, lr=0.24, momentum=0.6, nesterov=True)
-        optimizers = [optimizer1, optimizer2]
-        for opt in optimizers:
-            for group in opt.param_groups:
-                group["initial_lr"] = group["lr"]
+        elif args.alg in ["dadam"]:
+            x_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
+            opt_list.append(optim.AdamW(m.parameters(), args.lr, (args.beta1, args.beta2), args.eps, args.weight_decay))
+            tmp_schedule = get_schedule(max_round_per_epoch, args, opt_list[-1])
+            schedule_list.append(tmp_schedule)
 
+        elif args.alg in ["adamw"]:
+            args.lr = 0.001
+            args.beta1 = 0.9
+            args.beta2 = 0.999
+            args.eps = 1e-8
+            args.weight_decay = 0.05
+            tmp_opt = optim.AdamW(m.parameters(), args.lr, (args.beta1, args.beta2), args.eps, args.weight_decay)
+            tmp_schedule = CosineAnnealingLR(tmp_opt, total_rounds)
 
-    elif args.alg == 'stdcenmuon_nosgd':
-        model=workers[0]
-        # filter_params = [(n,p) for n,p in model.named_parameters() if p.requires_grad]
-        filter_params = list(model.named_parameters())
-        optimizer2 = Muon(filter_params, lr=0.24, momentum=0.6, nesterov=True)
-        optimizers = [optimizer2]
-        for opt in optimizers:
-            for group in opt.param_groups:
-                group["initial_lr"] = group["lr"]
+        elif args.alg == 'sen':
+            m_list.append({name: torch.zeros_like(param) for name, param in m.named_parameters()})
+        elif args.alg == 'stdcenmuon':
+            batch_size = 2000
+            bias_lr = 0.053
+            head_lr = 0.67
+            wd = 2e-6 * batch_size
+            filter_params = [p for p in m.parameters() if len(p.shape) == 4 and p.requires_grad]
+            norm_biases = [p for n, p in m.named_parameters() if 'norm' in n and p.requires_grad]
+            param_configs = [dict(params=[m.whiten.bias], lr=bias_lr, weight_decay=wd/bias_lr),
+                            dict(params=norm_biases, lr=bias_lr, weight_decay=wd/bias_lr),
+                            dict(params=[m.head.weight], lr=head_lr, weight_decay=wd/head_lr)]
+            optimizer1 = torch.optim.SGD(param_configs, momentum=0.85, nesterov=True, fused=True)
+            optimizer2 = Muon(filter_params, lr=0.24, momentum=0.6, nesterov=True)
+            optimizers = [optimizer1, optimizer2]
+            for opt in optimizers:
+                for group in opt.param_groups:
+                    group["initial_lr"] = group["lr"]
 
-        
+        elif args.alg == 'stdcenmuon_nosgd':
+            filter_params = list(m.named_parameters())
+            optimizer2 = Muon(filter_params, lr=0.24, momentum=0.6, nesterov=True)
+            optimizers = [optimizer2]
+            for opt in optimizers:
+                for group in opt.param_groups:
+                    group["initial_lr"] = group["lr"]
+    # del base_model
+    aa=[(ele[0], ele[1].shape) for ele in workers[0].named_parameters()]
+    jwp(aa)
+    # return "done"
 
     # if args.alg == 'adamw':
     #     # what's the warmup strategy for adamw?
@@ -650,9 +700,8 @@ if __name__ == '__main__':
     header += [f"w{i}_train" for i in range(args.n_workers)]
     loss_table = [header]
 
-    max_round_per_epoch = len(loaders[0])
-    total_rounds = args.epochs * max_round_per_epoch
-    whiten_bias_train_steps = 3 * max_round_per_epoch
+    
+    epoch = 0
     for r in range(1, total_rounds+1):
         round_losses = []
         # one local step per worker
@@ -673,6 +722,7 @@ if __name__ == '__main__':
                 logits = model(x)
             # jwp(f"logits shape: {logits.shape}, y shape: {y.shape}")
             loss   = loss_fn(logits.view(-1, logits.size(-1)), y.view(-1))
+            round_losses.append(loss.item())
             model.zero_grad(set_to_none=True)
             loss.backward()
 
@@ -723,7 +773,13 @@ if __name__ == '__main__':
                         m_temp = m.mul(mom).add(g, alpha=1-mom) # get v^t
                         y.add_(m_temp).add_(m, alpha=-1.0)
                         y_list[wid][name] = y
-                        m_list[wid][name] = m_temp 
+                        m_list[wid][name] = m_temp
+            elif args.alg in ["dadam"]: 
+                with torch.no_grad():
+                    # update buffers block by block
+                    for (name, p) in model.named_parameters():
+                        x_list[wid][name].copy_(p.data)
+                        
             elif args.alg == 'sen':
                 with torch.no_grad():
                     # update buffers block by block
@@ -751,7 +807,14 @@ if __name__ == '__main__':
                 for opt in optimizers:
                     opt.step()
 
-            round_losses.append(loss.item())
+            elif args.alg in ['adamw']:
+                tmp_opt.step()
+                tmp_schedule.step()
+                lr = tmp_schedule.get_last_lr()
+                if r % 100 == 0:
+                    jwp(f"lr: {lr}")
+
+            
 
         
         
@@ -832,6 +895,19 @@ if __name__ == '__main__':
                     #     return None
                     p.data -= lr * normalized_y[name]
 
+        elif args.alg in ['dadam']:
+            with torch.no_grad():
+                for wid, model in enumerate(workers):
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        stacked = torch.stack([s[name].float() for s in x_list])
+                        weight = mixing[wid].view(-1, *([1] * (stacked.dim() - 1)))
+                        mixed_x = torch.sum(weight * stacked, dim=0)
+                        p.copy_(mixed_x)
+                    opt_list[wid].step()
+                    schedule_list[wid].step()
+        
         for name, p in model.named_parameters():
             if torch.isnan(p).any() or torch.isinf(p).any():
                 jwp(f"{p.grad}")
