@@ -509,7 +509,9 @@ if __name__ == '__main__':
     # args = parser.parse_args(['--n_workers','8','--train_batch_size','64','--eval_batch_size','3500','--network','ring','--alg','gt_nsgdm','--epochs','100', '--log_interval','100'])
 
     # args = parser.parse_args(['--n_workers','8','--train_batch_size','128','--eval_batch_size','2000','--network','complete','--alg','dadam','--epochs','90', '--log_interval','100', '--modeltype','vitsmall', '--datatype','cifar100'])
-    args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','4000','--network','','--alg','adamw','--epochs','150', '--log_interval','500', '--modeltype','vitsmall', '--datatype','cifar100'])
+    # args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','4000','--network','','--alg','adamw','--epochs','150', '--log_interval','500', '--modeltype','vitsmall', '--datatype','cifar100'])
+
+    args = parser.parse_args(['--n_workers','8','--train_batch_size','128','--eval_batch_size','3500','--network','complete','--alg','muon','--epochs','200', '--log_interval', '100','--datatype','cifar100','--modeltype','vitsmall'])
 
 
 
