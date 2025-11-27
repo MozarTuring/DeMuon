@@ -13,6 +13,7 @@ import os
 import time
 
 import sys, logging
+import torch.nn as nn
 
 # 1) Remove any existing handlers (Jupyter often adds one)
 for h in logging.root.handlers[:]:
@@ -181,3 +182,58 @@ def end(args, artifact, loss_table):
     wandb.log_artifact(artifact)
 
     jwp(f"Done. Losses saved to {out_csv}")
+
+
+
+def evaluate(model, loader, device, criterion):
+    model.eval()
+    running_loss = 0.0
+    top1_m = 0.0
+    top5_m = 0.0
+    with torch.no_grad():
+        count = -1
+        n = 0
+        for images, targets in tqdm(loader, desc='Eval', leave=False):
+            count += 1
+            images = images.to(device, non_blocking=True)
+            targets = targets.to(device, non_blocking=True)
+            outputs = model(images)
+            # if count==0:
+            #     jwp(images[0,:])
+            #     jwp(outputs[0,:])
+            n += images.size(0)
+            loss = criterion(outputs, targets)
+            
+            running_loss += loss.item() * images.size(0)
+            if isinstance(criterion, nn.MSELoss):
+                t1, t5 = 0, 0
+            else:
+                t1, t5 = accuracy(outputs, targets, topk=(1, 5))
+                top1_m += t1 * images.size(0)
+                top5_m += t5 * images.size(0)
+
+    # n = len(loader.dataset)
+    return running_loss / n, top1_m / n, top5_m / n
+
+
+
+
+def get_graph(args, device):
+    if args.network == "ring":
+        weights = connected_cycle_weights(filename=f"graphs/ring_{args.n_workers}.npy", n=args.n_workers, degree=1)
+        mixing = torch.from_numpy(weights).float().to(device)
+        # ring: 0.804737854124365
+    elif args.network == "exp":
+        weights = exponential_graph_weights(filename=f"graphs/exp_{args.n_workers}.npy", n=args.n_workers)
+        mixing = torch.from_numpy(weights).float().to(device)
+        # exp:  0.5999999999999998 
+    elif args.network == "complete":
+        weights = complete_graph_weights(filename=f"graphs/complete_{args.n_workers}.npy", n=args.n_workers)
+        mixing = torch.from_numpy(weights).float().to(device)
+        # complete:
+
+    return mixing, weights
+
+
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

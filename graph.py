@@ -84,7 +84,8 @@ def complete_graph_weights(filename, n=20):
     np.save(filename, network)
     np.save(filename.replace('.npy', '_weights.npy'), weights)
     singular_values = np.linalg.svd(weights, compute_uv=False)
-    print('The second largest singular value of the complete graph is', singular_values[1])
+    # print('The second largest singular value of the complete graph is', singular_values[1])
+    print(singular_values)
     return weights
 
 def exponential_graph_weights(filename, n=20):
@@ -106,4 +107,3 @@ def exponential_graph_weights_undirected(filename, n=20):
     singular_values = np.linalg.svd(weights, compute_uv=False)
     print('The second largest singular value of the undirected exponential graph is', singular_values[1])
     return weights
-

@@ -27,7 +27,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 import torchvision
 import torchvision.transforms as T
 from torchvision.models import resnet34
@@ -399,31 +399,7 @@ def accuracy(output: torch.Tensor, target: torch.Tensor, topk=(1,)):
 #     return running_loss / n, top1_m / n, top5_m / n
 
 
-def evaluate(model, loader, device, criterion):
-    model.eval()
-    running_loss = 0.0
-    top1_m = 0.0
-    top5_m = 0.0
-    with torch.no_grad():
-        count = -1
-        n = 0
-        for images, targets in tqdm(loader, desc='Eval', leave=False):
-            count += 1
-            images = images.to(device, non_blocking=True)
-            targets = targets.to(device, non_blocking=True)
-            outputs = model(images)
-            # if count==0:
-            #     jwp(images[0,:])
-            #     jwp(outputs[0,:])
-            n += images.size(0)
-            loss = criterion(outputs, targets)
-            running_loss += loss.item() * images.size(0)
-            t1, t5 = accuracy(outputs, targets, topk=(1, 5))
-            top1_m += t1 * images.size(0)
-            top5_m += t5 * images.size(0)
 
-    # n = len(loader.dataset)
-    return running_loss / n, top1_m / n, top5_m / n
 
 
 def save_checkpoint(state: dict, is_best: bool, out_dir: str):
@@ -511,11 +487,13 @@ if __name__ == '__main__':
     # args = parser.parse_args(['--n_workers','8','--train_batch_size','128','--eval_batch_size','2000','--network','complete','--alg','dadam','--epochs','90', '--log_interval','100', '--modeltype','vitsmall', '--datatype','cifar100'])
     # args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','4000','--network','','--alg','adamw','--epochs','150', '--log_interval','500', '--modeltype','vitsmall', '--datatype','cifar100'])
 
-    args = parser.parse_args(['--n_workers','8','--train_batch_size','128','--eval_batch_size','3500','--network','complete','--alg','muon','--epochs','200', '--log_interval', '100','--datatype','cifar100','--modeltype','vitsmall'])
+    # args = parser.parse_args(['--n_workers','8','--train_batch_size','128','--eval_batch_size','3500','--network','complete','--alg','muon','--epochs','200', '--log_interval', '100','--datatype','cifar100','--modeltype','vitsmall'])
+
+    args = parser.parse_args(['--n_workers','1','--train_batch_size','128','--eval_batch_size','3500','--network','complete','--alg','muon','--epochs','2000000', '--log_interval', '100','--datatype','linear_reg','--modeltype','linear_map'])
 
 
 
-    wandb.init(project="my-kaggle-project", name=f'{args.alg}_{args.network}_vitsmall')
+    wandb.init(project="my-kaggle-project", name=f'{args.alg}_{args.network}')
     artifact = wandb.Artifact("my_model", type="model")
     
     os.makedirs("graphs", exist_ok=True)
@@ -553,6 +531,19 @@ if __name__ == '__main__':
         train_loader = CifarLoader('cifar10', train=True, batch_size=batch_size, aug=dict(flip=True, translate=2))
         train_images = train_loader.normalize(train_loader.images[:5000])
         loaders = [train_loader]
+    elif args.datatype=='linear_reg':
+        x=torch.tensor([[2.5],[1.5]])
+        loaders=list()
+        for _ in range(args.n_workers):
+            data_x=torch.randn([1000,2])
+            data_y=data_x@x
+            dataset = TensorDataset(data_x, data_y)
+            loader = DataLoader(dataset, batch_size=args.train_batch_size, shuffle=True)
+            loaders.append(loader)
+        data_x=torch.randn([args.eval_batch_size,2])
+        data_y=data_x@x
+        dataset = TensorDataset(data_x, data_y)
+        val_loader = DataLoader(dataset, batch_size=args.eval_batch_size, shuffle=False)
     else:
         loaders, val_loader = get_dataloaders_ordered_splits('./', args, 8)
     iters = [iter(loader) for loader in loaders]
@@ -562,18 +553,7 @@ if __name__ == '__main__':
     whiten_bias_train_steps = 3 * max_round_per_epoch
 
 
-    if args.network == "ring":
-        weights = connected_cycle_weights(filename=f"graphs/ring_{args.n_workers}.npy", n=args.n_workers, degree=1)
-        mixing = torch.from_numpy(weights).float().to(device)
-        # ring: 0.804737854124365
-    elif args.network == "exp":
-        weights = exponential_graph_weights(filename=f"graphs/exp_{args.n_workers}.npy", n=args.n_workers)
-        mixing = torch.from_numpy(weights).float().to(device)
-        # exp:  0.5999999999999998 
-    elif args.network == "complete":
-        weights = complete_graph_weights(filename=f"graphs/complete_{args.n_workers}.npy", n=args.n_workers)
-        mixing = torch.from_numpy(weights).float().to(device)
-        # complete: 
+    mixing, _ = get_graph(args, device)
 
     if args.alg == 'dsgd':
         args.lr=1e-2
@@ -607,7 +587,7 @@ if __name__ == '__main__':
 
 
 
-
+    loss_fn = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
     workers = []
     # if args.modeltype=='cifarnet':
     #     base_model = CifarNet()
@@ -624,6 +604,9 @@ if __name__ == '__main__':
             m.init_whiten(train_images)
         elif args.modeltype=='vitsmall':
             m = vit_small()
+        elif args.modeltype=='linear_map':
+            m = nn.Linear(2,1)
+            loss_fn = nn.MSELoss()
         else:
             exit('unknown modeltype')
         if len(workers) > 0:
@@ -691,7 +674,7 @@ if __name__ == '__main__':
     total_params = sum(p.numel() for p in workers[0].parameters())
     jwp(f"total_params = {total_params}")
     jwp(args.label_smoothing)
-    loss_fn = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
+    
 
     # 6) Example mixing matrix: uniform average
     # W = torch.full((args.n_workers, args.n_workers), 1/args.n_workers, device="cuda")
@@ -848,6 +831,8 @@ if __name__ == '__main__':
                     normalized_y = dict()
                     for name in y_list[wid]:
                         tmp=y_list[wid][name].squeeze()
+                        if tmp.ndim == 0:
+                            tmp = tmp.unsqueeze(dim=0)
                         if tmp.ndim==1 or name in ["tok_emb","pos_emg", "patch_embed.proj.weight"]:
                             normalized_y[name] = tmp/torch.norm(tmp)
                         elif tmp.ndim==2:
@@ -857,6 +842,7 @@ if __name__ == '__main__':
                             # normalized_y[name] = U @ Vt
                             normalized_y[name]=newtonschulz5(tmp)
                         else:
+                            jwp(y_list)
                             jwp(f"Error: not implemented for {name} {tmp.shape} ndim>2")
                             aaa=1/0
                 with torch.no_grad():
@@ -867,7 +853,7 @@ if __name__ == '__main__':
                         # if name == "pos_emb":
                         #     jwp(p.data.shape,normalized_y[name].shape)
                         #     return None
-                        p.data -= lr * normalized_y[name]
+                        p.data -= lr / r * normalized_y[name]
             mix_params(workers, mixing)
         elif args.alg == 'sen':
             mix_params(workers, mixing)
@@ -921,6 +907,7 @@ if __name__ == '__main__':
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
             val_losses = [evaluate(m, val_loader, device, loss_fn) for m in workers]
             loss_table.append([r] + val_losses + round_losses)
+            wandb.log({'training loss': round_losses[0], 'validation loss': val_losses[0][0]}, step=r)
             jwp(f"Round {r}/{total_rounds}: {round_losses},{val_losses}")
             
     # after the for‑round loop
