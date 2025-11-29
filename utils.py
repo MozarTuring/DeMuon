@@ -237,3 +237,4 @@ def get_graph(args, device):
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+os.makedirs("graphs", exist_ok=True)
