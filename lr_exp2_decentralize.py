@@ -24,9 +24,11 @@ if __name__ == '__main__':
     parser.add_argument("--n_workers", type=int, default=1)
     parser.add_argument("--network", type=str, required=True)
 
-    args = parser.parse_args(['--train_batch_size','128','--eval_batch_size','3500', '--epochs','2000', '--log_interval', '100', '--n_workers', '2', '--network', 'complete'])
+    args = parser.parse_args(['--train_batch_size','128','--eval_batch_size','3500', '--epochs','2000', '--log_interval', '100', '--n_workers', '8', '--network', 'complete'])
 
-    wandb.init(project='neurips_code', name='lr_exp2_decentralize')
+    filename = os.path.basename(__file__)
+
+    wandb.init(project='neurips_code', name=f'{filename}')
     artifact = wandb.Artifact("my_model", type="model")
     
 
