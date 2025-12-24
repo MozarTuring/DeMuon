@@ -1,0 +1,861 @@
+Device: cuda
+100%|██████████| 169M/169M [06:38<00:00, 424kB/s]
+/usr/local/lib/python3.12/dist-packages/torch/utils/data/dataloader.py:627: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 2, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+Epoch 1/200 — lr: 0.000050
+/tmp/ipython-input-38123301.py:210: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = torch.cuda.amp.GradScaler(enabled=(device.type == "cuda"))
+  [Epoch 001] Step 0100/195 Loss: 4.2554 | Top1: 5.86%
+  Train  — Loss: 4.2812 | Top1: 6.46%
+  Valid  — Loss: 3.9738 | Top1: 11.84%
+  ✔ New best: 11.84% (checkpoint saved)
+Epoch 2/200 — lr: 0.000100
+  [Epoch 002] Step 0100/195 Loss: 4.0592 | Top1: 9.77%
+  Train  — Loss: 4.0181 | Top1: 10.84%
+  Valid  — Loss: 3.7247 | Top1: 17.28%
+  ✔ New best: 17.28% (checkpoint saved)
+Epoch 3/200 — lr: 0.000150
+  [Epoch 003] Step 0100/195 Loss: 3.8409 | Top1: 14.45%
+  Train  — Loss: 3.8230 | Top1: 14.26%
+  Valid  — Loss: 3.5350 | Top1: 20.28%
+  ✔ New best: 20.28% (checkpoint saved)
+Epoch 4/200 — lr: 0.000200
+  [Epoch 004] Step 0100/195 Loss: 3.7958 | Top1: 14.45%
+  Train  — Loss: 3.6403 | Top1: 17.71%
+  Valid  — Loss: 3.2792 | Top1: 26.32%
+  ✔ New best: 26.32% (checkpoint saved)
+Epoch 5/200 — lr: 0.000250
+  [Epoch 005] Step 0100/195 Loss: 3.3719 | Top1: 24.61%
+  Train  — Loss: 3.4851 | Top1: 21.42%
+  Valid  — Loss: 3.1431 | Top1: 29.57%
+  ✔ New best: 29.57% (checkpoint saved)
+Epoch 6/200 — lr: 0.000300
+  [Epoch 006] Step 0100/195 Loss: 3.3468 | Top1: 22.27%
+  Train  — Loss: 3.3659 | Top1: 24.18%
+  Valid  — Loss: 3.0392 | Top1: 32.17%
+  ✔ New best: 32.17% (checkpoint saved)
+Epoch 7/200 — lr: 0.000350
+  [Epoch 007] Step 0100/195 Loss: 3.1998 | Top1: 27.34%
+  Train  — Loss: 3.2757 | Top1: 26.07%
+  Valid  — Loss: 2.9664 | Top1: 32.80%
+  ✔ New best: 32.80% (checkpoint saved)
+Epoch 8/200 — lr: 0.000400
+  [Epoch 008] Step 0100/195 Loss: 3.1514 | Top1: 29.30%
+  Train  — Loss: 3.2095 | Top1: 27.26%
+  Valid  — Loss: 2.8881 | Top1: 35.45%
+  ✔ New best: 35.45% (checkpoint saved)
+Epoch 9/200 — lr: 0.000450
+  [Epoch 009] Step 0100/195 Loss: 3.2339 | Top1: 26.56%
+  Train  — Loss: 3.1432 | Top1: 29.17%
+  Valid  — Loss: 2.7943 | Top1: 38.55%
+  ✔ New best: 38.55% (checkpoint saved)
+Epoch 10/200 — lr: 0.000500
+  [Epoch 010] Step 0100/195 Loss: 3.0101 | Top1: 29.69%
+  Train  — Loss: 3.0896 | Top1: 30.64%
+  Valid  — Loss: 2.8018 | Top1: 37.34%
+/usr/local/lib/python3.12/dist-packages/torch/optim/lr_scheduler.py:1087: UserWarning: To get the last learning rate computed by the scheduler, please use `get_last_lr()`.
+  _warn_get_lr_called_within_step(self)
+Epoch 11/200 — lr: 0.000500
+  [Epoch 011] Step 0100/195 Loss: 2.8517 | Top1: 32.81%
+  Train  — Loss: 3.0021 | Top1: 32.73%
+  Valid  — Loss: 2.6834 | Top1: 41.05%
+  ✔ New best: 41.05% (checkpoint saved)
+Epoch 12/200 — lr: 0.000500
+  [Epoch 012] Step 0100/195 Loss: 3.0820 | Top1: 29.69%
+  Train  — Loss: 2.9104 | Top1: 35.18%
+  Valid  — Loss: 2.5991 | Top1: 43.49%
+  ✔ New best: 43.49% (checkpoint saved)
+Epoch 13/200 — lr: 0.000500
+  [Epoch 013] Step 0100/195 Loss: 2.9107 | Top1: 33.59%
+  Train  — Loss: 2.8309 | Top1: 37.08%
+  Valid  — Loss: 2.5268 | Top1: 44.59%
+  ✔ New best: 44.59% (checkpoint saved)
+Epoch 14/200 — lr: 0.000500
+  [Epoch 014] Step 0100/195 Loss: 2.7039 | Top1: 42.19%
+  Train  — Loss: 2.7600 | Top1: 39.21%
+  Valid  — Loss: 2.4589 | Top1: 47.39%
+  ✔ New best: 47.39% (checkpoint saved)
+Epoch 15/200 — lr: 0.000499
+  [Epoch 015] Step 0100/195 Loss: 2.8706 | Top1: 37.11%
+  Train  — Loss: 2.6759 | Top1: 41.31%
+  Valid  — Loss: 2.4480 | Top1: 48.00%
+  ✔ New best: 48.00% (checkpoint saved)
+Epoch 16/200 — lr: 0.000499
+  [Epoch 016] Step 0100/195 Loss: 2.5989 | Top1: 42.97%
+  Train  — Loss: 2.6080 | Top1: 42.86%
+  Valid  — Loss: 2.4106 | Top1: 48.91%
+  ✔ New best: 48.91% (checkpoint saved)
+Epoch 17/200 — lr: 0.000499
+  [Epoch 017] Step 0100/195 Loss: 2.4712 | Top1: 47.66%
+  Train  — Loss: 2.5491 | Top1: 44.91%
+  Valid  — Loss: 2.3174 | Top1: 51.23%
+  ✔ New best: 51.23% (checkpoint saved)
+Epoch 18/200 — lr: 0.000498
+  [Epoch 018] Step 0100/195 Loss: 2.4916 | Top1: 45.70%
+  Train  — Loss: 2.4867 | Top1: 46.53%
+  Valid  — Loss: 2.3307 | Top1: 51.29%
+  ✔ New best: 51.29% (checkpoint saved)
+Epoch 19/200 — lr: 0.000498
+  [Epoch 019] Step 0100/195 Loss: 2.5138 | Top1: 44.92%
+  Train  — Loss: 2.4230 | Top1: 48.06%
+  Valid  — Loss: 2.2659 | Top1: 52.77%
+  ✔ New best: 52.77% (checkpoint saved)
+Epoch 20/200 — lr: 0.000497
+  [Epoch 020] Step 0100/195 Loss: 2.4499 | Top1: 48.83%
+  Train  — Loss: 2.3574 | Top1: 49.95%
+  Valid  — Loss: 2.2226 | Top1: 54.34%
+  ✔ New best: 54.34% (checkpoint saved)
+Epoch 21/200 — lr: 0.000497
+  [Epoch 021] Step 0100/195 Loss: 2.2596 | Top1: 52.73%
+  Train  — Loss: 2.3092 | Top1: 51.55%
+  Valid  — Loss: 2.2225 | Top1: 54.51%
+  ✔ New best: 54.51% (checkpoint saved)
+Epoch 22/200 — lr: 0.000496
+  [Epoch 022] Step 0100/195 Loss: 2.3285 | Top1: 50.00%
+  Train  — Loss: 2.2334 | Top1: 53.69%
+  Valid  — Loss: 2.2086 | Top1: 54.90%
+  ✔ New best: 54.90% (checkpoint saved)
+Epoch 23/200 — lr: 0.000495
+  [Epoch 023] Step 0100/195 Loss: 2.0110 | Top1: 63.67%
+  Train  — Loss: 2.1779 | Top1: 55.31%
+  Valid  — Loss: 2.1413 | Top1: 57.01%
+  ✔ New best: 57.01% (checkpoint saved)
+Epoch 24/200 — lr: 0.000494
+  [Epoch 024] Step 0100/195 Loss: 2.0388 | Top1: 61.72%
+  Train  — Loss: 2.1225 | Top1: 56.56%
+  Valid  — Loss: 2.1410 | Top1: 57.59%
+  ✔ New best: 57.59% (checkpoint saved)
+Epoch 25/200 — lr: 0.000493
+  [Epoch 025] Step 0100/195 Loss: 2.1124 | Top1: 57.03%
+  Train  — Loss: 2.0711 | Top1: 58.39%
+  Valid  — Loss: 2.1213 | Top1: 58.57%
+  ✔ New best: 58.57% (checkpoint saved)
+Epoch 26/200 — lr: 0.000492
+  [Epoch 026] Step 0100/195 Loss: 1.8140 | Top1: 66.41%
+  Train  — Loss: 2.0077 | Top1: 60.28%
+  Valid  — Loss: 2.1013 | Top1: 58.68%
+  ✔ New best: 58.68% (checkpoint saved)
+Epoch 27/200 — lr: 0.000491
+  [Epoch 027] Step 0100/195 Loss: 1.9873 | Top1: 64.45%
+  Train  — Loss: 1.9536 | Top1: 62.08%
+  Valid  — Loss: 2.0930 | Top1: 59.02%
+  ✔ New best: 59.02% (checkpoint saved)
+Epoch 28/200 — lr: 0.000490
+  [Epoch 028] Step 0100/195 Loss: 2.0081 | Top1: 61.72%
+  Train  — Loss: 1.9026 | Top1: 63.60%
+  Valid  — Loss: 2.1154 | Top1: 58.66%
+Epoch 29/200 — lr: 0.000489
+  [Epoch 029] Step 0100/195 Loss: 1.8073 | Top1: 65.62%
+  Train  — Loss: 1.8464 | Top1: 65.65%
+  Valid  — Loss: 2.0722 | Top1: 59.89%
+  ✔ New best: 59.89% (checkpoint saved)
+Epoch 30/200 — lr: 0.000488
+  [Epoch 030] Step 0100/195 Loss: 1.8149 | Top1: 67.58%
+  Train  — Loss: 1.7976 | Top1: 67.21%
+  Valid  — Loss: 2.0745 | Top1: 60.38%
+  ✔ New best: 60.38% (checkpoint saved)
+Epoch 31/200 — lr: 0.000486
+  [Epoch 031] Step 0100/195 Loss: 1.7807 | Top1: 68.75%
+  Train  — Loss: 1.7455 | Top1: 68.65%
+  Valid  — Loss: 2.0793 | Top1: 59.94%
+Epoch 32/200 — lr: 0.000485
+  [Epoch 032] Step 0100/195 Loss: 1.7692 | Top1: 66.02%
+  Train  — Loss: 1.7156 | Top1: 69.89%
+  Valid  — Loss: 2.0757 | Top1: 60.24%
+Epoch 33/200 — lr: 0.000484
+  [Epoch 033] Step 0100/195 Loss: 1.7067 | Top1: 69.14%
+  Train  — Loss: 1.6654 | Top1: 71.66%
+  Valid  — Loss: 2.0796 | Top1: 60.54%
+  ✔ New best: 60.54% (checkpoint saved)
+Epoch 34/200 — lr: 0.000482
+  [Epoch 034] Step 0100/195 Loss: 1.7311 | Top1: 66.80%
+  Train  — Loss: 1.6358 | Top1: 72.71%
+  Valid  — Loss: 2.0908 | Top1: 60.25%
+Epoch 35/200 — lr: 0.000481
+  [Epoch 035] Step 0100/195 Loss: 1.5939 | Top1: 74.22%
+  Train  — Loss: 1.5856 | Top1: 74.39%
+  Valid  — Loss: 2.0771 | Top1: 60.52%
+Epoch 36/200 — lr: 0.000479
+  [Epoch 036] Step 0100/195 Loss: 1.5300 | Top1: 76.17%
+  Train  — Loss: 1.5621 | Top1: 75.01%
+  Valid  — Loss: 2.0812 | Top1: 60.91%
+  ✔ New best: 60.91% (checkpoint saved)
+Epoch 37/200 — lr: 0.000477
+  [Epoch 037] Step 0100/195 Loss: 1.5649 | Top1: 74.61%
+  Train  — Loss: 1.5214 | Top1: 76.83%
+  Valid  — Loss: 2.0895 | Top1: 61.36%
+  ✔ New best: 61.36% (checkpoint saved)
+Epoch 38/200 — lr: 0.000476
+  [Epoch 038] Step 0100/195 Loss: 1.4448 | Top1: 77.73%
+  Train  — Loss: 1.4999 | Top1: 77.44%
+  Valid  — Loss: 2.0748 | Top1: 61.12%
+Epoch 39/200 — lr: 0.000474
+  [Epoch 039] Step 0100/195 Loss: 1.4766 | Top1: 77.34%
+  Train  — Loss: 1.4641 | Top1: 78.68%
+  Valid  — Loss: 2.0649 | Top1: 61.85%
+  ✔ New best: 61.85% (checkpoint saved)
+Epoch 40/200 — lr: 0.000472
+  [Epoch 040] Step 0100/195 Loss: 1.3643 | Top1: 81.25%
+  Train  — Loss: 1.4396 | Top1: 79.53%
+  Valid  — Loss: 2.0623 | Top1: 61.93%
+  ✔ New best: 61.93% (checkpoint saved)
+Epoch 41/200 — lr: 0.000470
+  [Epoch 041] Step 0100/195 Loss: 1.4320 | Top1: 80.08%
+  Train  — Loss: 1.4183 | Top1: 80.18%
+  Valid  — Loss: 2.1058 | Top1: 60.91%
+Epoch 42/200 — lr: 0.000468
+  [Epoch 042] Step 0100/195 Loss: 1.3794 | Top1: 83.20%
+  Train  — Loss: 1.3967 | Top1: 81.03%
+  Valid  — Loss: 2.0751 | Top1: 61.58%
+Epoch 43/200 — lr: 0.000466
+  [Epoch 043] Step 0100/195 Loss: 1.3863 | Top1: 81.25%
+  Train  — Loss: 1.3715 | Top1: 81.89%
+  Valid  — Loss: 2.1006 | Top1: 61.33%
+Epoch 44/200 — lr: 0.000464
+  [Epoch 044] Step 0100/195 Loss: 1.4135 | Top1: 79.69%
+  Train  — Loss: 1.3580 | Top1: 82.39%
+  Valid  — Loss: 2.0982 | Top1: 61.43%
+Epoch 45/200 — lr: 0.000462
+  [Epoch 045] Step 0100/195 Loss: 1.3234 | Top1: 83.98%
+  Train  — Loss: 1.3380 | Top1: 83.08%
+  Valid  — Loss: 2.1065 | Top1: 61.67%
+Epoch 46/200 — lr: 0.000459
+  [Epoch 046] Step 0100/195 Loss: 1.3134 | Top1: 82.42%
+  Train  — Loss: 1.3178 | Top1: 83.85%
+  Valid  — Loss: 2.1075 | Top1: 61.75%
+Epoch 47/200 — lr: 0.000457
+  [Epoch 047] Step 0100/195 Loss: 1.2890 | Top1: 83.98%
+  Train  — Loss: 1.3023 | Top1: 84.35%
+  Valid  — Loss: 2.0871 | Top1: 61.98%
+  ✔ New best: 61.98% (checkpoint saved)
+Epoch 48/200 — lr: 0.000455
+  [Epoch 048] Step 0100/195 Loss: 1.3041 | Top1: 82.81%
+  Train  — Loss: 1.2965 | Top1: 84.55%
+  Valid  — Loss: 2.1213 | Top1: 61.28%
+Epoch 49/200 — lr: 0.000452
+  [Epoch 049] Step 0100/195 Loss: 1.3200 | Top1: 82.81%
+  Train  — Loss: 1.2743 | Top1: 85.19%
+  Valid  — Loss: 2.0897 | Top1: 62.49%
+  ✔ New best: 62.49% (checkpoint saved)
+Epoch 50/200 — lr: 0.000450
+  [Epoch 050] Step 0100/195 Loss: 1.2209 | Top1: 88.28%
+  Train  — Loss: 1.2563 | Top1: 85.94%
+  Valid  — Loss: 2.1124 | Top1: 62.12%
+Epoch 51/200 — lr: 0.000447
+  [Epoch 051] Step 0100/195 Loss: 1.1941 | Top1: 86.33%
+  Train  — Loss: 1.2423 | Top1: 86.30%
+  Valid  — Loss: 2.1031 | Top1: 61.84%
+Epoch 52/200 — lr: 0.000445
+  [Epoch 052] Step 0100/195 Loss: 1.3052 | Top1: 85.55%
+  Train  — Loss: 1.2312 | Top1: 86.65%
+  Valid  — Loss: 2.1113 | Top1: 61.72%
+Epoch 53/200 — lr: 0.000442
+  [Epoch 053] Step 0100/195 Loss: 1.2158 | Top1: 88.67%
+  Train  — Loss: 1.2244 | Top1: 86.87%
+  Valid  — Loss: 2.1296 | Top1: 61.28%
+Epoch 54/200 — lr: 0.000439
+  [Epoch 054] Step 0100/195 Loss: 1.2479 | Top1: 84.77%
+  Train  — Loss: 1.2147 | Top1: 87.03%
+  Valid  — Loss: 2.1227 | Top1: 61.95%
+Epoch 55/200 — lr: 0.000437
+  [Epoch 055] Step 0100/195 Loss: 1.2190 | Top1: 87.50%
+  Train  — Loss: 1.1941 | Top1: 87.84%
+  Valid  — Loss: 2.1020 | Top1: 62.29%
+Epoch 56/200 — lr: 0.000434
+  [Epoch 056] Step 0100/195 Loss: 1.1974 | Top1: 88.28%
+  Train  — Loss: 1.1882 | Top1: 87.99%
+  Valid  — Loss: 2.1186 | Top1: 62.21%
+Epoch 57/200 — lr: 0.000431
+  [Epoch 057] Step 0100/195 Loss: 1.1726 | Top1: 87.11%
+  Train  — Loss: 1.1804 | Top1: 88.27%
+  Valid  — Loss: 2.1061 | Top1: 62.71%
+  ✔ New best: 62.71% (checkpoint saved)
+Epoch 58/200 — lr: 0.000428
+  [Epoch 058] Step 0100/195 Loss: 1.2422 | Top1: 86.72%
+  Train  — Loss: 1.1710 | Top1: 88.50%
+  Valid  — Loss: 2.0959 | Top1: 62.79%
+  ✔ New best: 62.79% (checkpoint saved)
+Epoch 59/200 — lr: 0.000425
+  [Epoch 059] Step 0100/195 Loss: 1.0881 | Top1: 92.58%
+  Train  — Loss: 1.1678 | Top1: 88.48%
+  Valid  — Loss: 2.1066 | Top1: 62.46%
+Epoch 60/200 — lr: 0.000422
+  [Epoch 060] Step 0100/195 Loss: 1.1374 | Top1: 89.84%
+  Train  — Loss: 1.1452 | Top1: 89.35%
+  Valid  — Loss: 2.1290 | Top1: 62.13%
+Epoch 61/200 — lr: 0.000419
+  [Epoch 061] Step 0100/195 Loss: 1.2211 | Top1: 86.72%
+  Train  — Loss: 1.1415 | Top1: 89.31%
+  Valid  — Loss: 2.0835 | Top1: 63.16%
+  ✔ New best: 63.16% (checkpoint saved)
+Epoch 62/200 — lr: 0.000416
+  [Epoch 062] Step 0100/195 Loss: 1.0969 | Top1: 92.19%
+  Train  — Loss: 1.1359 | Top1: 89.50%
+  Valid  — Loss: 2.1011 | Top1: 62.83%
+Epoch 63/200 — lr: 0.000413
+  [Epoch 063] Step 0100/195 Loss: 1.0421 | Top1: 92.97%
+  Train  — Loss: 1.1257 | Top1: 89.86%
+  Valid  — Loss: 2.1207 | Top1: 62.55%
+Epoch 64/200 — lr: 0.000410
+  [Epoch 064] Step 0100/195 Loss: 1.0685 | Top1: 92.97%
+  Train  — Loss: 1.1218 | Top1: 89.95%
+  Valid  — Loss: 2.1230 | Top1: 62.38%
+Epoch 65/200 — lr: 0.000407
+  [Epoch 065] Step 0100/195 Loss: 1.0692 | Top1: 92.58%
+  Train  — Loss: 1.1110 | Top1: 90.25%
+  Valid  — Loss: 2.1252 | Top1: 61.99%
+Epoch 66/200 — lr: 0.000404
+  [Epoch 066] Step 0100/195 Loss: 1.1854 | Top1: 87.11%
+  Train  — Loss: 1.1054 | Top1: 90.22%
+  Valid  — Loss: 2.1267 | Top1: 62.04%
+Epoch 67/200 — lr: 0.000400
+  [Epoch 067] Step 0100/195 Loss: 1.1127 | Top1: 89.84%
+  Train  — Loss: 1.1016 | Top1: 90.59%
+  Valid  — Loss: 2.1200 | Top1: 62.39%
+Epoch 68/200 — lr: 0.000397
+  [Epoch 068] Step 0100/195 Loss: 1.0751 | Top1: 92.58%
+  Train  — Loss: 1.0925 | Top1: 90.63%
+  Valid  — Loss: 2.1272 | Top1: 62.50%
+Epoch 69/200 — lr: 0.000394
+  [Epoch 069] Step 0100/195 Loss: 1.2383 | Top1: 83.98%
+  Train  — Loss: 1.0851 | Top1: 91.01%
+  Valid  — Loss: 2.1338 | Top1: 62.62%
+Epoch 70/200 — lr: 0.000390
+  [Epoch 070] Step 0100/195 Loss: 1.0809 | Top1: 93.36%
+  Train  — Loss: 1.0754 | Top1: 91.11%
+  Valid  — Loss: 2.1506 | Top1: 62.24%
+Epoch 71/200 — lr: 0.000387
+  [Epoch 071] Step 0100/195 Loss: 1.0354 | Top1: 91.41%
+  Train  — Loss: 1.0729 | Top1: 91.30%
+  Valid  — Loss: 2.1243 | Top1: 62.45%
+Epoch 72/200 — lr: 0.000383
+  [Epoch 072] Step 0100/195 Loss: 1.1947 | Top1: 89.45%
+  Train  — Loss: 1.0679 | Top1: 91.44%
+  Valid  — Loss: 2.1301 | Top1: 62.56%
+Epoch 73/200 — lr: 0.000380
+  [Epoch 073] Step 0100/195 Loss: 1.0322 | Top1: 94.14%
+  Train  — Loss: 1.0591 | Top1: 91.69%
+  Valid  — Loss: 2.1671 | Top1: 62.34%
+Epoch 74/200 — lr: 0.000376
+  [Epoch 074] Step 0100/195 Loss: 1.0498 | Top1: 92.58%
+  Train  — Loss: 1.0583 | Top1: 91.71%
+  Valid  — Loss: 2.1471 | Top1: 62.11%
+Epoch 75/200 — lr: 0.000373
+  [Epoch 075] Step 0100/195 Loss: 1.0745 | Top1: 91.02%
+  Train  — Loss: 1.0439 | Top1: 92.19%
+  Valid  — Loss: 2.1365 | Top1: 62.87%
+Epoch 76/200 — lr: 0.000369
+  [Epoch 076] Step 0100/195 Loss: 1.0888 | Top1: 91.80%
+  Train  — Loss: 1.0393 | Top1: 92.28%
+  Valid  — Loss: 2.1466 | Top1: 62.48%
+Epoch 77/200 — lr: 0.000365
+  [Epoch 077] Step 0100/195 Loss: 1.0887 | Top1: 91.41%
+  Train  — Loss: 1.0307 | Top1: 92.59%
+  Valid  — Loss: 2.1659 | Top1: 62.44%
+Epoch 78/200 — lr: 0.000362
+  [Epoch 078] Step 0100/195 Loss: 1.0190 | Top1: 94.14%
+  Train  — Loss: 1.0298 | Top1: 92.38%
+  Valid  — Loss: 2.1410 | Top1: 62.99%
+Epoch 79/200 — lr: 0.000358
+  [Epoch 079] Step 0100/195 Loss: 1.0114 | Top1: 94.53%
+  Train  — Loss: 1.0317 | Top1: 92.45%
+  Valid  — Loss: 2.1764 | Top1: 62.26%
+Epoch 80/200 — lr: 0.000354
+  [Epoch 080] Step 0100/195 Loss: 1.0238 | Top1: 92.58%
+  Train  — Loss: 1.0217 | Top1: 92.71%
+  Valid  — Loss: 2.1313 | Top1: 63.49%
+  ✔ New best: 63.49% (checkpoint saved)
+Epoch 81/200 — lr: 0.000350
+  [Epoch 081] Step 0100/195 Loss: 0.9382 | Top1: 93.75%
+  Train  — Loss: 1.0160 | Top1: 92.97%
+  Valid  — Loss: 2.1479 | Top1: 62.50%
+Epoch 82/200 — lr: 0.000347
+  [Epoch 082] Step 0100/195 Loss: 0.9832 | Top1: 94.53%
+  Train  — Loss: 1.0176 | Top1: 92.77%
+  Valid  — Loss: 2.1330 | Top1: 63.35%
+Epoch 83/200 — lr: 0.000343
+  [Epoch 083] Step 0100/195 Loss: 1.0150 | Top1: 93.36%
+  Train  — Loss: 1.0095 | Top1: 93.17%
+  Valid  — Loss: 2.1531 | Top1: 62.64%
+Epoch 84/200 — lr: 0.000339
+  [Epoch 084] Step 0100/195 Loss: 0.9722 | Top1: 94.53%
+  Train  — Loss: 1.0049 | Top1: 93.22%
+  Valid  — Loss: 2.1599 | Top1: 62.63%
+Epoch 85/200 — lr: 0.000335
+  [Epoch 085] Step 0100/195 Loss: 0.9730 | Top1: 94.53%
+  Train  — Loss: 1.0017 | Top1: 93.22%
+  Valid  — Loss: 2.1739 | Top1: 62.26%
+Epoch 86/200 — lr: 0.000331
+  [Epoch 086] Step 0100/195 Loss: 1.0152 | Top1: 92.58%
+  Train  — Loss: 0.9947 | Top1: 93.57%
+  Valid  — Loss: 2.1425 | Top1: 62.93%
+Epoch 87/200 — lr: 0.000327
+  [Epoch 087] Step 0100/195 Loss: 1.0137 | Top1: 92.97%
+  Train  — Loss: 0.9947 | Top1: 93.49%
+  Valid  — Loss: 2.1866 | Top1: 62.23%
+Epoch 88/200 — lr: 0.000323
+  [Epoch 088] Step 0100/195 Loss: 1.0079 | Top1: 93.36%
+  Train  — Loss: 0.9840 | Top1: 93.81%
+  Valid  — Loss: 2.1621 | Top1: 63.13%
+Epoch 89/200 — lr: 0.000319
+  [Epoch 089] Step 0100/195 Loss: 0.9906 | Top1: 94.14%
+  Train  — Loss: 0.9863 | Top1: 93.67%
+  Valid  — Loss: 2.1828 | Top1: 62.62%
+Epoch 90/200 — lr: 0.000315
+  [Epoch 090] Step 0100/195 Loss: 0.9773 | Top1: 94.14%
+  Train  — Loss: 0.9792 | Top1: 93.85%
+  Valid  — Loss: 2.1629 | Top1: 62.95%
+Epoch 91/200 — lr: 0.000311
+  [Epoch 091] Step 0100/195 Loss: 0.9849 | Top1: 92.58%
+  Train  — Loss: 0.9783 | Top1: 93.99%
+  Valid  — Loss: 2.1743 | Top1: 62.82%
+Epoch 92/200 — lr: 0.000307
+  [Epoch 092] Step 0100/195 Loss: 1.0071 | Top1: 92.97%
+  Train  — Loss: 0.9775 | Top1: 93.95%
+  Valid  — Loss: 2.1666 | Top1: 63.02%
+Epoch 93/200 — lr: 0.000303
+  [Epoch 093] Step 0100/195 Loss: 0.9788 | Top1: 93.75%
+  Train  — Loss: 0.9639 | Top1: 94.49%
+  Valid  — Loss: 2.1846 | Top1: 63.02%
+Epoch 94/200 — lr: 0.000299
+  [Epoch 094] Step 0100/195 Loss: 0.9550 | Top1: 94.53%
+  Train  — Loss: 0.9667 | Top1: 94.33%
+  Valid  — Loss: 2.1809 | Top1: 62.93%
+Epoch 95/200 — lr: 0.000295
+  [Epoch 095] Step 0100/195 Loss: 0.9889 | Top1: 94.92%
+  Train  — Loss: 0.9617 | Top1: 94.52%
+  Valid  — Loss: 2.1799 | Top1: 62.66%
+Epoch 96/200 — lr: 0.000291
+  [Epoch 096] Step 0100/195 Loss: 0.9213 | Top1: 95.70%
+  Train  — Loss: 0.9591 | Top1: 94.62%
+  Valid  — Loss: 2.1897 | Top1: 62.97%
+Epoch 97/200 — lr: 0.000287
+  [Epoch 097] Step 0100/195 Loss: 0.9438 | Top1: 94.14%
+  Train  — Loss: 0.9550 | Top1: 94.74%
+  Valid  — Loss: 2.1913 | Top1: 62.74%
+Epoch 98/200 — lr: 0.000283
+  [Epoch 098] Step 0100/195 Loss: 0.9676 | Top1: 94.53%
+  Train  — Loss: 0.9517 | Top1: 94.74%
+  Valid  — Loss: 2.1893 | Top1: 62.91%
+Epoch 99/200 — lr: 0.000279
+  [Epoch 099] Step 0100/195 Loss: 0.9385 | Top1: 94.92%
+  Train  — Loss: 0.9459 | Top1: 94.92%
+  Valid  — Loss: 2.1717 | Top1: 63.22%
+Epoch 100/200 — lr: 0.000275
+  [Epoch 100] Step 0100/195 Loss: 0.9528 | Top1: 94.53%
+  Train  — Loss: 0.9442 | Top1: 94.87%
+  Valid  — Loss: 2.1966 | Top1: 63.22%
+Epoch 101/200 — lr: 0.000271
+  [Epoch 101] Step 0100/195 Loss: 0.9456 | Top1: 94.92%
+  Train  — Loss: 0.9430 | Top1: 94.98%
+  Valid  — Loss: 2.1832 | Top1: 63.73%
+  ✔ New best: 63.73% (checkpoint saved)
+Epoch 102/200 — lr: 0.000267
+  [Epoch 102] Step 0100/195 Loss: 0.9719 | Top1: 94.14%
+  Train  — Loss: 0.9371 | Top1: 95.25%
+  Valid  — Loss: 2.2363 | Top1: 62.42%
+Epoch 103/200 — lr: 0.000262
+  [Epoch 103] Step 0100/195 Loss: 0.9655 | Top1: 94.14%
+  Train  — Loss: 0.9379 | Top1: 95.14%
+  Valid  — Loss: 2.2048 | Top1: 63.39%
+Epoch 104/200 — lr: 0.000258
+  [Epoch 104] Step 0100/195 Loss: 0.9222 | Top1: 94.92%
+  Train  — Loss: 0.9307 | Top1: 95.33%
+  Valid  — Loss: 2.1913 | Top1: 63.29%
+Epoch 105/200 — lr: 0.000254
+  [Epoch 105] Step 0100/195 Loss: 0.9381 | Top1: 95.70%
+  Train  — Loss: 0.9276 | Top1: 95.47%
+  Valid  — Loss: 2.2150 | Top1: 63.08%
+Epoch 106/200 — lr: 0.000250
+  [Epoch 106] Step 0100/195 Loss: 0.9166 | Top1: 96.48%
+  Train  — Loss: 0.9252 | Top1: 95.52%
+  Valid  — Loss: 2.2017 | Top1: 63.08%
+Epoch 107/200 — lr: 0.000246
+  [Epoch 107] Step 0100/195 Loss: 0.9472 | Top1: 94.53%
+  Train  — Loss: 0.9222 | Top1: 95.78%
+  Valid  — Loss: 2.1773 | Top1: 63.54%
+Epoch 108/200 — lr: 0.000242
+  [Epoch 108] Step 0100/195 Loss: 0.8814 | Top1: 98.05%
+  Train  — Loss: 0.9200 | Top1: 95.74%
+  Valid  — Loss: 2.1842 | Top1: 63.33%
+Epoch 109/200 — lr: 0.000238
+  [Epoch 109] Step 0100/195 Loss: 0.9293 | Top1: 95.70%
+  Train  — Loss: 0.9167 | Top1: 95.86%
+  Valid  — Loss: 2.1867 | Top1: 63.28%
+Epoch 110/200 — lr: 0.000233
+  [Epoch 110] Step 0100/195 Loss: 0.8933 | Top1: 96.48%
+  Train  — Loss: 0.9120 | Top1: 96.04%
+  Valid  — Loss: 2.1916 | Top1: 63.31%
+Epoch 111/200 — lr: 0.000229
+  [Epoch 111] Step 0100/195 Loss: 0.9030 | Top1: 97.27%
+  Train  — Loss: 0.9110 | Top1: 96.06%
+  Valid  — Loss: 2.1867 | Top1: 63.93%
+  ✔ New best: 63.93% (checkpoint saved)
+Epoch 112/200 — lr: 0.000225
+  [Epoch 112] Step 0100/195 Loss: 0.8942 | Top1: 96.88%
+  Train  — Loss: 0.9078 | Top1: 96.00%
+  Valid  — Loss: 2.2190 | Top1: 63.12%
+Epoch 113/200 — lr: 0.000221
+  [Epoch 113] Step 0100/195 Loss: 0.9095 | Top1: 96.48%
+  Train  — Loss: 0.9105 | Top1: 95.99%
+  Valid  — Loss: 2.1727 | Top1: 64.03%
+  ✔ New best: 64.03% (checkpoint saved)
+Epoch 114/200 — lr: 0.000217
+  [Epoch 114] Step 0100/195 Loss: 0.9191 | Top1: 96.88%
+  Train  — Loss: 0.9037 | Top1: 96.19%
+  Valid  — Loss: 2.2064 | Top1: 63.37%
+Epoch 115/200 — lr: 0.000213
+  [Epoch 115] Step 0100/195 Loss: 0.8993 | Top1: 96.48%
+  Train  — Loss: 0.9029 | Top1: 96.28%
+  Valid  — Loss: 2.2152 | Top1: 63.21%
+Epoch 116/200 — lr: 0.000209
+  [Epoch 116] Step 0100/195 Loss: 0.9193 | Top1: 96.09%
+  Train  — Loss: 0.9007 | Top1: 96.26%
+  Valid  — Loss: 2.2193 | Top1: 63.19%
+Epoch 117/200 — lr: 0.000205
+  [Epoch 117] Step 0100/195 Loss: 0.8903 | Top1: 96.09%
+  Train  — Loss: 0.8988 | Top1: 96.36%
+  Valid  — Loss: 2.2192 | Top1: 63.32%
+Epoch 118/200 — lr: 0.000201
+  [Epoch 118] Step 0100/195 Loss: 0.8813 | Top1: 96.48%
+  Train  — Loss: 0.8896 | Top1: 96.73%
+  Valid  — Loss: 2.2184 | Top1: 63.44%
+Epoch 119/200 — lr: 0.000197
+  [Epoch 119] Step 0100/195 Loss: 0.8646 | Top1: 98.05%
+  Train  — Loss: 0.8918 | Top1: 96.57%
+  Valid  — Loss: 2.2348 | Top1: 63.03%
+Epoch 120/200 — lr: 0.000193
+  [Epoch 120] Step 0100/195 Loss: 0.9217 | Top1: 95.70%
+  Train  — Loss: 0.8895 | Top1: 96.73%
+  Valid  — Loss: 2.2209 | Top1: 63.61%
+Epoch 121/200 — lr: 0.000189
+  [Epoch 121] Step 0100/195 Loss: 0.9000 | Top1: 96.09%
+  Train  — Loss: 0.8835 | Top1: 96.82%
+  Valid  — Loss: 2.2341 | Top1: 63.54%
+Epoch 122/200 — lr: 0.000185
+  [Epoch 122] Step 0100/195 Loss: 0.8784 | Top1: 98.05%
+  Train  — Loss: 0.8798 | Top1: 97.04%
+  Valid  — Loss: 2.2275 | Top1: 63.60%
+Epoch 123/200 — lr: 0.000181
+  [Epoch 123] Step 0100/195 Loss: 0.8550 | Top1: 97.66%
+  Train  — Loss: 0.8829 | Top1: 96.82%
+  Valid  — Loss: 2.2036 | Top1: 63.98%
+Epoch 124/200 — lr: 0.000177
+  [Epoch 124] Step 0100/195 Loss: 0.8926 | Top1: 96.48%
+  Train  — Loss: 0.8829 | Top1: 96.93%
+  Valid  — Loss: 2.2113 | Top1: 63.76%
+Epoch 125/200 — lr: 0.000173
+  [Epoch 125] Step 0100/195 Loss: 0.8801 | Top1: 96.09%
+  Train  — Loss: 0.8800 | Top1: 97.01%
+  Valid  — Loss: 2.2024 | Top1: 63.99%
+Epoch 126/200 — lr: 0.000169
+  [Epoch 126] Step 0100/195 Loss: 0.8518 | Top1: 97.27%
+  Train  — Loss: 0.8784 | Top1: 96.98%
+  Valid  — Loss: 2.1709 | Top1: 64.23%
+  ✔ New best: 64.23% (checkpoint saved)
+Epoch 127/200 — lr: 0.000165
+  [Epoch 127] Step 0100/195 Loss: 0.8363 | Top1: 98.83%
+  Train  — Loss: 0.8752 | Top1: 97.16%
+  Valid  — Loss: 2.2303 | Top1: 63.60%
+Epoch 128/200 — lr: 0.000161
+  [Epoch 128] Step 0100/195 Loss: 0.8469 | Top1: 98.05%
+  Train  — Loss: 0.8699 | Top1: 97.26%
+  Valid  — Loss: 2.2335 | Top1: 63.81%
+Epoch 129/200 — lr: 0.000157
+  [Epoch 129] Step 0100/195 Loss: 0.8821 | Top1: 97.66%
+  Train  — Loss: 0.8685 | Top1: 97.32%
+  Valid  — Loss: 2.2238 | Top1: 63.83%
+Epoch 130/200 — lr: 0.000153
+  [Epoch 130] Step 0100/195 Loss: 0.8364 | Top1: 98.44%
+  Train  — Loss: 0.8687 | Top1: 97.31%
+  Valid  — Loss: 2.2120 | Top1: 64.09%
+Epoch 131/200 — lr: 0.000150
+  [Epoch 131] Step 0100/195 Loss: 0.8943 | Top1: 96.09%
+  Train  — Loss: 0.8638 | Top1: 97.41%
+  Valid  — Loss: 2.2354 | Top1: 63.85%
+Epoch 132/200 — lr: 0.000146
+  [Epoch 132] Step 0100/195 Loss: 0.8853 | Top1: 97.27%
+  Train  — Loss: 0.8647 | Top1: 97.44%
+  Valid  — Loss: 2.2245 | Top1: 64.11%
+Epoch 133/200 — lr: 0.000142
+  [Epoch 133] Step 0100/195 Loss: 0.8569 | Top1: 98.05%
+  Train  — Loss: 0.8607 | Top1: 97.50%
+  Valid  — Loss: 2.2099 | Top1: 64.17%
+Epoch 134/200 — lr: 0.000138
+  [Epoch 134] Step 0100/195 Loss: 0.8471 | Top1: 98.05%
+  Train  — Loss: 0.8589 | Top1: 97.56%
+  Valid  — Loss: 2.2507 | Top1: 63.58%
+Epoch 135/200 — lr: 0.000135
+  [Epoch 135] Step 0100/195 Loss: 0.8717 | Top1: 96.88%
+  Train  — Loss: 0.8556 | Top1: 97.66%
+  Valid  — Loss: 2.2231 | Top1: 64.01%
+Epoch 136/200 — lr: 0.000131
+  [Epoch 136] Step 0100/195 Loss: 0.8748 | Top1: 96.88%
+  Train  — Loss: 0.8550 | Top1: 97.66%
+  Valid  — Loss: 2.2390 | Top1: 63.70%
+Epoch 137/200 — lr: 0.000127
+  [Epoch 137] Step 0100/195 Loss: 0.8531 | Top1: 97.66%
+  Train  — Loss: 0.8525 | Top1: 97.79%
+  Valid  — Loss: 2.2336 | Top1: 64.30%
+  ✔ New best: 64.30% (checkpoint saved)
+Epoch 138/200 — lr: 0.000124
+  [Epoch 138] Step 0100/195 Loss: 0.8624 | Top1: 98.05%
+  Train  — Loss: 0.8495 | Top1: 97.93%
+  Valid  — Loss: 2.2361 | Top1: 64.24%
+Epoch 139/200 — lr: 0.000120
+  [Epoch 139] Step 0100/195 Loss: 0.8472 | Top1: 98.44%
+  Train  — Loss: 0.8500 | Top1: 97.84%
+  Valid  — Loss: 2.2212 | Top1: 64.49%
+  ✔ New best: 64.49% (checkpoint saved)
+Epoch 140/200 — lr: 0.000117
+  [Epoch 140] Step 0100/195 Loss: 0.8249 | Top1: 98.83%
+  Train  — Loss: 0.8487 | Top1: 97.87%
+  Valid  — Loss: 2.2299 | Top1: 63.98%
+Epoch 141/200 — lr: 0.000113
+  [Epoch 141] Step 0100/195 Loss: 0.8365 | Top1: 98.83%
+  Train  — Loss: 0.8487 | Top1: 97.95%
+  Valid  — Loss: 2.2340 | Top1: 63.87%
+Epoch 142/200 — lr: 0.000110
+  [Epoch 142] Step 0100/195 Loss: 0.8435 | Top1: 98.05%
+  Train  — Loss: 0.8446 | Top1: 98.05%
+  Valid  — Loss: 2.2350 | Top1: 64.07%
+Epoch 143/200 — lr: 0.000106
+  [Epoch 143] Step 0100/195 Loss: 0.8218 | Top1: 98.83%
+  Train  — Loss: 0.8419 | Top1: 98.13%
+  Valid  — Loss: 2.2539 | Top1: 63.63%
+Epoch 144/200 — lr: 0.000103
+  [Epoch 144] Step 0100/195 Loss: 0.8128 | Top1: 99.61%
+  Train  — Loss: 0.8432 | Top1: 98.04%
+  Valid  — Loss: 2.2534 | Top1: 63.71%
+Epoch 145/200 — lr: 0.000100
+  [Epoch 145] Step 0100/195 Loss: 0.8343 | Top1: 98.44%
+  Train  — Loss: 0.8412 | Top1: 98.10%
+  Valid  — Loss: 2.2440 | Top1: 64.15%
+Epoch 146/200 — lr: 0.000096
+  [Epoch 146] Step 0100/195 Loss: 0.8419 | Top1: 98.44%
+  Train  — Loss: 0.8399 | Top1: 98.19%
+  Valid  — Loss: 2.2302 | Top1: 64.40%
+Epoch 147/200 — lr: 0.000093
+  [Epoch 147] Step 0100/195 Loss: 0.8465 | Top1: 97.66%
+  Train  — Loss: 0.8384 | Top1: 98.19%
+  Valid  — Loss: 2.2363 | Top1: 64.47%
+Epoch 148/200 — lr: 0.000090
+  [Epoch 148] Step 0100/195 Loss: 0.8051 | Top1: 99.61%
+  Train  — Loss: 0.8381 | Top1: 98.15%
+  Valid  — Loss: 2.2257 | Top1: 64.65%
+  ✔ New best: 64.65% (checkpoint saved)
+Epoch 149/200 — lr: 0.000087
+  [Epoch 149] Step 0100/195 Loss: 0.8475 | Top1: 98.83%
+  Train  — Loss: 0.8357 | Top1: 98.30%
+  Valid  — Loss: 2.2429 | Top1: 64.52%
+Epoch 150/200 — lr: 0.000084
+  [Epoch 150] Step 0100/195 Loss: 0.8467 | Top1: 97.66%
+  Train  — Loss: 0.8337 | Top1: 98.33%
+  Valid  — Loss: 2.2284 | Top1: 64.98%
+  ✔ New best: 64.98% (checkpoint saved)
+Epoch 151/200 — lr: 0.000081
+  [Epoch 151] Step 0100/195 Loss: 0.8071 | Top1: 99.22%
+  Train  — Loss: 0.8331 | Top1: 98.37%
+  Valid  — Loss: 2.2548 | Top1: 64.22%
+Epoch 152/200 — lr: 0.000078
+  [Epoch 152] Step 0100/195 Loss: 0.8225 | Top1: 98.83%
+  Train  — Loss: 0.8299 | Top1: 98.47%
+  Valid  — Loss: 2.2308 | Top1: 64.83%
+Epoch 153/200 — lr: 0.000075
+  [Epoch 153] Step 0100/195 Loss: 0.8164 | Top1: 98.83%
+  Train  — Loss: 0.8290 | Top1: 98.46%
+  Valid  — Loss: 2.2438 | Top1: 64.05%
+Epoch 154/200 — lr: 0.000072
+  [Epoch 154] Step 0100/195 Loss: 0.8132 | Top1: 99.22%
+  Train  — Loss: 0.8287 | Top1: 98.48%
+  Valid  — Loss: 2.2405 | Top1: 64.50%
+Epoch 155/200 — lr: 0.000069
+  [Epoch 155] Step 0100/195 Loss: 0.7981 | Top1: 100.00%
+  Train  — Loss: 0.8268 | Top1: 98.58%
+  Valid  — Loss: 2.2447 | Top1: 64.41%
+Epoch 156/200 — lr: 0.000066
+  [Epoch 156] Step 0100/195 Loss: 0.8338 | Top1: 98.83%
+  Train  — Loss: 0.8247 | Top1: 98.61%
+  Valid  — Loss: 2.2299 | Top1: 64.54%
+Epoch 157/200 — lr: 0.000063
+  [Epoch 157] Step 0100/195 Loss: 0.8065 | Top1: 99.22%
+  Train  — Loss: 0.8276 | Top1: 98.52%
+  Valid  — Loss: 2.2260 | Top1: 64.80%
+Epoch 158/200 — lr: 0.000061
+  [Epoch 158] Step 0100/195 Loss: 0.8202 | Top1: 98.83%
+  Train  — Loss: 0.8256 | Top1: 98.59%
+  Valid  — Loss: 2.2567 | Top1: 64.71%
+Epoch 159/200 — lr: 0.000058
+  [Epoch 159] Step 0100/195 Loss: 0.8207 | Top1: 98.83%
+  Train  — Loss: 0.8235 | Top1: 98.68%
+  Valid  — Loss: 2.2296 | Top1: 65.01%
+  ✔ New best: 65.01% (checkpoint saved)
+Epoch 160/200 — lr: 0.000055
+  [Epoch 160] Step 0100/195 Loss: 0.8692 | Top1: 96.88%
+  Train  — Loss: 0.8245 | Top1: 98.59%
+  Valid  — Loss: 2.2350 | Top1: 64.79%
+Epoch 161/200 — lr: 0.000053
+  [Epoch 161] Step 0100/195 Loss: 0.8232 | Top1: 98.83%
+  Train  — Loss: 0.8225 | Top1: 98.66%
+  Valid  — Loss: 2.2332 | Top1: 64.54%
+Epoch 162/200 — lr: 0.000050
+  [Epoch 162] Step 0100/195 Loss: 0.8626 | Top1: 98.05%
+  Train  — Loss: 0.8212 | Top1: 98.72%
+  Valid  — Loss: 2.2405 | Top1: 64.69%
+Epoch 163/200 — lr: 0.000048
+  [Epoch 163] Step 0100/195 Loss: 0.8260 | Top1: 98.44%
+  Train  — Loss: 0.8214 | Top1: 98.70%
+  Valid  — Loss: 2.2371 | Top1: 64.55%
+Epoch 164/200 — lr: 0.000045
+  [Epoch 164] Step 0100/195 Loss: 0.8161 | Top1: 99.61%
+  Train  — Loss: 0.8190 | Top1: 98.81%
+  Valid  — Loss: 2.2316 | Top1: 64.99%
+Epoch 165/200 — lr: 0.000043
+  [Epoch 165] Step 0100/195 Loss: 0.8538 | Top1: 98.44%
+  Train  — Loss: 0.8195 | Top1: 98.73%
+  Valid  — Loss: 2.2532 | Top1: 64.20%
+Epoch 166/200 — lr: 0.000041
+  [Epoch 166] Step 0100/195 Loss: 0.8349 | Top1: 98.44%
+  Train  — Loss: 0.8200 | Top1: 98.76%
+  Valid  — Loss: 2.2380 | Top1: 65.04%
+  ✔ New best: 65.04% (checkpoint saved)
+Epoch 167/200 — lr: 0.000038
+  [Epoch 167] Step 0100/195 Loss: 0.8262 | Top1: 98.83%
+  Train  — Loss: 0.8178 | Top1: 98.80%
+  Valid  — Loss: 2.2371 | Top1: 64.78%
+Epoch 168/200 — lr: 0.000036
+  [Epoch 168] Step 0100/195 Loss: 0.8371 | Top1: 98.83%
+  Train  — Loss: 0.8166 | Top1: 98.87%
+  Valid  — Loss: 2.2365 | Top1: 65.23%
+  ✔ New best: 65.23% (checkpoint saved)
+Epoch 169/200 — lr: 0.000034
+  [Epoch 169] Step 0100/195 Loss: 0.8123 | Top1: 98.83%
+  Train  — Loss: 0.8141 | Top1: 98.95%
+  Valid  — Loss: 2.2559 | Top1: 64.81%
+Epoch 170/200 — lr: 0.000032
+  [Epoch 170] Step 0100/195 Loss: 0.7915 | Top1: 99.61%
+  Train  — Loss: 0.8165 | Top1: 98.85%
+  Valid  — Loss: 2.2408 | Top1: 65.22%
+Epoch 171/200 — lr: 0.000030
+  [Epoch 171] Step 0100/195 Loss: 0.8175 | Top1: 98.44%
+  Train  — Loss: 0.8154 | Top1: 98.86%
+  Valid  — Loss: 2.2410 | Top1: 64.97%
+Epoch 172/200 — lr: 0.000028
+  [Epoch 172] Step 0100/195 Loss: 0.8077 | Top1: 99.61%
+  Train  — Loss: 0.8127 | Top1: 98.98%
+  Valid  — Loss: 2.2464 | Top1: 64.96%
+Epoch 173/200 — lr: 0.000026
+  [Epoch 173] Step 0100/195 Loss: 0.8212 | Top1: 99.61%
+  Train  — Loss: 0.8126 | Top1: 99.00%
+  Valid  — Loss: 2.2486 | Top1: 64.87%
+Epoch 174/200 — lr: 0.000025
+  [Epoch 174] Step 0100/195 Loss: 0.8476 | Top1: 98.83%
+  Train  — Loss: 0.8148 | Top1: 98.92%
+  Valid  — Loss: 2.2333 | Top1: 65.02%
+Epoch 175/200 — lr: 0.000023
+  [Epoch 175] Step 0100/195 Loss: 0.8041 | Top1: 99.61%
+  Train  — Loss: 0.8109 | Top1: 99.03%
+  Valid  — Loss: 2.2496 | Top1: 64.81%
+Epoch 176/200 — lr: 0.000021
+  [Epoch 176] Step 0100/195 Loss: 0.8179 | Top1: 99.61%
+  Train  — Loss: 0.8120 | Top1: 99.01%
+  Valid  — Loss: 2.2490 | Top1: 65.06%
+Epoch 177/200 — lr: 0.000019
+  [Epoch 177] Step 0100/195 Loss: 0.8061 | Top1: 99.22%
+  Train  — Loss: 0.8105 | Top1: 99.04%
+  Valid  — Loss: 2.2372 | Top1: 65.20%
+Epoch 178/200 — lr: 0.000018
+  [Epoch 178] Step 0100/195 Loss: 0.8015 | Top1: 99.61%
+  Train  — Loss: 0.8118 | Top1: 98.97%
+  Valid  — Loss: 2.2466 | Top1: 64.89%
+Epoch 179/200 — lr: 0.000016
+  [Epoch 179] Step 0100/195 Loss: 0.8090 | Top1: 99.61%
+  Train  — Loss: 0.8092 | Top1: 99.06%
+  Valid  — Loss: 2.2428 | Top1: 65.19%
+Epoch 180/200 — lr: 0.000015
+  [Epoch 180] Step 0100/195 Loss: 0.8311 | Top1: 98.05%
+  Train  — Loss: 0.8123 | Top1: 99.00%
+  Valid  — Loss: 2.2415 | Top1: 65.04%
+Epoch 181/200 — lr: 0.000014
+  [Epoch 181] Step 0100/195 Loss: 0.7889 | Top1: 100.00%
+  Train  — Loss: 0.8115 | Top1: 99.02%
+  Valid  — Loss: 2.2319 | Top1: 65.26%
+  ✔ New best: 65.26% (checkpoint saved)
+Epoch 182/200 — lr: 0.000012
+  [Epoch 182] Step 0100/195 Loss: 0.8166 | Top1: 98.44%
+  Train  — Loss: 0.8096 | Top1: 98.99%
+  Valid  — Loss: 2.2409 | Top1: 65.18%
+Epoch 183/200 — lr: 0.000011
+  [Epoch 183] Step 0100/195 Loss: 0.8002 | Top1: 99.61%
+  Train  — Loss: 0.8074 | Top1: 99.15%
+  Valid  — Loss: 2.2398 | Top1: 65.05%
+Epoch 184/200 — lr: 0.000010
+  [Epoch 184] Step 0100/195 Loss: 0.8209 | Top1: 98.83%
+  Train  — Loss: 0.8102 | Top1: 99.04%
+  Valid  — Loss: 2.2375 | Top1: 65.09%
+Epoch 185/200 — lr: 0.000009
+  [Epoch 185] Step 0100/195 Loss: 0.8019 | Top1: 99.61%
+  Train  — Loss: 0.8055 | Top1: 99.18%
+  Valid  — Loss: 2.2368 | Top1: 65.20%
+Epoch 186/200 — lr: 0.000008
+  [Epoch 186] Step 0100/195 Loss: 0.8050 | Top1: 99.61%
+  Train  — Loss: 0.8097 | Top1: 99.05%
+  Valid  — Loss: 2.2360 | Top1: 65.38%
+  ✔ New best: 65.38% (checkpoint saved)
+Epoch 187/200 — lr: 0.000007
+  [Epoch 187] Step 0100/195 Loss: 0.7928 | Top1: 99.61%
+  Train  — Loss: 0.8083 | Top1: 99.10%
+  Valid  — Loss: 2.2355 | Top1: 65.26%
+Epoch 188/200 — lr: 0.000006
+  [Epoch 188] Step 0100/195 Loss: 0.7926 | Top1: 100.00%
+  Train  — Loss: 0.8087 | Top1: 99.09%
+  Valid  — Loss: 2.2367 | Top1: 65.17%
+Epoch 189/200 — lr: 0.000005
+  [Epoch 189] Step 0100/195 Loss: 0.8327 | Top1: 98.83%
+  Train  — Loss: 0.8081 | Top1: 99.15%
+  Valid  — Loss: 2.2390 | Top1: 65.12%
+Epoch 190/200 — lr: 0.000004
+  [Epoch 190] Step 0100/195 Loss: 0.8018 | Top1: 99.22%
+  Train  — Loss: 0.8091 | Top1: 99.02%
+  Valid  — Loss: 2.2370 | Top1: 65.30%
+Epoch 191/200 — lr: 0.000003
+  [Epoch 191] Step 0100/195 Loss: 0.8071 | Top1: 99.61%
+  Train  — Loss: 0.8087 | Top1: 99.08%
+  Valid  — Loss: 2.2386 | Top1: 65.17%
+Epoch 192/200 — lr: 0.000003
+  [Epoch 192] Step 0100/195 Loss: 0.8056 | Top1: 99.22%
+  Train  — Loss: 0.8089 | Top1: 99.07%
+  Valid  — Loss: 2.2388 | Top1: 65.13%
+Epoch 193/200 — lr: 0.000002
+  [Epoch 193] Step 0100/195 Loss: 0.8316 | Top1: 99.22%
+  Train  — Loss: 0.8063 | Top1: 99.16%
+  Valid  — Loss: 2.2376 | Top1: 65.25%
+Epoch 194/200 — lr: 0.000002
+  [Epoch 194] Step 0100/195 Loss: 0.8063 | Top1: 99.22%
+  Train  — Loss: 0.8072 | Top1: 99.10%
+  Valid  — Loss: 2.2374 | Top1: 65.25%
+Epoch 195/200 — lr: 0.000001
+  [Epoch 195] Step 0100/195 Loss: 0.7909 | Top1: 100.00%
+  Train  — Loss: 0.8084 | Top1: 99.07%
+  Valid  — Loss: 2.2372 | Top1: 65.18%
+Epoch 196/200 — lr: 0.000001
+  [Epoch 196] Step 0100/195 Loss: 0.7894 | Top1: 100.00%
+  Train  — Loss: 0.8075 | Top1: 99.14%
+  Valid  — Loss: 2.2367 | Top1: 65.28%
+Epoch 197/200 — lr: 0.000001
+  [Epoch 197] Step 0100/195 Loss: 0.8117 | Top1: 99.61%
+  Train  — Loss: 0.8047 | Top1: 99.16%
+  Valid  — Loss: 2.2369 | Top1: 65.24%
+Epoch 198/200 — lr: 0.000000
+  [Epoch 198] Step 0100/195 Loss: 0.8096 | Top1: 99.22%
+  Train  — Loss: 0.8067 | Top1: 99.14%
+  Valid  — Loss: 2.2369 | Top1: 65.23%
+Epoch 199/200 — lr: 0.000000
+  [Epoch 199] Step 0100/195 Loss: 0.7990 | Top1: 99.61%
+  Train  — Loss: 0.8084 | Top1: 99.08%
+  Valid  — Loss: 2.2368 | Top1: 65.25%
+Epoch 200/200 — lr: 0.000000
+  [Epoch 200] Step 0100/195 Loss: 0.8027 | Top1: 99.61%
+  Train  — Loss: 0.8086 | Top1: 99.07%
+  Valid  — Loss: 2.2369 | Top1: 65.24%
+Training complete. Best Top-1: 65.38%

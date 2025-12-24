@@ -33,11 +33,19 @@ if __name__ == '__main__':
     parser.add_argument("--lr",   type=float, default=1e-1)
     parser.add_argument("--mom",   type=float, default=0.8)
 
-    args = parser.parse_args(['--train_batch_size','128','--eval_batch_size','512', '--epochs','30', '--log_interval', '100', '--n_workers', '1', '--network', 'complete', '--lr','0.5'])
+    parser.add_argument("--msgn",   type=int, default=1)
+
+    parser.add_argument("--lr_schedule",   type=str, default='1')
+
+    # args = parser.parse_args(['--train_batch_size','128','--eval_batch_size','512', '--epochs','30', '--log_interval', '100', '--n_workers', '1', '--network', 'complete', '--lr','0.1', '--msgn', '1', '--lr_schedule', '2'])
+
+    args = parser.parse_args(['--train_batch_size','128','--eval_batch_size','512', '--epochs','240', '--log_interval', '100', '--n_workers', '8', '--network', 'complete', '--lr','0.1', '--msgn', '1', '--lr_schedule', '2'])
+
+    jwp(args)
 
     filename = os.path.basename(__file__)
 
-    wandb.init(project='neurips_code', group=f'{filename}', name=f'{args.network}_lr{args.lr}')
+    wandb.init(project='neurips_code', config=args, group=f'{filename}', name=f'{args.network}_lr{args.lr}_msgn{args.msgn}_schedule{args.lr_schedule}_workers{args.n_workers}')
     artifact = wandb.Artifact("my_model", type="model")
     
     loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
@@ -82,6 +90,7 @@ if __name__ == '__main__':
             round_losses.append(loss.item())
             model.zero_grad(set_to_none=True)
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
 
             with torch.no_grad():
                 for (name, p) in model.named_parameters():
@@ -89,14 +98,20 @@ if __name__ == '__main__':
                         continue
                     m_temp = mom * m_list[wid][name]+ (1-mom) * p.grad
                     y_list[wid][name] = y_list[wid][name] + m_temp - m_list[wid][name]
-                    if name == 'pos_emb' and r > 1430:
-                        jwp(f'{p.grad}, {p.data}')
+                    # if name == 'pos_emb' and r > 1430:
+                    #     jwp(f'{p.grad}, {p.data}')
 
                     m_list[wid][name] = m_temp
 
         
         if args.n_workers > 1:
             y_list = mix_y_list(y_list, mixing)
+        if args.lr_schedule == '1':
+            tmp_lr = lr * (1-r/total_rounds)
+        elif args.lr_schedule == '2':
+            tmp_lr = lr / math.sqrt(r)
+        else:
+            pass
         for wid, model in enumerate(model_ls):
             with torch.no_grad():
                 for (name, p) in model.named_parameters():
@@ -107,17 +122,20 @@ if __name__ == '__main__':
                     if tmp.ndim == 0:
                         denominator = torch.abs(tmp)
                         assert denominator != 0
-                        p.data -= lr * (1-r/total_rounds)  * tmp.reshape(tmp_shape)  / denominator
+                        p.data -= tmp_lr  * tmp.reshape(tmp_shape)  / denominator
                     elif tmp.ndim == 1:
                         denominator = torch.norm(tmp)
                         assert denominator != 0
-                        p.data -= lr * (1-r/total_rounds)  * tmp.reshape(tmp_shape)  / denominator
+                        p.data -= tmp_lr  * tmp.reshape(tmp_shape)  / denominator
                     elif tmp.ndim == 2:
                         if name in ['pos_emb','tok_emb.weight']:
-                            p.data -= lr * (1-r/total_rounds)  * y_list[wid][name]
-                        else:
+                            p.data -= tmp_lr  * y_list[wid][name]
+                        elif args.msgn == 0:
+                            p.data -= tmp_lr  * y_list[wid][name]
+                        elif args.msgn == 1:
                             update = zeropower_via_newtonschulz5(tmp)
-                            p.data -= lr * (1-r/total_rounds)  * update.reshape(tmp_shape)
+                            p.data -= tmp_lr  * update.reshape(tmp_shape)
+                            
                     else:
                         jwp(f'{name}, error, {tmp}')
                         1/0

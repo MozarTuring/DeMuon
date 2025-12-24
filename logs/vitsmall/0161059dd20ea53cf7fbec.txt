@@ -1,0 +1,1661 @@
+2025-11-06 15:51:11 - /tmp/ipykernel_46/3450082893.py - LINE482 - 
+Starting trainingMSG-END
+Finishing previous runs because reinit is set to 'default'.
+View run adamw__vitsmall at: https://wandb.ai/marvin-maojw95-link-ping-university/my-kaggle-project/runs/gy48ze4z
+View project at: https://wandb.ai/marvin-maojw95-link-ping-university/my-kaggle-project
+Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+Find logs at: ./wandb/run-20251106_154751-gy48ze4z/logs
+Tracking run with wandb version 0.20.1
+Run data is saved locally in /kaggle/working/wandb/run-20251106_155111-38jv624q
+Syncing run adamw__vitsmall to Weights & Biases (docs)
+View project at https://wandb.ai/marvin-maojw95-link-ping-university/my-kaggle-project
+View run at https://wandb.ai/marvin-maojw95-link-ping-university/my-kaggle-project/runs/38jv624q
+2025-11-06 15:51:21 - /tmp/ipykernel_46/3450082893.py - LINE682 - 
+[('cls_token', torch.Size([1, 1, 384])), ('pos_embed', torch.Size([1, 65, 384])), ('patch_embed.proj.weight', torch.Size([384, 3, 4, 4])), ('patch_embed.proj.bias', torch.Size([384])), ('blocks.0.norm1.weight', torch.Size([384])), ('blocks.0.norm1.bias', torch.Size([384])), ('blocks.0.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.0.attn.qkv.bias', torch.Size([1152])), ('blocks.0.attn.proj.weight', torch.Size([384, 384])), ('blocks.0.attn.proj.bias', torch.Size([384])), ('blocks.0.norm2.weight', torch.Size([384])), ('blocks.0.norm2.bias', torch.Size([384])), ('blocks.0.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.0.mlp.fc1.bias', torch.Size([1536])), ('blocks.0.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.0.mlp.fc2.bias', torch.Size([384])), ('blocks.1.norm1.weight', torch.Size([384])), ('blocks.1.norm1.bias', torch.Size([384])), ('blocks.1.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.1.attn.qkv.bias', torch.Size([1152])), ('blocks.1.attn.proj.weight', torch.Size([384, 384])), ('blocks.1.attn.proj.bias', torch.Size([384])), ('blocks.1.norm2.weight', torch.Size([384])), ('blocks.1.norm2.bias', torch.Size([384])), ('blocks.1.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.1.mlp.fc1.bias', torch.Size([1536])), ('blocks.1.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.1.mlp.fc2.bias', torch.Size([384])), ('blocks.2.norm1.weight', torch.Size([384])), ('blocks.2.norm1.bias', torch.Size([384])), ('blocks.2.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.2.attn.qkv.bias', torch.Size([1152])), ('blocks.2.attn.proj.weight', torch.Size([384, 384])), ('blocks.2.attn.proj.bias', torch.Size([384])), ('blocks.2.norm2.weight', torch.Size([384])), ('blocks.2.norm2.bias', torch.Size([384])), ('blocks.2.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.2.mlp.fc1.bias', torch.Size([1536])), ('blocks.2.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.2.mlp.fc2.bias', torch.Size([384])), ('blocks.3.norm1.weight', torch.Size([384])), ('blocks.3.norm1.bias', torch.Size([384])), ('blocks.3.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.3.attn.qkv.bias', torch.Size([1152])), ('blocks.3.attn.proj.weight', torch.Size([384, 384])), ('blocks.3.attn.proj.bias', torch.Size([384])), ('blocks.3.norm2.weight', torch.Size([384])), ('blocks.3.norm2.bias', torch.Size([384])), ('blocks.3.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.3.mlp.fc1.bias', torch.Size([1536])), ('blocks.3.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.3.mlp.fc2.bias', torch.Size([384])), ('blocks.4.norm1.weight', torch.Size([384])), ('blocks.4.norm1.bias', torch.Size([384])), ('blocks.4.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.4.attn.qkv.bias', torch.Size([1152])), ('blocks.4.attn.proj.weight', torch.Size([384, 384])), ('blocks.4.attn.proj.bias', torch.Size([384])), ('blocks.4.norm2.weight', torch.Size([384])), ('blocks.4.norm2.bias', torch.Size([384])), ('blocks.4.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.4.mlp.fc1.bias', torch.Size([1536])), ('blocks.4.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.4.mlp.fc2.bias', torch.Size([384])), ('blocks.5.norm1.weight', torch.Size([384])), ('blocks.5.norm1.bias', torch.Size([384])), ('blocks.5.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.5.attn.qkv.bias', torch.Size([1152])), ('blocks.5.attn.proj.weight', torch.Size([384, 384])), ('blocks.5.attn.proj.bias', torch.Size([384])), ('blocks.5.norm2.weight', torch.Size([384])), ('blocks.5.norm2.bias', torch.Size([384])), ('blocks.5.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.5.mlp.fc1.bias', torch.Size([1536])), ('blocks.5.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.5.mlp.fc2.bias', torch.Size([384])), ('blocks.6.norm1.weight', torch.Size([384])), ('blocks.6.norm1.bias', torch.Size([384])), ('blocks.6.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.6.attn.qkv.bias', torch.Size([1152])), ('blocks.6.attn.proj.weight', torch.Size([384, 384])), ('blocks.6.attn.proj.bias', torch.Size([384])), ('blocks.6.norm2.weight', torch.Size([384])), ('blocks.6.norm2.bias', torch.Size([384])), ('blocks.6.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.6.mlp.fc1.bias', torch.Size([1536])), ('blocks.6.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.6.mlp.fc2.bias', torch.Size([384])), ('blocks.7.norm1.weight', torch.Size([384])), ('blocks.7.norm1.bias', torch.Size([384])), ('blocks.7.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.7.attn.qkv.bias', torch.Size([1152])), ('blocks.7.attn.proj.weight', torch.Size([384, 384])), ('blocks.7.attn.proj.bias', torch.Size([384])), ('blocks.7.norm2.weight', torch.Size([384])), ('blocks.7.norm2.bias', torch.Size([384])), ('blocks.7.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.7.mlp.fc1.bias', torch.Size([1536])), ('blocks.7.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.7.mlp.fc2.bias', torch.Size([384])), ('blocks.8.norm1.weight', torch.Size([384])), ('blocks.8.norm1.bias', torch.Size([384])), ('blocks.8.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.8.attn.qkv.bias', torch.Size([1152])), ('blocks.8.attn.proj.weight', torch.Size([384, 384])), ('blocks.8.attn.proj.bias', torch.Size([384])), ('blocks.8.norm2.weight', torch.Size([384])), ('blocks.8.norm2.bias', torch.Size([384])), ('blocks.8.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.8.mlp.fc1.bias', torch.Size([1536])), ('blocks.8.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.8.mlp.fc2.bias', torch.Size([384])), ('blocks.9.norm1.weight', torch.Size([384])), ('blocks.9.norm1.bias', torch.Size([384])), ('blocks.9.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.9.attn.qkv.bias', torch.Size([1152])), ('blocks.9.attn.proj.weight', torch.Size([384, 384])), ('blocks.9.attn.proj.bias', torch.Size([384])), ('blocks.9.norm2.weight', torch.Size([384])), ('blocks.9.norm2.bias', torch.Size([384])), ('blocks.9.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.9.mlp.fc1.bias', torch.Size([1536])), ('blocks.9.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.9.mlp.fc2.bias', torch.Size([384])), ('blocks.10.norm1.weight', torch.Size([384])), ('blocks.10.norm1.bias', torch.Size([384])), ('blocks.10.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.10.attn.qkv.bias', torch.Size([1152])), ('blocks.10.attn.proj.weight', torch.Size([384, 384])), ('blocks.10.attn.proj.bias', torch.Size([384])), ('blocks.10.norm2.weight', torch.Size([384])), ('blocks.10.norm2.bias', torch.Size([384])), ('blocks.10.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.10.mlp.fc1.bias', torch.Size([1536])), ('blocks.10.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.10.mlp.fc2.bias', torch.Size([384])), ('blocks.11.norm1.weight', torch.Size([384])), ('blocks.11.norm1.bias', torch.Size([384])), ('blocks.11.attn.qkv.weight', torch.Size([1152, 384])), ('blocks.11.attn.qkv.bias', torch.Size([1152])), ('blocks.11.attn.proj.weight', torch.Size([384, 384])), ('blocks.11.attn.proj.bias', torch.Size([384])), ('blocks.11.norm2.weight', torch.Size([384])), ('blocks.11.norm2.bias', torch.Size([384])), ('blocks.11.mlp.fc1.weight', torch.Size([1536, 384])), ('blocks.11.mlp.fc1.bias', torch.Size([1536])), ('blocks.11.mlp.fc2.weight', torch.Size([384, 1536])), ('blocks.11.mlp.fc2.bias', torch.Size([384])), ('norm.weight', torch.Size([384])), ('norm.bias', torch.Size([384])), ('head.weight', torch.Size([100, 384])), ('head.bias', torch.Size([100]))]MSG-END
+2025-11-06 15:51:21 - /tmp/ipykernel_46/3450082893.py - LINE690 - 
+total_params = 21376996MSG-END
+2025-11-06 15:51:21 - /tmp/ipykernel_46/3450082893.py - LINE691 - 
+0.1MSG-END
+                                                   
+2025-11-06 15:51:27 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 1/58500: [4.74033784866333],[(4.784618663787842, 1.8300000190734864, 7.110000038146973)]MSG-END
+
+2025-11-06 15:51:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009999927901375688]MSG-END
+2025-11-06 15:52:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000999971160758204]MSG-END
+2025-11-06 15:52:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000999935112485686]MSG-END
+2025-11-06 15:53:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000999884646359627]MSG-END
+2025-11-06 15:53:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000999819763835442]MSG-END
+                                                   
+2025-11-06 15:53:30 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 500/58500: [4.1927337646484375],[(4.051842784881591, 8.44000015258789, 29.100000381469727)]MSG-END
+
+2025-11-06 15:53:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009997404667843068]MSG-END
+2025-11-06 15:54:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009996467574931037]MSG-END
+2025-11-06 15:54:40 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009995386386643602]MSG-END
+2025-11-06 15:55:03 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009994161134161612]MSG-END
+2025-11-06 15:55:26 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009992791852820695]MSG-END
+                                                   
+2025-11-06 15:55:33 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 1000/58500: [3.991664171218872],[(3.919473075866699, 11.370000076293945, 33.970000457763675)]MSG-END
+
+2025-11-06 15:55:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009991278582110149]MSG-END
+2025-11-06 15:56:20 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009989621365671883]MSG-END
+2025-11-06 15:56:43 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009987820251299107]MSG-END
+2025-11-06 15:57:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009985875290934967]MSG-END
+2025-11-06 15:57:29 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009983786540671037]MSG-END
+                                                   
+2025-11-06 15:57:36 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 1500/58500: [3.864074468612671],[(3.793955087661743, 13.989999961853027, 38.02000045776367)]MSG-END
+
+2025-11-06 15:57:59 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009981554060745743]MSG-END
+2025-11-06 15:58:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000997917791554256]MSG-END
+2025-11-06 15:58:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009976658173588228]MSG-END
+2025-11-06 15:59:09 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009973994907550715]MSG-END
+2025-11-06 15:59:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009971188194237129]MSG-END
+                                                   
+2025-11-06 15:59:39 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 2000/58500: [3.880039691925049],[(3.7612930297851563, 14.190000343322755, 40.32000045776367)]MSG-END
+
+2025-11-06 16:00:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009968238114591538]MSG-END
+2025-11-06 16:00:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009965144753692641]MSG-END
+2025-11-06 16:00:49 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009961908200751249]MSG-END
+2025-11-06 16:01:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000995852854910778]MSG-END
+2025-11-06 16:01:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009955005896229512]MSG-END
+                                                   
+2025-11-06 16:01:42 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 2500/58500: [3.676154613494873],[(3.681135654449463, 16.520000076293947, 42.75999984741211)]MSG-END
+
+2025-11-06 16:02:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000995134034370782]MSG-END
+2025-11-06 16:02:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009947531997255212]MSG-END
+2025-11-06 16:02:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009943580966702318]MSG-END
+2025-11-06 16:03:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009939487365994688]MSG-END
+2025-11-06 16:03:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009935251313189517]MSG-END
+                                                   
+2025-11-06 16:03:45 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 3000/58500: [3.762801170349121],[(3.6316815853118896, 17.72000045776367, 44.57000045776367)]MSG-END
+
+2025-11-06 16:04:08 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000993087293045222]MSG-END
+2025-11-06 16:04:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000992635234405295]MSG-END
+2025-11-06 16:04:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009921689684362944]MSG-END
+2025-11-06 16:05:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009916885085850726]MSG-END
+2025-11-06 16:05:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009911938687078286]MSG-END
+                                                   
+2025-11-06 16:05:48 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 3500/58500: [3.492161750793457],[(3.506958532333374, 20.700000381469728, 49.210000610351564)]MSG-END
+
+2025-11-06 16:06:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009906850630697027]MSG-END
+2025-11-06 16:06:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009901621063443712]MSG-END
+2025-11-06 16:06:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009896250136136168]MSG-END
+2025-11-06 16:07:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009890738003668982]MSG-END
+2025-11-06 16:07:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009885084825009042]MSG-END
+                                                   
+2025-11-06 16:07:52 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 4000/58500: [3.625656843185425],[(3.4865527153015137, 20.870000457763673, 49.86000137329101)]MSG-END
+
+2025-11-06 16:08:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009879290763190889]MSG-END
+2025-11-06 16:08:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009873355985312085]MSG-END
+2025-11-06 16:09:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000986728066252837]MSG-END
+2025-11-06 16:09:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00098610649700487]MSG-END
+2025-11-06 16:09:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009854709087130217]MSG-END
+                                                   
+2025-11-06 16:09:54 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 4500/58500: [3.4176511764526367],[(3.4092206954956055, 23.13000068664551, 52.66000061035156)]MSG-END
+
+2025-11-06 16:10:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009848213197073104]MSG-END
+2025-11-06 16:10:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009841577487215236]MSG-END
+2025-11-06 16:11:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009834802148926851]MSG-END
+2025-11-06 16:11:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009827887377604966]MSG-END
+2025-11-06 16:11:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000982083337266779]MSG-END
+                                                   
+2025-11-06 16:11:57 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 5000/58500: [3.2852659225463867],[(3.368188810348511, 23.97000045776367, 53.20999984741211)]MSG-END
+
+2025-11-06 16:12:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009813640337548943]MSG-END
+2025-11-06 16:12:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000980630847969159]MSG-END
+2025-11-06 16:13:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009798838010542483]MSG-END
+2025-11-06 16:13:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009791229145545833]MSG-END
+2025-11-06 16:13:54 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009783482104137125]MSG-END
+                                                   
+2025-11-06 16:14:01 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 5500/58500: [3.1737172603607178],[(3.337335157394409, 24.200000381469728, 54.550000762939455)]MSG-END
+
+2025-11-06 16:14:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000977559710973678]MSG-END
+2025-11-06 16:14:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000976757438974369]MSG-END
+2025-11-06 16:15:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009759414175528676]MSG-END
+2025-11-06 16:15:34 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009751116702427845]MSG-END
+2025-11-06 16:15:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009742682209735742]MSG-END
+                                                   
+2025-11-06 16:16:03 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 6000/58500: [3.4487383365631104],[(3.286817932128906, 25.050000762939455, 56.27000045776367)]MSG-END
+
+2025-11-06 16:16:26 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009734110940698489]MSG-END
+2025-11-06 16:16:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009725403142506776]MSG-END
+2025-11-06 16:17:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009716559066288716]MSG-END
+2025-11-06 16:17:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009707578967102605]MSG-END
+2025-11-06 16:18:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009698463103929544]MSG-END
+                                                   
+2025-11-06 16:18:06 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 6500/58500: [3.363585948944092],[(3.271410036087036, 26.020000457763672, 56.970001983642575)]MSG-END
+
+2025-11-06 16:18:29 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009689211739666029]MSG-END
+2025-11-06 16:18:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009679825141116302]MSG-END
+2025-11-06 16:19:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009670303578984702]MSG-END
+2025-11-06 16:19:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000966064732786785]MSG-END
+2025-11-06 16:20:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009650856666246699]MSG-END
+                                                   
+2025-11-06 16:20:09 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 7000/58500: [3.2614223957061768],[(3.173106575012207, 28.320000076293944, 59.33000106811524)]MSG-END
+
+2025-11-06 16:20:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009640931876478553]MSG-END
+2025-11-06 16:20:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009630873244788893]MSG-END
+2025-11-06 16:21:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009620681061263111]MSG-END
+2025-11-06 16:21:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009610355619838176]MSG-END
+2025-11-06 16:22:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009599897218294138]MSG-END
+                                                   
+2025-11-06 16:22:12 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 7500/58500: [2.951207160949707],[(3.151156520843506, 28.560000228881837, 60.470000457763675)]MSG-END
+
+2025-11-06 16:22:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009589306158245542]MSG-END
+2025-11-06 16:22:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009578582745132731]MSG-END
+2025-11-06 16:23:22 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009567727288213029]MSG-END
+2025-11-06 16:23:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009556740100551853]MSG-END
+2025-11-06 16:24:08 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009545621499013644]MSG-END
+                                                   
+2025-11-06 16:24:15 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 8000/58500: [3.275402069091797],[(3.097115135192871, 30.370000457763673, 62.040000915527344)]MSG-END
+
+2025-11-06 16:24:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009534371804252753]MSG-END
+2025-11-06 16:25:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009522991340704186]MSG-END
+2025-11-06 16:25:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009511480436574253]MSG-END
+2025-11-06 16:25:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000949983942383109]MSG-END
+2025-11-06 16:26:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009488068638195101]MSG-END
+                                                   
+2025-11-06 16:26:19 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 8500/58500: [3.0848066806793213],[(3.066963529586792, 30.750000762939454, 62.77000045776367)]MSG-END
+
+2025-11-06 16:26:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009476168419129263]MSG-END
+2025-11-06 16:27:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000946413910982935]MSG-END
+2025-11-06 16:27:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009451981057214029]MSG-END
+2025-11-06 16:27:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009439694611914835]MSG-END
+2025-11-06 16:28:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009427280128266085]MSG-END
+                                                   
+2025-11-06 16:28:22 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 9000/58500: [3.307979106903076],[(3.025716686248779, 32.38999938964844, 63.9400016784668)]MSG-END
+
+2025-11-06 16:28:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009414737964294676]MSG-END
+2025-11-06 16:29:08 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009402068481709697]MSG-END
+2025-11-06 16:29:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009389272045892061]MSG-END
+2025-11-06 16:29:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009376349025883937]MSG-END
+2025-11-06 16:30:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009363299794378108]MSG-END
+                                                   
+2025-11-06 16:30:25 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 9500/58500: [3.025085926055908],[(3.0232080459594726, 32.84000015258789, 64.03000106811524)]MSG-END
+
+2025-11-06 16:30:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009350124727707235]MSG-END
+2025-11-06 16:31:11 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009336824205832988]MSG-END
+2025-11-06 16:31:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009323398612335085]MSG-END
+2025-11-06 16:31:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009309848334400269]MSG-END
+2025-11-06 16:32:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009296173762811105]MSG-END
+                                                   
+2025-11-06 16:32:28 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 10000/58500: [2.919403314590454],[(2.934087800979614, 34.710001373291014, 66.11999969482422)]MSG-END
+
+2025-11-06 16:32:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009282375291934708]MSG-END
+2025-11-06 16:33:14 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009268453319711383]MSG-END
+2025-11-06 16:33:37 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000925440824764315]MSG-END
+2025-11-06 16:34:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009240240480782152]MSG-END
+2025-11-06 16:34:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009225950427718993]MSG-END
+                                                   
+2025-11-06 16:34:31 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 10500/58500: [2.8964176177978516],[(2.903926467895508, 35.470000457763675, 67.27000122070312)]MSG-END
+
+2025-11-06 16:34:54 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009211538500570945]MSG-END
+2025-11-06 16:35:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009197005114970049]MSG-END
+2025-11-06 16:35:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009182350690051153]MSG-END
+2025-11-06 16:36:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009167575648439809]MSG-END
+2025-11-06 16:36:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009152680416240072]MSG-END
+                                                   
+2025-11-06 16:36:34 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 11000/58500: [2.7003512382507324],[(2.8670742511749268, 37.19000091552734, 68.1300033569336)]MSG-END
+
+2025-11-06 16:36:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009137665423022263]MSG-END
+2025-11-06 16:37:20 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009122531101810512]MSG-END
+2025-11-06 16:37:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009107277889070323]MSG-END
+2025-11-06 16:38:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009091906224695954]MSG-END
+2025-11-06 16:38:31 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009076416551997736]MSG-END
+                                                   
+2025-11-06 16:38:38 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 11500/58500: [2.8992371559143066],[(2.8399280071258546, 37.35000076293945, 69.2000015258789)]MSG-END
+
+2025-11-06 16:39:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009060809317689321]MSG-END
+2025-11-06 16:39:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009045084971874748]MSG-END
+2025-11-06 16:39:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009029243968035508]MSG-END
+2025-11-06 16:40:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0009013286763017423]MSG-END
+2025-11-06 16:40:34 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008997213817017524]MSG-END
+                                                   
+2025-11-06 16:40:41 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 12000/58500: [2.7964975833892822],[(2.8171902656555177, 38.650000762939456, 69.63000183105468)]MSG-END
+
+2025-11-06 16:41:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008981025593570709]MSG-END
+2025-11-06 16:41:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008964722559536435]MSG-END
+2025-11-06 16:41:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000894830518508524]MSG-END
+2025-11-06 16:42:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008931773943685172]MSG-END
+2025-11-06 16:42:37 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008915129312088132]MSG-END
+                                                   
+2025-11-06 16:42:44 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 12500/58500: [2.270906448364258],[(2.7420275688171385, 40.870001220703124, 71.48999938964843)]MSG-END
+
+2025-11-06 16:43:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008898371770316127]MSG-END
+2025-11-06 16:43:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008881501801647452]MSG-END
+2025-11-06 16:43:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008864519892602723]MSG-END
+2025-11-06 16:44:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008847426532930838]MSG-END
+2025-11-06 16:44:40 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008830222215594898]MSG-END
+                                                   
+2025-11-06 16:44:47 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 13000/58500: [2.493649959564209],[(2.73874979019165, 40.89000015258789, 71.74000244140625)]MSG-END
+
+2025-11-06 16:45:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000881290743675794]MSG-END
+2025-11-06 16:45:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000879548269576866]MSG-END
+2025-11-06 16:45:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008777948495147]MSG-END
+2025-11-06 16:46:20 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008760305340569659]MSG-END
+2025-11-06 16:46:43 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008742553740855502]MSG-END
+                                                   
+2025-11-06 16:46:50 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 13500/58500: [2.4083054065704346],[(2.6871801376342774, 42.380001831054685, 72.97000274658203)]MSG-END
+
+2025-11-06 16:47:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008724694207950894]MSG-END
+2025-11-06 16:47:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008706727256914947]MSG-END
+2025-11-06 16:48:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008688653405904641]MSG-END
+2025-11-06 16:48:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008670473176159887]MSG-END
+2025-11-06 16:48:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008652187091988501]MSG-END
+                                                   
+2025-11-06 16:48:53 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 14000/58500: [2.5082709789276123],[(2.6742427825927733, 43.810000610351565, 73.44000244140625)]MSG-END
+
+2025-11-06 16:49:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008633795680751101]MSG-END
+2025-11-06 16:49:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008615299472845852]MSG-END
+2025-11-06 16:50:03 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008596699001693228]MSG-END
+2025-11-06 16:50:26 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000857799480372057]MSG-END
+2025-11-06 16:50:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008559187418346669]MSG-END
+                                                   
+2025-11-06 16:50:56 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 14500/58500: [2.2125277519226074],[(2.6815681934356688, 43.16000137329102, 73.33999938964844)]MSG-END
+
+2025-11-06 16:51:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008540277387966165]MSG-END
+2025-11-06 16:51:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008521265257933917]MSG-END
+2025-11-06 16:52:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008502151576549304]MSG-END
+2025-11-06 16:52:29 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008482936895040372]MSG-END
+2025-11-06 16:52:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008463621767547967]MSG-END
+                                                   
+2025-11-06 16:52:59 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 15000/58500: [2.2773571014404297],[(2.6608085155487062, 44.230001068115236, 74.13999938964844)]MSG-END
+
+2025-11-06 16:53:22 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000844420675110974]MSG-END
+2025-11-06 16:53:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000842469240564408]MSG-END
+2025-11-06 16:54:09 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008405079293933963]MSG-END
+2025-11-06 16:54:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008385367981610749]MSG-END
+2025-11-06 16:54:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008365559037137823]MSG-END
+                                                   
+2025-11-06 16:55:02 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 15500/58500: [2.3277359008789062],[(2.6378891468048096, 45.05, 74.27000122070312)]MSG-END
+
+2025-11-06 16:55:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008345653031794261]MSG-END
+2025-11-06 16:55:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008325650539658298]MSG-END
+2025-11-06 16:56:11 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008305552137590801]MSG-END
+2025-11-06 16:56:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008285358405218624]MSG-END
+2025-11-06 16:56:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008265069924917899]MSG-END
+                                                   
+2025-11-06 16:57:05 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 16000/58500: [2.0493075847625732],[(2.6348454475402834, 45.67000198364258, 74.73000030517578)]MSG-END
+
+2025-11-06 16:57:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008244687281797222]MSG-END
+2025-11-06 16:57:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008224211063680825]MSG-END
+2025-11-06 16:58:14 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008203641861091553]MSG-END
+2025-11-06 16:58:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00081829802672339]MSG-END
+2025-11-06 16:59:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008162226877976859]MSG-END
+                                                   
+2025-11-06 16:59:08 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 16500/58500: [2.0556249618530273],[(2.642263984680176, 45.870001220703124, 75.20000305175782)]MSG-END
+
+2025-11-06 16:59:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008141382291836762]MSG-END
+2025-11-06 16:59:54 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008120447109959993]MSG-END
+2025-11-06 17:00:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008099421936105678]MSG-END
+2025-11-06 17:00:40 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000807830737662827]MSG-END
+2025-11-06 17:01:03 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008057104040460039]MSG-END
+                                                   
+2025-11-06 17:01:10 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 17000/58500: [1.8821874856948853],[(2.661023998260498, 46.60000076293945, 74.85000152587891)]MSG-END
+
+2025-11-06 17:01:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008035812539093539]MSG-END
+2025-11-06 17:01:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0008014433486563941]MSG-END
+2025-11-06 17:02:20 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007992967499431371]MSG-END
+2025-11-06 17:02:43 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007971415196763074]MSG-END
+2025-11-06 17:03:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007949777200115597]MSG-END
+                                                   
+2025-11-06 17:03:13 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 17500/58500: [1.606938123703003],[(2.6440948009490968, 46.91000061035156, 74.9800018310547)]MSG-END
+
+2025-11-06 17:03:37 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007928054133516867]MSG-END
+2025-11-06 17:04:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007906246623448168]MSG-END
+2025-11-06 17:04:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007884355298826086]MSG-END
+2025-11-06 17:04:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007862380790984378]MSG-END
+2025-11-06 17:05:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007840323733655767]MSG-END
+                                                   
+2025-11-06 17:05:16 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 18000/58500: [1.648542881011963],[(2.70582594871521, 46.87000198364258, 74.76999969482422)]MSG-END
+
+2025-11-06 17:05:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007818184762953641]MSG-END
+2025-11-06 17:06:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007795964517353723]MSG-END
+2025-11-06 17:06:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007773663637675679]MSG-END
+2025-11-06 17:06:49 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007751282767064606]MSG-END
+2025-11-06 17:07:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007728822550972505]MSG-END
+                                                   
+2025-11-06 17:07:19 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 18500/58500: [1.508373498916626],[(2.704081153869629, 47.45999984741211, 74.85000152587891)]MSG-END
+
+2025-11-06 17:07:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007706283637139644]MSG-END
+2025-11-06 17:08:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007683666675575894]MSG-END
+2025-11-06 17:08:29 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007660972318541968]MSG-END
+2025-11-06 17:08:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007638201220530654]MSG-END
+2025-11-06 17:09:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007615354038247883]MSG-END
+                                                   
+2025-11-06 17:09:22 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 19000/58500: [1.3564670085906982],[(2.7345672607421876, 47.39000015258789, 74.16000213623047)]MSG-END
+
+2025-11-06 17:09:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007592431430593816]MSG-END
+2025-11-06 17:10:09 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007569434058643841]MSG-END
+2025-11-06 17:10:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007546362585629511]MSG-END
+2025-11-06 17:10:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007523217676919419]MSG-END
+2025-11-06 17:11:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007499999999999989]MSG-END
+                                                   
+2025-11-06 17:11:25 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 19500/58500: [1.5331509113311768],[(2.7095674514770507, 47.6900016784668, 74.79000091552734)]MSG-END
+
+2025-11-06 17:11:49 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007476710224456254]MSG-END
+2025-11-06 17:12:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007453349021952524]MSG-END
+2025-11-06 17:12:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007429917066213021]MSG-END
+2025-11-06 17:12:59 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007406415033002451]MSG-END
+2025-11-06 17:13:22 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007382843600106523]MSG-END
+                                                   
+2025-11-06 17:13:29 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 20000/58500: [1.3733292818069458],[(2.738737201690674, 47.82000045776367, 74.04000091552734)]MSG-END
+
+2025-11-06 17:13:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007359203447312398]MSG-END
+2025-11-06 17:14:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007335495256389062]MSG-END
+2025-11-06 17:14:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007311719711067699]MSG-END
+2025-11-06 17:15:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007287877497021965]MSG-END
+2025-11-06 17:15:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007263969301848173]MSG-END
+                                                   
+2025-11-06 17:15:32 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 20500/58500: [1.2825264930725098],[(2.7076499462127686, 48.42000045776367, 74.71000061035156)]MSG-END
+
+2025-11-06 17:15:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007239995815045528]MSG-END
+2025-11-06 17:16:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007215957727996187]MSG-END
+2025-11-06 17:16:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007191855733945372]MSG-END
+2025-11-06 17:17:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007167690527981318]MSG-END
+2025-11-06 17:17:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007143462807015258]MSG-END
+                                                   
+2025-11-06 17:17:35 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 21000/58500: [1.3106732368469238],[(2.74344744682312, 48.17000045776367, 74.36000213623046)]MSG-END
+
+2025-11-06 17:17:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007119173269761345]MSG-END
+2025-11-06 17:18:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007094822616716464]MSG-END
+2025-11-06 17:18:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007070411550140048]MSG-END
+2025-11-06 17:19:08 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007045940774033822]MSG-END
+2025-11-06 17:19:31 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0007021410994121506]MSG-END
+                                                   
+2025-11-06 17:19:38 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 21500/58500: [1.2116825580596924],[(2.7133578300476073, 48.75999984741211, 74.7500015258789)]MSG-END
+
+2025-11-06 17:20:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006996822917828462]MSG-END
+2025-11-06 17:20:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006972177254261272]MSG-END
+2025-11-06 17:20:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000694747471418731]MSG-END
+2025-11-06 17:21:11 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006922716010014248]MSG-END
+2025-11-06 17:21:34 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006897901855769468]MSG-END
+                                                   
+2025-11-06 17:21:41 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 22000/58500: [1.2625057697296143],[(2.7229970932006835, 48.27000045776367, 74.33000335693359)]MSG-END
+
+2025-11-06 17:22:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006873032967079552]MSG-END
+2025-11-06 17:22:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006848110061149544]MSG-END
+2025-11-06 17:22:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006823133856742343]MSG-END
+2025-11-06 17:23:14 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006798105074157944]MSG-END
+2025-11-06 17:23:37 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006773024435212671]MSG-END
+                                                   
+2025-11-06 17:23:44 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 22500/58500: [1.2481606006622314],[(2.726874351501465, 48.44000091552734, 74.55)]MSG-END
+
+2025-11-06 17:24:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000674789266321833]MSG-END
+2025-11-06 17:24:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006722710482961414]MSG-END
+2025-11-06 17:24:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006697478620682137]MSG-END
+2025-11-06 17:25:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006672197804053521]MSG-END
+2025-11-06 17:25:40 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006646868762160401]MSG-END
+                                                   
+2025-11-06 17:25:47 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 23000/58500: [1.167424201965332],[(2.737880277633667, 48.37999954223633, 74.1500015258789)]MSG-END
+
+2025-11-06 17:26:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006621492225478416]MSG-END
+2025-11-06 17:26:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006596068925852917]MSG-END
+2025-11-06 17:26:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006570599596477879]MSG-END
+2025-11-06 17:27:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000654508497187474]MSG-END
+2025-11-06 17:27:43 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006519525787871238]MSG-END
+                                                   
+2025-11-06 17:27:50 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 23500/58500: [1.171850323677063],[(2.733244848251343, 48.99000015258789, 73.85000152587891)]MSG-END
+
+2025-11-06 17:28:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006493922781580174]MSG-END
+2025-11-06 17:28:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006468276691378155]MSG-END
+2025-11-06 17:29:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000644258825688431]MSG-END
+2025-11-06 17:29:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006416858218938967]MSG-END
+2025-11-06 17:29:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006391087319582256]MSG-END
+                                                   
+2025-11-06 17:29:53 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 24000/58500: [1.1559014320373535],[(2.7305588245391847, 48.900000762939456, 73.81000213623047)]MSG-END
+
+2025-11-06 17:30:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006365276302032722]MSG-END
+2025-11-06 17:30:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006339425910665927]MSG-END
+2025-11-06 17:31:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006313536890992915]MSG-END
+2025-11-06 17:31:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006287609989638791]MSG-END
+2025-11-06 17:31:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006261645954321101]MSG-END
+                                                   
+2025-11-06 17:31:55 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 24500/58500: [1.1046022176742554],[(2.7218286037445067, 49.60000228881836, 73.95000305175782)]MSG-END
+
+2025-11-06 17:32:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006235645533828341]MSG-END
+2025-11-06 17:32:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000620960947799833]MSG-END
+2025-11-06 17:33:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006183538537696593]MSG-END
+2025-11-06 17:33:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006157433464794705]MSG-END
+2025-11-06 17:33:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006131295012148606]MSG-END
+                                                   
+2025-11-06 17:33:58 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 25000/58500: [1.1053961515426636],[(2.7032661914825438, 49.34000015258789, 74.34000396728516)]MSG-END
+
+2025-11-06 17:34:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006105123933576873]MSG-END
+2025-11-06 17:34:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006078920983839024]MSG-END
+2025-11-06 17:35:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006052686918613708]MSG-END
+2025-11-06 17:35:31 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006026422494476928]MSG-END
+2025-11-06 17:35:54 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0006000128468880226]MSG-END
+                                                   
+2025-11-06 17:36:01 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 25500/58500: [1.0300545692443848],[(2.679697322845459, 50.04000015258789, 74.33000183105469)]MSG-END
+
+2025-11-06 17:36:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005973805600128821]MSG-END
+2025-11-06 17:36:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005947454647359777]MSG-END
+2025-11-06 17:37:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005921076370520061]MSG-END
+2025-11-06 17:37:34 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005894671530344674]MSG-END
+2025-11-06 17:37:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005868240888334665]MSG-END
+                                                   
+2025-11-06 17:38:03 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 26000/58500: [1.0657103061676025],[(2.6915117263793946, 50.44000015258789, 74.29000244140624)]MSG-END
+
+2025-11-06 17:38:26 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005841785206735209]MSG-END
+2025-11-06 17:38:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005815305248513605]MSG-END
+2025-11-06 17:39:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005788801777337273]MSG-END
+2025-11-06 17:39:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000576227555755175]MSG-END
+2025-11-06 17:39:59 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005735727354158601]MSG-END
+                                                   
+2025-11-06 17:40:06 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 26500/58500: [1.0362861156463623],[(2.685044193267822, 50.03000030517578, 74.92000122070313)]MSG-END
+
+2025-11-06 17:40:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000570915793279341]MSG-END
+2025-11-06 17:40:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005682568059703663]MSG-END
+2025-11-06 17:41:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005655958501726684]MSG-END
+2025-11-06 17:41:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005629330026267478]MSG-END
+2025-11-06 17:42:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005602683401276621]MSG-END
+                                                   
+2025-11-06 17:42:09 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 27000/58500: [1.0331017971038818],[(2.671743965148926, 50.36000061035156, 74.47000122070312)]MSG-END
+
+2025-11-06 17:42:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005576019395228112]MSG-END
+2025-11-06 17:42:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005549338777097213]MSG-END
+2025-11-06 17:43:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000552264231633827]MSG-END
+2025-11-06 17:43:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005495930782862532]MSG-END
+2025-11-06 17:44:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005469204947015907]MSG-END
+                                                   
+2025-11-06 17:44:12 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 27500/58500: [1.0798509120941162],[(2.6706995487213137, 50.02000045776367, 74.42000274658203)]MSG-END
+
+2025-11-06 17:44:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005442465579556803]MSG-END
+2025-11-06 17:44:59 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005415713451633855]MSG-END
+2025-11-06 17:45:22 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005388949334763731]MSG-END
+2025-11-06 17:45:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000536217400080882]MSG-END
+2025-11-06 17:46:08 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005335388221955017]MSG-END
+                                                   
+2025-11-06 17:46:15 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 28000/58500: [1.0174556970596313],[(2.714805269241333, 49.52000122070312, 74.02000427246094)]MSG-END
+
+2025-11-06 17:46:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005308592770689453]MSG-END
+2025-11-06 17:47:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005281788419778185]MSG-END
+2025-11-06 17:47:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005254975942243965]MSG-END
+2025-11-06 17:47:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005228156111343867]MSG-END
+2025-11-06 17:48:11 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005201329700547071]MSG-END
+                                                   
+2025-11-06 17:48:18 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 28500/58500: [0.9997485876083374],[(2.7045889854431153, 49.91000137329102, 74.32000122070312)]MSG-END
+
+2025-11-06 17:48:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005174497483512497]MSG-END
+2025-11-06 17:49:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005147660234066524]MSG-END
+2025-11-06 17:49:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000512081872618066]MSG-END
+2025-11-06 17:49:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005093973733949208]MSG-END
+2025-11-06 17:50:14 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005067126031566992]MSG-END
+                                                   
+2025-11-06 17:50:21 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 29000/58500: [0.997299313545227],[(2.6989910125732424, 49.810001373291016, 73.69000091552735)]MSG-END
+
+2025-11-06 17:50:43 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005040276393306958]MSG-END
+2025-11-06 17:51:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0005013425593497909]MSG-END
+2025-11-06 17:51:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004986574406502129]MSG-END
+2025-11-06 17:51:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004959723606693073]MSG-END
+2025-11-06 17:52:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004932873968433038]MSG-END
+                                                   
+2025-11-06 17:52:23 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 29500/58500: [0.9823637008666992],[(2.7093799114227295, 50.369999694824216, 73.9500015258789)]MSG-END
+
+2025-11-06 17:52:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004906026266050818]MSG-END
+2025-11-06 17:53:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00048791812738193654]MSG-END
+2025-11-06 17:53:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00048523397659334976]MSG-END
+2025-11-06 17:53:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00048255025164875223]MSG-END
+2025-11-06 17:54:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004798670299452953]MSG-END
+                                                   
+2025-11-06 17:54:26 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 30000/58500: [1.0084574222564697],[(2.7047092437744142, 49.80999984741211, 73.66999969482421)]MSG-END
+
+2025-11-06 17:54:49 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00047718438886561567]MSG-END
+2025-11-06 17:55:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00047450240577560676]MSG-END
+2025-11-06 17:55:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00047182115802218446]MSG-END
+2025-11-06 17:55:59 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004691407229310584]MSG-END
+2025-11-06 17:56:22 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00046646117780450223]MSG-END
+                                                   
+2025-11-06 17:56:29 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 30500/58500: [0.923830509185791],[(2.6933906078338623, 50.50000152587891, 74.41000213623047)]MSG-END
+
+2025-11-06 17:56:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00046378259991912196]MSG-END
+2025-11-06 17:57:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00046110506652363085]MSG-END
+2025-11-06 17:57:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00045842865483661807]MSG-END
+2025-11-06 17:58:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00045575344204432376]MSG-END
+2025-11-06 17:58:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00045307950529841325]MSG-END
+                                                   
+2025-11-06 17:58:32 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 31000/58500: [0.9640398025512695],[(2.7166555881500245, 50.02000045776367, 73.69000396728515)]MSG-END
+
+2025-11-06 17:58:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00045040692171375115]MSG-END
+2025-11-06 17:59:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000447735768366176]MSG-END
+2025-11-06 17:59:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00044506612229028205]MSG-END
+2025-11-06 18:00:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00044239806047719247]MSG-END
+2025-11-06 18:00:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004397316598723414]MSG-END
+                                                   
+2025-11-06 18:00:35 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 31500/58500: [0.9631611704826355],[(2.7120430946350096, 50.2000015258789, 74.2500015258789)]MSG-END
+
+2025-11-06 18:00:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00043706699737325544]MSG-END
+2025-11-06 18:01:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004344041498273346]MSG-END
+2025-11-06 18:01:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00043174319402963676]MSG-END
+2025-11-06 18:02:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00042908420672066336]MSG-END
+2025-11-06 18:02:31 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004264272645841446]MSG-END
+                                                   
+2025-11-06 18:02:38 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 32000/58500: [0.9500946998596191],[(2.7013212203979493, 50.050000762939455, 74.25)]MSG-END
+
+2025-11-06 18:03:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004237724442448295]MSG-END
+2025-11-06 18:03:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004211198222662767]MSG-END
+2025-11-06 18:03:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004184694751486436]MSG-END
+2025-11-06 18:04:11 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004158214793264827]MSG-END
+2025-11-06 18:04:34 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00041317591116653664]MSG-END
+                                                   
+2025-11-06 18:04:41 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 32500/58500: [0.898631751537323],[(2.706159830093384, 50.87000045776367, 74.21000366210937)]MSG-END
+
+2025-11-06 18:05:03 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004105328469655353]MSG-END
+2025-11-06 18:05:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004078923629479961]MSG-END
+2025-11-06 18:05:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00040525453526402464]MSG-END
+2025-11-06 18:06:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0004026194399871196]MSG-END
+2025-11-06 18:06:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00039998715311197956]MSG-END
+                                                   
+2025-11-06 18:06:43 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 33000/58500: [0.9056411981582642],[(2.715622615814209, 50.460001373291014, 74.01000213623047)]MSG-END
+
+2025-11-06 18:07:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00039735775055230887]MSG-END
+2025-11-06 18:07:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000394731308138631]MSG-END
+2025-11-06 18:07:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00039210790161609937]MSG-END
+2025-11-06 18:08:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003894876066423142]MSG-END
+2025-11-06 18:08:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00038687049878514094]MSG-END
+                                                   
+2025-11-06 18:08:46 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 33500/58500: [0.9037841558456421],[(2.7152588844299315, 50.64000015258789, 73.69000091552735)]MSG-END
+
+2025-11-06 18:09:09 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00038425665352053047]MSG-END
+2025-11-06 18:09:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00038164614623034177]MSG-END
+2025-11-06 18:09:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00037903905220016814]MSG-END
+2025-11-06 18:10:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003764354466171672]MSG-END
+2025-11-06 18:10:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000373835404567891]MSG-END
+                                                   
+2025-11-06 18:10:49 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 34000/58500: [0.8912193775177002],[(2.704628610610962, 51.1900016784668, 74.2)]MSG-END
+
+2025-11-06 18:11:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003712390010361218]MSG-END
+2025-11-06 18:11:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003686463109007085]MSG-END
+2025-11-06 18:11:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000366057408933408]MSG-END
+2025-11-06 18:12:22 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00036347236979672817]MSG-END
+2025-11-06 18:12:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003608912680417754]MSG-END
+                                                   
+2025-11-06 18:12:52 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 34500/58500: [0.8769813776016235],[(2.7203540325164797, 50.25000076293945, 74.07000274658203)]MSG-END
+
+2025-11-06 18:13:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003583141781061045]MSG-END
+2025-11-06 18:13:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00035574117431157]MSG-END
+2025-11-06 18:14:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003531723308621866]MSG-END
+2025-11-06 18:14:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00035060772184198474]MSG-END
+2025-11-06 18:14:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003480474212128782]MSG-END
+                                                   
+2025-11-06 18:14:54 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 35000/58500: [0.9132776260375977],[(2.7680188179016114, 50.35999984741211, 73.33000335693359)]MSG-END
+
+2025-11-06 18:15:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003454915028125277]MSG-END
+2025-11-06 18:15:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003429400403522141]MSG-END
+2025-11-06 18:16:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003403931074147101]MSG-END
+2025-11-06 18:16:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003378507774521603]MSG-END
+2025-11-06 18:16:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00033531312378396177]MSG-END
+                                                   
+2025-11-06 18:16:58 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 35500/58500: [0.8737956285476685],[(2.742324638366699, 50.460000610351564, 73.44000091552735)]MSG-END
+
+2025-11-06 18:17:20 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003327802195946498]MSG-END
+2025-11-06 18:17:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00033025213793178796]MSG-END
+2025-11-06 18:18:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003277289517038596]MSG-END
+2025-11-06 18:18:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00032521073367816747]MSG-END
+2025-11-06 18:18:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00032269755647873347]MSG-END
+                                                   
+2025-11-06 18:19:00 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 36000/58500: [0.9111226797103882],[(2.7352324962615966, 50.62999954223633, 74.03000183105469)]MSG-END
+
+2025-11-06 18:19:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00032018949258420527]MSG-END
+2025-11-06 18:19:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003176866143257658]MSG-END
+2025-11-06 18:20:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003151889938850461]MSG-END
+2025-11-06 18:20:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003126967032920452]MSG-END
+2025-11-06 18:20:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00031020981442305307]MSG-END
+                                                   
+2025-11-06 18:21:03 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 36500/58500: [0.9231013059616089],[(2.7398812770843506, 51.35000076293945, 74.0000015258789)]MSG-END
+
+2025-11-06 18:21:26 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00030772839899857583]MSG-END
+2025-11-06 18:21:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000305252528581269]MSG-END
+2025-11-06 18:22:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00030278227457387273]MSG-END
+2025-11-06 18:22:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0003003177082171532]MSG-END
+2025-11-06 18:22:59 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002978589005878485]MSG-END
+                                                   
+2025-11-06 18:23:06 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 37000/58500: [0.8644721508026123],[(2.782673645019531, 50.650000762939456, 73.16999969482421)]MSG-END
+
+2025-11-06 18:23:29 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002954059225966173]MSG-END
+2025-11-06 18:23:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000292958844985995]MSG-END
+2025-11-06 18:24:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00029051773832835295]MSG-END
+2025-11-06 18:24:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00028808267302386515]MSG-END
+2025-11-06 18:25:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00028565371929847394]MSG-END
+                                                   
+2025-11-06 18:25:09 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 37500/58500: [0.85710209608078],[(2.7725361347198487, 50.5, 73.96000061035156)]MSG-END
+
+2025-11-06 18:25:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00028323094720186814]MSG-END
+2025-11-06 18:25:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00028081442660546216]MSG-END
+2025-11-06 18:26:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002784042272003802]MSG-END
+2025-11-06 18:26:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00027600041849544683]MSG-END
+2025-11-06 18:27:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002736030698151824]MSG-END
+                                                   
+2025-11-06 18:27:11 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 38000/58500: [0.8804681301116943],[(2.7347460746765138, 51.00999984741211, 74.47000122070312)]MSG-END
+
+2025-11-06 18:27:34 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002712122502978034]MSG-END
+2025-11-06 18:27:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002688280288932292]MSG-END
+2025-11-06 18:28:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002664504743610935]MSG-END
+2025-11-06 18:28:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002640796552687603]MSG-END
+2025-11-06 18:29:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00026171563998934736]MSG-END
+                                                   
+2025-11-06 18:29:14 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 38500/58500: [0.8358857035636902],[(2.785950946807861, 50.230001068115236, 73.7500015258789)]MSG-END
+
+2025-11-06 18:29:37 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00025935849669975517]MSG-END
+2025-11-06 18:30:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002570082933786984]MSG-END
+2025-11-06 18:30:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002546650978047484]MSG-END
+2025-11-06 18:30:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00025232897755437514]MSG-END
+2025-11-06 18:31:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002500000000000015]MSG-END
+                                                   
+2025-11-06 18:31:17 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 39000/58500: [0.864628791809082],[(2.79970121383667, 50.800001525878905, 73.69000244140625)]MSG-END
+
+2025-11-06 18:31:40 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00024767823230805916]MSG-END
+2025-11-06 18:32:03 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00024536374143705017]MSG-END
+2025-11-06 18:32:26 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00024305659413561743]MSG-END
+2025-11-06 18:32:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00024075685694062006]MSG-END
+2025-11-06 18:33:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00023846459617521293]MSG-END
+                                                   
+2025-11-06 18:33:20 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 39500/58500: [0.8420353531837463],[(2.788930654525757, 50.93000106811523, 73.61999969482422)]MSG-END
+
+2025-11-06 18:33:43 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002361798779469354]MSG-END
+2025-11-06 18:34:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00023390276814580372]MSG-END
+2025-11-06 18:34:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002316333324424119]MSG-END
+2025-11-06 18:34:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00022937163628603633]MSG-END
+2025-11-06 18:35:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0002271177449027498]MSG-END
+                                                   
+2025-11-06 18:35:23 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 40000/58500: [0.814181923866272],[(2.7635525703430175, 51.070001220703126, 74.01000213623047)]MSG-END
+
+2025-11-06 18:35:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00022487172329353956]MSG-END
+2025-11-06 18:36:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00022263363623243292]MSG-END
+2025-11-06 18:36:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00022040354826462888]MSG-END
+2025-11-06 18:36:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00021818152370463745]MSG-END
+2025-11-06 18:37:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00021596762663442438]MSG-END
+                                                   
+2025-11-06 18:37:26 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 40500/58500: [0.8467189073562622],[(2.7822239875793455, 51.210000610351564, 74.07000122070312)]MSG-END
+
+2025-11-06 18:37:49 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00021376192090156288]MSG-END
+2025-11-06 18:38:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00021156447011739222]MSG-END
+2025-11-06 18:38:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00020937533765518415]MSG-END
+2025-11-06 18:38:59 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00020719458664831416]MSG-END
+2025-11-06 18:39:22 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00020502227998844114]MSG-END
+                                                   
+2025-11-06 18:39:29 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 41000/58500: [0.8540381193161011],[(2.7775265693664553, 51.310001373291016, 73.88000030517578)]MSG-END
+
+2025-11-06 18:39:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00020285848032369406]MSG-END
+2025-11-06 18:40:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00020070325005686415]MSG-END
+2025-11-06 18:40:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00019855665134360645]MSG-END
+2025-11-06 18:41:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001964187460906469]MSG-END
+2025-11-06 18:41:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00019428959595399635]MSG-END
+                                                   
+2025-11-06 18:41:32 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 41500/58500: [0.8289382457733154],[(2.805968189239502, 50.810000610351565, 73.71000061035156)]MSG-END
+
+2025-11-06 18:41:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000192169262337173]MSG-END
+2025-11-06 18:42:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00019005780638943178]MSG-END
+2025-11-06 18:42:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001879552890040007]MSG-END
+2025-11-06 18:43:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00018586177081632367]MSG-END
+2025-11-06 18:43:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00018377731220231352]MSG-END
+                                                   
+2025-11-06 18:43:34 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 42000/58500: [0.8355989456176758],[(2.8199041366577147, 50.68000030517578, 73.4300033569336)]MSG-END
+
+2025-11-06 18:43:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00018170197327660928]MSG-END
+2025-11-06 18:44:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00017963581389084386]MSG-END
+2025-11-06 18:44:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001775788936319169]MSG-END
+2025-11-06 18:45:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00017553127182027658]MSG-END
+2025-11-06 18:45:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00017349300750820956]MSG-END
+                                                   
+2025-11-06 18:45:37 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 42500/58500: [0.8045669794082642],[(2.817440891265869, 50.80999984741211, 73.64000244140625)]MSG-END
+
+2025-11-06 18:46:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00017146415947813675]MSG-END
+2025-11-06 18:46:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00016944478624091906]MSG-END
+2025-11-06 18:46:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00016743494603416902]MSG-END
+2025-11-06 18:47:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00016543469682057292]MSG-END
+2025-11-06 18:47:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00016344409628621677]MSG-END
+                                                   
+2025-11-06 18:47:40 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 43000/58500: [0.8537728786468506],[(2.806840705871582, 51.230001068115236, 73.53000030517578)]MSG-END
+
+2025-11-06 18:48:03 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00016146320183892495]MSG-END
+2025-11-06 18:48:26 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.000159492070606603]MSG-END
+2025-11-06 18:48:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00015753075943559155]MSG-END
+2025-11-06 18:49:13 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00015557932488902514]MSG-END
+2025-11-06 18:49:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00015363782324520232]MSG-END
+                                                   
+2025-11-06 18:49:43 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 43500/58500: [0.8144654035568237],[(2.8428609371185303, 51.26000137329102, 73.09000244140626)]MSG-END
+
+2025-11-06 18:50:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00015170631049596167]MSG-END
+2025-11-06 18:50:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00014978484234506862]MSG-END
+2025-11-06 18:50:53 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001478734742066072]MSG-END
+2025-11-06 18:51:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00014597226120338235]MSG-END
+2025-11-06 18:51:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00014408125816533132]MSG-END
+                                                   
+2025-11-06 18:51:46 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 44000/58500: [0.8287385702133179],[(2.828872489929199, 50.650000762939456, 73.66999969482421)]MSG-END
+
+2025-11-06 18:52:09 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00014220051962794098]MSG-END
+2025-11-06 18:52:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00014033009983067585]MSG-END
+2025-11-06 18:52:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001384700527154139]MSG-END
+2025-11-06 18:53:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00013662043192488998]MSG-END
+2025-11-06 18:53:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001347812908011501]MSG-END
+                                                   
+2025-11-06 18:53:49 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 44500/58500: [0.8126338124275208],[(2.8337942600250243, 51.08000106811524, 73.46000366210937)]MSG-END
+
+2025-11-06 18:54:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001329526823840121]MSG-END
+2025-11-06 18:54:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00013113465940953653]MSG-END
+2025-11-06 18:54:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00012932727430850567]MSG-END
+2025-11-06 18:55:22 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00012753057920491097]MSG-END
+2025-11-06 18:55:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00012574462591445073]MSG-END
+                                                   
+2025-11-06 18:55:52 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 45000/58500: [0.8158009648323059],[(2.827199029922485, 51.480001068115236, 73.64000396728515)]MSG-END
+
+2025-11-06 18:56:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001239694659430355]MSG-END
+2025-11-06 18:56:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00012220515048530137]MSG-END
+2025-11-06 18:57:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00012045173042313559]MSG-END
+2025-11-06 18:57:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00011870925632420773]MSG-END
+2025-11-06 18:57:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00011697777844051213]MSG-END
+                                                   
+2025-11-06 18:57:55 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 45500/58500: [0.8243392109870911],[(2.8377270698547363, 51.45000076293945, 73.35999908447266)]MSG-END
+
+2025-11-06 18:58:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00011525734670691844]MSG-END
+2025-11-06 18:58:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00011354801073973033]MSG-END
+2025-11-06 18:59:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001118498198352571]MSG-END
+2025-11-06 18:59:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00011016282296838995]MSG-END
+2025-11-06 18:59:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00010848706879118998]MSG-END
+                                                   
+2025-11-06 18:59:58 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 46000/58500: [0.7964212894439697],[(2.8386035442352293, 51.28000030517578, 73.2500015258789)]MSG-END
+
+2025-11-06 19:00:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00010682260563148569]MSG-END
+2025-11-06 19:00:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00010516948149147856]MSG-END
+2025-11-06 19:01:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00010352774404635918]MSG-END
+2025-11-06 19:01:31 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.00010189744064293221]MSG-END
+2025-11-06 19:01:54 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0001002786182982503]MSG-END
+                                                   
+2025-11-06 19:02:01 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 46500/58500: [0.8036247491836548],[(2.832468318939209, 51.630001831054685, 73.4000015258789)]MSG-END
+
+2025-11-06 19:02:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [9.867132369825968e-05]MSG-END
+2025-11-06 19:02:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [9.707560319645153e-05]MSG-END
+2025-11-06 19:03:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [9.549150281252721e-05]MSG-END
+2025-11-06 19:03:34 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [9.391906823107038e-05]MSG-END
+2025-11-06 19:03:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [9.235834480022872e-05]MSG-END
+                                                   
+2025-11-06 19:04:04 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 47000/58500: [0.8120722770690918],[(2.858192205429077, 50.95, 73.05000152587891)]MSG-END
+
+2025-11-06 19:04:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [9.080937753040725e-05]MSG-END
+2025-11-06 19:04:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.927221109296996e-05]MSG-END
+2025-11-06 19:05:14 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.774688981895076e-05]MSG-END
+2025-11-06 19:05:37 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.6233457697776e-05]MSG-END
+2025-11-06 19:06:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.473195837599507e-05]MSG-END
+                                                   
+2025-11-06 19:06:07 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 47500/58500: [0.8196441531181335],[(2.84311466217041, 51.18000106811523, 73.17000274658203)]MSG-END
+
+2025-11-06 19:06:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.324243515602212e-05]MSG-END
+2025-11-06 19:06:54 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.176493099488764e-05]MSG-END
+2025-11-06 19:07:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.029948850299786e-05]MSG-END
+2025-11-06 19:07:40 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.884614994290844e-05]MSG-END
+2025-11-06 19:08:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.740495722810342e-05]MSG-END
+                                                   
+2025-11-06 19:08:10 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 48000/58500: [0.796881914138794],[(2.845004749298096, 51.290000915527344, 73.0000015258789)]MSG-END
+
+2025-11-06 19:08:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.597595192178772e-05]MSG-END
+2025-11-06 19:08:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.455917523568821e-05]MSG-END
+2025-11-06 19:09:19 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.315466802886462e-05]MSG-END
+2025-11-06 19:09:43 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.176247080653197e-05]MSG-END
+2025-11-06 19:10:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.038262371889224e-05]MSG-END
+                                                   
+2025-11-06 19:10:13 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 48500/58500: [0.818384051322937],[(2.847582197189331, 51.42000045776367, 73.17000274658203)]MSG-END
+
+2025-11-06 19:10:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.901516655997595e-05]MSG-END
+2025-11-06 19:10:59 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.766013876649534e-05]MSG-END
+2025-11-06 19:11:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.6317579416706e-05]MSG-END
+2025-11-06 19:11:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.498752722928098e-05]MSG-END
+2025-11-06 19:12:09 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.367002056219355e-05]MSG-END
+                                                   
+2025-11-06 19:12:16 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 49000/58500: [0.8484268188476562],[(2.8321330547332764, 51.96000213623047, 73.44000091552735)]MSG-END
+
+2025-11-06 19:12:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.23650974116107e-05]MSG-END
+2025-11-06 19:13:02 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.107279541079841e-05]MSG-END
+2025-11-06 19:13:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.979315182903488e-05]MSG-END
+2025-11-06 19:13:49 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.852620357053705e-05]MSG-END
+2025-11-06 19:14:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.727198717339562e-05]MSG-END
+                                                   
+2025-11-06 19:14:19 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 49500/58500: [0.7940057516098022],[(2.862340974807739, 50.960000610351564, 72.66999969482421)]MSG-END
+
+2025-11-06 19:14:42 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.603053880852105e-05]MSG-END
+2025-11-06 19:15:05 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.480189427860125e-05]MSG-END
+2025-11-06 19:15:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.35860890170685e-05]MSG-END
+2025-11-06 19:15:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.23831580870771e-05]MSG-END
+2025-11-06 19:16:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.1193136180493513e-05]MSG-END
+                                                   
+2025-11-06 19:16:22 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 50000/58500: [0.8168846964836121],[(2.8522058486938477, 51.790000915527344, 73.03000335693359)]MSG-END
+
+2025-11-06 19:16:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.001605761689437e-05]MSG-END
+2025-11-06 19:17:08 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.885195634257786e-05]MSG-END
+2025-11-06 19:17:31 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.770086592958439e-05]MSG-END
+2025-11-06 19:17:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.656281957472773e-05]MSG-END
+2025-11-06 19:18:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.5437850098638644e-05]MSG-END
+                                                   
+2025-11-06 19:18:25 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 50500/58500: [0.789908230304718],[(2.845904588699341, 51.76000213623047, 73.07000274658203)]MSG-END
+
+2025-11-06 19:18:48 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.432598994481771e-05]MSG-END
+2025-11-06 19:19:11 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.322727117869995e-05]MSG-END
+2025-11-06 19:19:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.214172548673012e-05]MSG-END
+2025-11-06 19:19:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.106938417544846e-05]MSG-END
+2025-11-06 19:20:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.001027817058828e-05]MSG-END
+                                                   
+2025-11-06 19:20:28 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 51000/58500: [0.7888864278793335],[(2.8303255081176757, 52.11000061035156, 73.63000030517578)]MSG-END
+
+2025-11-06 19:20:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.896443801618414e-05]MSG-END
+2025-11-06 19:21:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.793189387369042e-05]MSG-END
+2025-11-06 19:21:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.691267552111214e-05]MSG-END
+2025-11-06 19:22:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.5906812352145646e-05]MSG-END
+2025-11-06 19:22:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.491433337533123e-05]MSG-END
+                                                   
+2025-11-06 19:22:31 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 51500/58500: [0.7993760108947754],[(2.836703157424927, 51.92999954223633, 73.34000244140626)]MSG-END
+
+2025-11-06 19:22:54 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.3935267213216546e-05]MSG-END
+2025-11-06 19:23:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.296964210153079e-05]MSG-END
+2025-11-06 19:23:40 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.201748588837094e-05]MSG-END
+2025-11-06 19:24:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.10788260333981e-05]MSG-END
+2025-11-06 19:24:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.015368960704617e-05]MSG-END
+                                                   
+2025-11-06 19:24:34 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 52000/58500: [0.8021953105926514],[(2.839651107788086, 52.060001373291016, 73.3800033569336)]MSG-END
+
+2025-11-06 19:24:57 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.9242103289740505e-05]MSG-END
+2025-11-06 19:25:20 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.8344093371128746e-05]MSG-END
+2025-11-06 19:25:44 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.745968574932298e-05]MSG-END
+2025-11-06 19:26:07 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.6588905930152306e-05]MSG-END
+2025-11-06 19:26:30 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.57317790264275e-05]MSG-END
+                                                   
+2025-11-06 19:26:37 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 52500/58500: [0.7985876798629761],[(2.849170970916748, 51.70000076293945, 73.08000183105469)]MSG-END
+
+2025-11-06 19:27:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.4888329757216846e-05]MSG-END
+2025-11-06 19:27:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.4058582447133027e-05]MSG-END
+2025-11-06 19:27:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.3242561025632017e-05]MSG-END
+2025-11-06 19:28:10 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.2440289026322578e-05]MSG-END
+2025-11-06 19:28:33 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.165178958628758e-05]MSG-END
+                                                   
+2025-11-06 19:28:40 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 53000/58500: [0.7933530807495117],[(2.8418609619140627, 51.71000213623047, 73.42000427246094)]MSG-END
+
+2025-11-06 19:29:03 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.087708544541715e-05]MSG-END
+2025-11-06 19:29:26 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.0116198945752208e-05]MSG-END
+2025-11-06 19:29:49 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.936915203084075e-05]MSG-END
+2025-11-06 19:30:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.8635966245104836e-05]MSG-END
+2025-11-06 19:30:36 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.7916662733219014e-05]MSG-END
+                                                   
+2025-11-06 19:30:43 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 53500/58500: [0.7893767952919006],[(2.845441150665283, 51.900000762939456, 73.0000015258789)]MSG-END
+
+2025-11-06 19:31:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.7211262239500634e-05]MSG-END
+2025-11-06 19:31:29 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.6519785107312047e-05]MSG-END
+2025-11-06 19:31:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.5842251278472925e-05]MSG-END
+2025-11-06 19:32:16 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.51786802926863e-05]MSG-END
+2025-11-06 19:32:39 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.452909128697414e-05]MSG-END
+                                                   
+2025-11-06 19:32:46 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 54000/58500: [0.7885687947273254],[(2.842771577835083, 51.58000030517578, 72.9800018310547)]MSG-END
+
+2025-11-06 19:33:09 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.3893502995125898e-05]MSG-END
+2025-11-06 19:33:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.327193374715832e-05]MSG-END
+2025-11-06 19:33:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.2664401468786242e-05]MSG-END
+2025-11-06 19:34:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.2070923680906408e-05]MSG-END
+2025-11-06 19:34:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.1491517499091613e-05]MSG-END
+                                                   
+2025-11-06 19:34:48 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 54500/58500: [0.8125245571136475],[(2.8444939613342286, 51.470000457763675, 73.08000183105469)]MSG-END
+
+2025-11-06 19:35:11 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.0926199633097261e-05]MSG-END
+2025-11-06 19:35:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.0374986386379669e-05]MSG-END
+2025-11-06 19:35:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [9.837893655625416e-06]MSG-END
+2025-11-06 19:36:21 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [9.314936930293375e-06]MSG-END
+2025-11-06 19:36:45 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.806131292167717e-06]MSG-END
+                                                   
+2025-11-06 19:36:51 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 55000/58500: [0.8175148367881775],[(2.842150068283081, 51.85000152587891, 72.89000244140625)]MSG-END
+
+2025-11-06 19:37:14 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.311491414923028e-06]MSG-END
+2025-11-06 19:37:37 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.83103156370127e-06]MSG-END
+2025-11-06 19:38:00 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.364765594700033e-06]MSG-END
+2025-11-06 19:38:24 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.912706954773328e-06]MSG-END
+2025-11-06 19:38:47 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.474868681043652e-06]MSG-END
+                                                   
+2025-11-06 19:38:54 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 55500/58500: [0.7877873182296753],[(2.8376017570495606, 51.900001525878906, 73.24000091552735)]MSG-END
+
+2025-11-06 19:39:17 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.051263400525821e-06]MSG-END
+2025-11-06 19:39:40 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.641903329763063e-06]MSG-END
+2025-11-06 19:40:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.2468002744745e-06]MSG-END
+2025-11-06 19:40:27 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.865965629214873e-06]MSG-END
+2025-11-06 19:40:50 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.4994103770458155e-06]MSG-END
+                                                   
+2025-11-06 19:40:57 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 56000/58500: [0.8022958040237427],[(2.842535305023193, 51.870001220703124, 73.13000030517578)]MSG-END
+
+2025-11-06 19:41:20 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.1471450892190335e-06]MSG-END
+2025-11-06 19:41:43 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.809179924871665e-06]MSG-END
+2025-11-06 19:42:06 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.4855246307329708e-06]MSG-END
+2025-11-06 19:42:29 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.1761885408435424e-06]MSG-END
+2025-11-06 19:42:52 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.881180576286091e-06]MSG-END
+                                                   
+2025-11-06 19:42:59 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 56500/58500: [0.7915518283843994],[(2.841964292526245, 51.85000152587891, 73.1)]MSG-END
+
+2025-11-06 19:43:23 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.60050924492786e-06]MSG-END
+2025-11-06 19:43:46 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.3341826411757145e-06]MSG-END
+2025-11-06 19:44:09 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.082208445742276e-06]MSG-END
+2025-11-06 19:44:32 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.8445939254247097e-06]MSG-END
+2025-11-06 19:44:56 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.6213459328950546e-06]MSG-END
+                                                   
+2025-11-06 19:45:03 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 57000/58500: [0.794060230255127],[(2.842926836013794, 51.880001068115234, 73.05000152587891)]MSG-END
+
+2025-11-06 19:45:25 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.4124709065025003e-06]MSG-END
+2025-11-06 19:45:49 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.2179748700878601e-06]MSG-END
+2025-11-06 19:46:12 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.0378634328099394e-06]MSG-END
+2025-11-06 19:46:35 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [8.72141788983326e-07]MSG-END
+2025-11-06 19:46:58 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.208147179291275e-07]MSG-END
+                                                   
+2025-11-06 19:47:05 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 57500/58500: [0.7916219830513],[(2.8429595947265627, 51.87000198364258, 73.10000305175781)]MSG-END
+
+2025-11-06 19:47:28 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [5.838865838367409e-07]MSG-END
+2025-11-06 19:47:51 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [4.6136133563818297e-07]MSG-END
+2025-11-06 19:48:15 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [3.532425068942843e-07]MSG-END
+2025-11-06 19:48:38 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.595332156925567e-07]MSG-END
+2025-11-06 19:49:01 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.8023616455731508e-07]MSG-END
+                                                   
+2025-11-06 19:49:08 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 58000/58500: [0.7884081602096558],[(2.842385768890381, 51.84000091552734, 73.09000244140626)]MSG-END
+
+2025-11-06 19:49:31 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [1.1535364037190842e-07]MSG-END
+2025-11-06 19:49:55 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [6.488751431266236e-08]MSG-END
+2025-11-06 19:50:18 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [2.883924179486502e-08]MSG-END
+2025-11-06 19:50:41 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [7.209862430801553e-09]MSG-END
+2025-11-06 19:51:04 - /tmp/ipykernel_46/3450082893.py - LINE814 - 
+lr: [0.0]MSG-END
+                                                   
+2025-11-06 19:51:11 - /tmp/ipykernel_46/3450082893.py - LINE921 - 
+Round 58500/58500: [0.7949972152709961],[(2.842417335510254, 51.870001220703124, 73.10000305175781)]MSG-END
+2025-11-06 19:51:11 - /kaggle/working/utils.py - LINE183 - 
+Done. Losses saved to output/_adamw_losses.csvMSG-END
