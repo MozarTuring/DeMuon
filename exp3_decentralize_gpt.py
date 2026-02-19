@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 import random
 
 
@@ -9,6 +10,24 @@ from gpt_utils import *
 from utils import *
 
 
+def quick2json(inp_path, inp_data):
+    with open(inp_path, "w", encoding="utf8") as wf:
+        wf.write(json.dumps(inp_data, ensure_ascii=False, indent=2))
+
+
+
+@torch.no_grad()
+def eval_loss(model, loader, loss_fn):
+    model.eval()
+    tot, ntok = 0.0, 0
+    for x, y in loader:
+        x, y = x.to(device), y.to(device)
+        logits = model(x)
+        loss   = loss_fn(logits.view(-1, logits.size(-1)), y.view(-1))
+        n      = y.numel()
+        tot   += loss.item()*n
+        ntok  += n
+    return tot/ntok
 
 
 
@@ -17,35 +36,41 @@ if __name__ == '__main__':
 
     jwp("Starting training")
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs",    type=int, required=True)
-    parser.add_argument("--train_batch_size",type=int, required=True)
-    parser.add_argument("--eval_batch_size",type=int, required=True)
-    parser.add_argument("--log_interval",type=int, required=True)
-    parser.add_argument("--n_workers", type=int, default=1)
-    parser.add_argument("--network", type=str, required=True)
-
     parser.add_argument("--block_size",type=int, default=64)
     parser.add_argument("--d_model",   type=int, default=256)
     parser.add_argument("--n_layer",   type=int, default=2)
     parser.add_argument("--n_head",    type=int, default=4)
     parser.add_argument("--max_len",   type=int, default=128)
+    parser.add_argument("--train_batch_size",   type=int, default=64)
+    parser.add_argument("--eval_batch_size",   type=int, default=512)
+    parser.add_argument("--epochs",   type=int, default=12)
+    parser.add_argument("--log_interval",   type=int, default=100)
+    parser.add_argument("--n_workers",   type=int, default=8)
 
     parser.add_argument("--lr",   type=float, default=1e-1)
     parser.add_argument("--mom",   type=float, default=0.8)
 
     parser.add_argument("--msgn",   type=int, default=1)
 
-    parser.add_argument("--lr_schedule",   type=str, default='1')
+    parser.add_argument("--lr_schedule",   type=int, default=3)
+    parser.add_argument("--network",   type=str, default='complete')
+    parser.add_argument("--alg",   type=str, default='demuon')
 
-    # args = parser.parse_args(['--train_batch_size','128','--eval_batch_size','512', '--epochs','30', '--log_interval', '100', '--n_workers', '1', '--network', 'complete', '--lr','0.1', '--msgn', '1', '--lr_schedule', '2'])
+    args = parser.parse_args()
+    jwm_commit_id=str(os.environ['jwm_commit_id'])
 
-    args = parser.parse_args(['--train_batch_size','128','--eval_batch_size','512', '--epochs','240', '--log_interval', '100', '--n_workers', '8', '--network', 'complete', '--lr','0.1', '--msgn', '1', '--lr_schedule', '2'])
-
+    quick2json(os.path.join('./args.json'), vars(args))
     jwp(args)
+
+    header = ["round"]
+    header += [f"w{i}_val"   for i in range(args.n_workers)]
+    header += [f"w{i}_train" for i in range(args.n_workers)]
+    loss_table = [header]
+
 
     filename = os.path.basename(__file__)
 
-    wandb.init(project='neurips_code', config=args, group=f'{filename}', name=f'{args.network}_lr{args.lr}_msgn{args.msgn}_schedule{args.lr_schedule}_workers{args.n_workers}')
+    wandb.init(project='neurips_code', config=args, name=f'{jwm_commit_id}')
     artifact = wandb.Artifact("my_model", type="model")
     
     loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
@@ -106,10 +131,12 @@ if __name__ == '__main__':
         
         if args.n_workers > 1:
             y_list = mix_y_list(y_list, mixing)
-        if args.lr_schedule == '1':
+        if args.lr_schedule == 1:
             tmp_lr = lr * (1-r/total_rounds)
-        elif args.lr_schedule == '2':
+        elif args.lr_schedule == 2:
             tmp_lr = lr / math.sqrt(r)
+        elif args.lr_schedule == 3:
+            tmp_lr = lr
         else:
             pass
         for wid, model in enumerate(model_ls):
@@ -144,8 +171,17 @@ if __name__ == '__main__':
         if args.n_workers > 1:
             mix_params(model_ls, mixing)
     
-
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
+            val_losses = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
+            loss_table.append([r] + val_losses + round_losses)
             wandb.log({'training loss': np.average(round_losses)}, step=r)
             jwp(f"Round {r}/{total_rounds}: {round_losses}")
             # wandb.log({'lr': lr/r, 'lr_norm': lr/r/denominator}, step=r)
+            if r > 10 and "test" in jwm_commit_id:
+                break
+
+    out_csv = Path(f"./loss.csv")
+    with out_csv.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(loss_table)
+
