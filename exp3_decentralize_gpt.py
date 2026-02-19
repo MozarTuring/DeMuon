@@ -53,7 +53,7 @@ if __name__ == '__main__':
     parser.add_argument("--msgn",   type=int, default=2)
 
     parser.add_argument("--lr_schedule",   type=int, default=3)
-    parser.add_argument("--network",   type=str, default='exp')
+    parser.add_argument("--network",   type=str, default='complete')
     parser.add_argument("--alg",   type=str, default='demuon')
 
     args = parser.parse_args()
