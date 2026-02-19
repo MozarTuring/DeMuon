@@ -158,7 +158,7 @@ if __name__ == '__main__':
                         if args.msgn == 0:
                             p.data -= tmp_lr  * y_list[wid][name]
                         elif args.msgn == 1:
-                            update = zeropower_via_newtonschulz5(tmp)
+                            update = zeropower_via_newtonschulz5(tmp, steps=5)
                             p.data -= tmp_lr  * update.reshape(tmp_shape)
                             
                         elif args.msgn == 2:
