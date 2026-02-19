@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument("--lr",   type=float, default=1e-1)
     parser.add_argument("--mom",   type=float, default=0.8)
 
-    parser.add_argument("--msgn",   type=int, default=2)
+    parser.add_argument("--msgn",   type=int, default=1)
 
     parser.add_argument("--lr_schedule",   type=int, default=3)
     parser.add_argument("--network",   type=str, default='complete')
