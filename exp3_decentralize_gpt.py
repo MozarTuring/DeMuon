@@ -155,9 +155,7 @@ if __name__ == '__main__':
                         assert denominator != 0
                         p.data -= tmp_lr  * tmp.reshape(tmp_shape)  / denominator
                     elif tmp.ndim == 2:
-                        if name in ['pos_emb','tok_emb.weight']:
-                            p.data -= tmp_lr  * y_list[wid][name]
-                        elif args.msgn == 0:
+                        if args.msgn == 0:
                             p.data -= tmp_lr  * y_list[wid][name]
                         elif args.msgn == 1:
                             update = zeropower_via_newtonschulz5(tmp)
