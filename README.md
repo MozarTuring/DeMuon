@@ -72,31 +72,4 @@ python exp3_decentralize_gpt.py \
   --lr_schedule 3
 ```
 
-### Running on SLURM (Alvis cluster)
 
-```bash
-export jwm_commit_id=$(git rev-parse --short HEAD)
-sbatch slurm.sh
-```
-
-The provided `slurm.sh` requests one T4 GPU on the Alvis partition and sources a pre-built virtual environment.
-
-## Outputs
-
-| File | Description |
-|---|---|
-| `args.json` | Saved hyperparameters for the run |
-| `loss.csv` | Per-round validation and training losses for each worker |
-| W&B dashboard | Live training loss curves under project `neurips_code` |
-
-## Project structure
-
-```
-├── exp3_decentralize_gpt.py   # Main decentralized training script
-├── gpt_utils.py               # MiniGPT model, dataset, data loading
-├── utils.py                   # Mixing, optimizers, evaluation helpers
-├── graph.py                   # Graph topology generation (ring, exp, complete)
-├── slurm.sh                   # SLURM job script for Alvis cluster
-├── requirements_gpt.txt       # Python dependencies
-└── graphs/                    # Auto-created; cached mixing matrices
-```
