@@ -6,7 +6,7 @@ This repository implements decentralized training of a small GPT model (MiniGPT)
 
 - Python 3.12+
 - CUDA-capable GPU (falls back to CPU if unavailable)
-- A [Weights & Biases](https://wandb.ai) account (logging is enabled by default)
+- A [Weights & Biases](https://wandb.ai) account 
 
 ## Installation
 
