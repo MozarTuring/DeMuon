@@ -2,6 +2,8 @@
 #SBATCH -A naiss2026-4-5 -p alvis
 #SBATCH -N 1 --gpus-per-node=T4:1
 #SBATCH -t 1-00:03:00
+#SBATCH --output=slurm_out.log
+#SBATCH --error=slurm_out.log
 
 # if [ -d "${jwm_outputdir}" ]; then
 #   this dir is passed to sbatch --output and will be created
@@ -18,4 +20,4 @@ source /mimer/NOBACKUP/groups/naiss2025-22-1056/pythonenv/neurips_code/bin/activ
 # pip install -r requirements_gpt.txt
 # pip install wandb
 
-python exp3_decentralize_gpt.py
+PYTHONUNBUFFERED=1 python exp3_decentralize_gpt.py

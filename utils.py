@@ -1,7 +1,6 @@
 import torch
 from copy import deepcopy
 from typing import Union
-import wandb
 from tqdm import tqdm
 import math, random, argparse, csv
 from pathlib import Path
@@ -34,7 +33,6 @@ def jwp(*args):
     logging.info(total)
 jwp = logging.info
 
-wandb.login(key='44605eadd683b5ce6dd038f6678b22fbbe392f3f')
 
 # ---------- mixing utility ------------------------------------
 def mix_params(workers, mixing):
@@ -178,8 +176,6 @@ def end(args, artifact, loss_table):
         writer = csv.writer(f)
         writer.writerows(loss_table)
 
-    artifact.add_file(str(out_csv))
-    wandb.log_artifact(artifact)
 
     jwp(f"Done. Losses saved to {out_csv}")
 

@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from gpt_utils import *
 
 from utils import *
+import wandb
 
 
 def quick2json(inp_path, inp_data):
@@ -57,7 +58,7 @@ if __name__ == '__main__':
     parser.add_argument("--alg",   type=str, default='demuon')
 
     args = parser.parse_args()
-    jwm_commit_id=str(os.environ['jwm_commit_id'])
+    JWM_COMMIT_ID=str(os.environ['JWM_COMMIT_ID'])
 
     quick2json(os.path.join('./args.json'), vars(args))
     jwp(args)
@@ -70,8 +71,8 @@ if __name__ == '__main__':
 
     filename = os.path.basename(__file__)
 
-    wandb.init(project='neurips_code', config=args, name=f'{jwm_commit_id}')
-    artifact = wandb.Artifact("my_model", type="model")
+    wandb.login(key=str(os.environ['WANDB_TOKEN']))
+    wandb.init(project='neurips_code', config=args, name=f'{JWM_COMMIT_ID}')
     
     loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
     jwp(rounds_per_epoch)
@@ -179,7 +180,7 @@ if __name__ == '__main__':
             wandb.log({'training loss': np.average(round_losses)}, step=r)
             jwp(f"Round {r}/{total_rounds}: {round_losses}")
             # wandb.log({'lr': lr/r, 'lr_norm': lr/r/denominator}, step=r)
-            if r > 10 and "test" in jwm_commit_id:
+            if r > 10 and "test" in JWM_COMMIT_ID:
                 break
 
     out_csv = Path(f"./loss.csv")
