@@ -8,7 +8,6 @@ from torch.utils.data import DataLoader, TensorDataset
 from gpt_utils import *
 
 from utils import *
-import wandb
 
 
 def quick2json(inp_path, inp_data):
@@ -71,8 +70,6 @@ if __name__ == '__main__':
 
     filename = os.path.basename(__file__)
 
-    wandb.login(key=str(os.environ['WANDB_TOKEN']))
-    wandb.init(project='neurips_code', config=args, name=f'{JWM_COMMIT_ID}')
     
     loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
     jwp(rounds_per_epoch)
@@ -177,9 +174,7 @@ if __name__ == '__main__':
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
             val_losses = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
             loss_table.append([r] + val_losses + round_losses)
-            wandb.log({'training loss': np.average(round_losses)}, step=r)
             jwp(f"Round {r}/{total_rounds}: {round_losses}")
-            # wandb.log({'lr': lr/r, 'lr_norm': lr/r/denominator}, step=r)
             if r > 10 and "test" in JWM_COMMIT_ID:
                 break
 

@@ -6,26 +6,27 @@ This repository implements decentralized training of a small GPT model (MiniGPT)
 
 - Python 3.12+
 - CUDA-capable GPU (falls back to CPU if unavailable)
-- A [Weights & Biases](https://wandb.ai) account 
-
 ## Installation
 
 ```bash
 pip install -r requirements_gpt.txt
-pip install wandb
 ```
 
 ## Running `exp3_decentralize_gpt.py`
 
 ### Environment variable
 
-The script requires a `jwm_commit_id` environment variable, used to name the W&B run. Set it before launching:
+The script requires one environment variable:
+
+| Variable | Purpose |
+|---|---|
+| `JWM_COMMIT_ID` | Run identifier (used in logging) |
 
 ```bash
-export jwm_commit_id="my_run_v1"
+export JWM_COMMIT_ID="my_run_v1"
 ```
 
-> If the value contains the substring `"test"`, training will stop early (after round 10) for quick sanity checks.
+> If `JWM_COMMIT_ID` contains the substring `"test"`, training will stop early (after round 10) for quick sanity checks.
 
 ### Basic usage
 
@@ -54,12 +55,19 @@ This runs with all default hyperparameters (8 workers, ring topology, 12 epochs,
 | `--msgn` | int | 1 | Update normalization: 0 = plain, 1 = Newton-Schulz, 2 = SVD |
 | `--lr_schedule` | int | 3 | LR schedule: 1 = linear decay, 2 = 1/sqrt(t), 3 = constant |
 | `--network` | str | `ring` | Graph topology (`ring`, `exp`, `complete`) |
-| `--alg` | str | `DeMuon` | Algorithm name (used for W&B tagging) |
+| `--alg` | str | `demuon` | Algorithm name |
+
+### Output files
+
+| File | Description |
+|---|---|
+| `args.json` | Serialized copy of all parsed arguments |
+| `loss.csv` | Per-round training and validation losses for every worker |
 
 ### Example
 
 ```bash
-export jwm_commit_id="ring_8w_lr01"
+export JWM_COMMIT_ID="ring_8w_lr01"
 
 python exp3_decentralize_gpt.py \
   --n_workers 8 \
