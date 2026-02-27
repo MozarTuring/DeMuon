@@ -1,7 +1,5 @@
 #!/usr/bin/bash
 #SBATCH -A naiss2026-4-5 -p alvis
-#SBATCH -N 1 --gpus-per-node=T4:1
-#SBATCH -t 1-00:03:00
 #SBATCH --output=slurm_out.log
 #SBATCH --error=slurm_out.log
 

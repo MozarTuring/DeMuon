@@ -70,7 +70,6 @@ if __name__ == '__main__':
 
     filename = os.path.basename(__file__)
 
-    
     loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
     jwp(rounds_per_epoch)
     iter_ls = [iter(loader) for loader in loader_ls]
