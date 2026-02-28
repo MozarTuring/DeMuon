@@ -1,6 +1,8 @@
 from __future__ import annotations
 import json
 import random
+import statistics
+import time
 
 
 from torch.utils.data import DataLoader, TensorDataset
@@ -65,6 +67,7 @@ if __name__ == '__main__':
     header = ["round"]
     header += [f"w{i}_val"   for i in range(args.n_workers)]
     header += [f"w{i}_train" for i in range(args.n_workers)]
+    header += ["time_sec"]
     loss_table = [header]
 
 
@@ -93,7 +96,9 @@ if __name__ == '__main__':
     jwp(aa)
     loss_fn = nn.CrossEntropyLoss(ignore_index=vocab["<pad>"])
 
+    iteration_times = []
     for r in range(1, total_rounds+1):
+        t_start = time.perf_counter()
         round_losses = []
         for wid, model in enumerate(model_ls):
             try:
@@ -170,12 +175,39 @@ if __name__ == '__main__':
         if args.n_workers > 1:
             mix_params(model_ls, mixing)
     
+        t_elapsed = time.perf_counter() - t_start
+        iteration_times.append(t_elapsed)
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
             val_losses = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
-            loss_table.append([r] + val_losses + round_losses)
-            jwp(f"Round {r}/{total_rounds}: {round_losses}")
+            loss_table.append([r] + val_losses + round_losses + [round(t_elapsed, 4)])
+            jwp(f"Round {r}/{total_rounds}: {round_losses}, time={t_elapsed:.3f}s")
             if r > 10 and "test" in JWM_COMMIT_ID:
                 break
+
+    # iteration time statistics (after training)
+    if iteration_times:
+        n = len(iteration_times)
+        time_stats = {
+            "n_iterations": n,
+            "mean_sec": statistics.mean(iteration_times),
+            "stdev_sec": statistics.stdev(iteration_times) if n > 1 else 0.0,
+            "variance_sec2": statistics.variance(iteration_times) if n > 1 else 0.0,
+            "min_sec": min(iteration_times),
+            "max_sec": max(iteration_times),
+            "median_sec": statistics.median(iteration_times),
+        }
+        if n >= 100:
+            q = statistics.quantiles(iteration_times, n=100)
+            time_stats["p5_sec"] = q[4]
+            time_stats["p95_sec"] = q[94]
+            time_stats["p99_sec"] = q[98]
+        elif n >= 20:
+            q = statistics.quantiles(iteration_times, n=20)
+            time_stats["p5_sec"] = q[0]
+            time_stats["p95_sec"] = q[18]
+        time_stats = {k: round(v, 6) if isinstance(v, float) else v for k, v in time_stats.items()}
+        jwp("Iteration time stats (after training): " + json.dumps(time_stats, indent=2))
+        quick2json(os.path.join("./time_stats.json"), time_stats)
 
     out_csv = Path(f"./loss.csv")
     with out_csv.open("w", newline="") as f:
