@@ -40,6 +40,9 @@ for i in "${!NETWORKS[@]}"; do
 done
 
 echo "PIDs: ${PIDS[*]}"
+echo "Monitoring GPU for 5 minutes..."
+timeout 300 nvidia-smi -l 10
+echo "============================================="
 echo "Waiting for all ${#PIDS[@]} jobs to finish..."
 
 FAIL=0

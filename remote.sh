@@ -20,10 +20,15 @@ if false; then
     # remote
     exit
     ssh alvis1
-    scancel 6012107
+    scancel 6022218
     squeue --me
 fi
 
 if false; then
     rsync -av alvis1:~/project_remote_jwm/runs/DeMuon/75e38fab2adf1e39629f12360a5ff12eb4ad4eb7/ /Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/runs/75e38fab2adf1e39629f12360a5ff12eb4ad4eb7/
 fi
+
+if false; then
+    rsync -av alvis1:~/project_remote_jwm/runs/DeMuon/c6e197aa99933f681dd64b87c7a3fee5de3dd464/ /Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/runs/c6e197aa99933f681dd64b87c7a3fee5de3dd464/
+fi
+
