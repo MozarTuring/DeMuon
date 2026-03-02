@@ -13,6 +13,9 @@ from gpt_utils import *
 from utils import *
 
 
+SUPPORTED_ALGS = ['demuon', 'dsgd', 'dsgd_gclip_decay', 'gt_dsgd', 'gt_nsgdm', 'sen']
+
+
 def quick2json(inp_path, inp_data):
     with open(inp_path, "w", encoding="utf8") as wf:
         wf.write(json.dumps(inp_data, ensure_ascii=False, indent=2))
@@ -29,8 +32,7 @@ def eval_loss(model, loader, loss_fn):
         n      = y.numel()
         tot   += loss.item() * n
         ntok  += n
-    avg_loss = tot / ntok
-    return avg_loss
+    return tot / ntok
 
 
 def run_single_seed(args, seed):
@@ -73,7 +75,6 @@ def run_single_seed(args, seed):
     total_rounds = args.epochs * max_round_per_epoch
 
     lr, mom = args.lr, args.mom
-    y_list, m_list = [], []
     mixing, _ = get_graph(args, device)
 
     model_ls = list()
@@ -83,14 +84,29 @@ def run_single_seed(args, seed):
             model.load_state_dict(model_ls[0].state_dict())
         model.to(device)
         model_ls.append(model)
-        y_list.append({name: torch.zeros_like(param) for name, param in model.named_parameters()})
-        m_list.append({name: torch.zeros_like(param) for name, param in model.named_parameters()})
 
+    ref_model = model_ls[-1]
     loss_fn = nn.CrossEntropyLoss(ignore_index=vocab["<pad>"])
 
+    # --- algorithm-specific buffer init ---
+    alg = args.alg
+    y_list, m_list, g_prev_list = [], [], []
+
+    if alg in ('demuon', 'gt_nsgdm'):
+        for _ in range(args.n_workers):
+            y_list.append({n: torch.zeros_like(p) for n, p in ref_model.named_parameters()})
+            m_list.append({n: torch.zeros_like(p) for n, p in ref_model.named_parameters()})
+    elif alg == 'gt_dsgd':
+        for _ in range(args.n_workers):
+            y_list.append({n: torch.zeros_like(p) for n, p in ref_model.named_parameters()})
+            g_prev_list.append({n: torch.zeros_like(p) for n, p in ref_model.named_parameters()})
+    elif alg == 'sen':
+        for _ in range(args.n_workers):
+            m_list.append({n: torch.zeros_like(p) for n, p in ref_model.named_parameters()})
+
     # --- communication cost estimate ---
-    bytes_per_round = communication_bytes_per_round(
-        model_ls[0], args.n_workers, use_msgn=(args.msgn != 0))
+    use_msgn = (alg == 'demuon' and args.msgn != 0)
+    bytes_per_round = communication_bytes_per_round(model_ls[0], args.n_workers, use_msgn)
     jwp(f"[seed={seed}] Estimated comm bytes/round: {bytes_per_round:,}")
 
     iteration_times = []
@@ -100,6 +116,8 @@ def run_single_seed(args, seed):
     for r in range(1, total_rounds + 1):
         t_start = time.perf_counter()
         round_losses = []
+
+        # ===== per-worker forward/backward + local buffer update =====
         for wid, model in enumerate(model_ls):
             try:
                 batch_x, batch_y = next(iter_ls[wid])
@@ -111,71 +129,140 @@ def run_single_seed(args, seed):
 
             model.train()
             logits = model(batch_x)
-            loss   = loss_fn(logits.view(-1, logits.size(-1)), batch_y.view(-1))
+            loss = loss_fn(logits.view(-1, logits.size(-1)), batch_y.view(-1))
             round_losses.append(loss.item())
             model.zero_grad(set_to_none=True)
             loss.backward()
 
             with torch.no_grad():
-                for (name, p) in model.named_parameters():
-                    if p.grad is None:
-                        continue
-                    m_temp = mom * m_list[wid][name] + (1 - mom) * p.grad
-                    y_list[wid][name] = y_list[wid][name] + m_temp - m_list[wid][name]
-                    m_list[wid][name] = m_temp
+                if alg == 'demuon':
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        m_temp = mom * m_list[wid][name] + (1 - mom) * p.grad
+                        y_list[wid][name] = y_list[wid][name] + m_temp - m_list[wid][name]
+                        m_list[wid][name] = m_temp
 
-        # --- gradient tracking consensus (communication round for V) ---
-        if args.n_workers > 1:
-            y_list = mix_y_list(y_list, mixing)
-            comm_rounds_count += 1
+                elif alg == 'dsgd':
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        p.data -= lr * p.grad
 
-        # --- learning rate schedule ---
-        if args.lr_schedule == 1:
-            tmp_lr = lr * (1 - r / total_rounds)
-        elif args.lr_schedule == 2:
-            tmp_lr = lr / math.sqrt(r)
-        elif args.lr_schedule == 3:
-            tmp_lr = lr
-        else:
-            tmp_lr = lr
+                elif alg == 'dsgd_gclip_decay':
+                    cur_lr = args.lr / r
+                    cur_clip = args.l2_clip_bd * r ** 0.4
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cur_clip)
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        p.data -= cur_lr * p.grad
 
-        # --- local update (msgn or other normalization) ---
-        for wid, model in enumerate(model_ls):
-            with torch.no_grad():
-                for (name, p) in model.named_parameters():
-                    if p.grad is None:
-                        continue
-                    tmp_shape = y_list[wid][name].shape
-                    tmp = y_list[wid][name].squeeze()
-                    if tmp.ndim == 0:
-                        denominator = torch.abs(tmp)
-                        assert denominator != 0
-                        p.data -= tmp_lr * tmp.reshape(tmp_shape) / denominator
-                    elif tmp.ndim == 1:
-                        denominator = torch.norm(tmp)
-                        assert denominator != 0
-                        p.data -= tmp_lr * tmp.reshape(tmp_shape) / denominator
-                    elif tmp.ndim == 2:
-                        if args.msgn == 0:
-                            p.data -= tmp_lr * y_list[wid][name]
-                        elif args.msgn == 1:
-                            update = zeropower_via_newtonschulz5(tmp, steps=args.ns_steps)
-                            p.data -= tmp_lr * update.reshape(tmp_shape)
-                        elif args.msgn == 2:
-                            U, S, Vt = torch.linalg.svd(tmp, full_matrices=False)
-                            update = U @ Vt
-                            p.data -= tmp_lr * update
-                    else:
-                        jwp(f'{name}, error, {tmp}')
-                        1 / 0
+                elif alg == 'gt_dsgd':
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        g = p.grad
+                        y_list[wid][name].add_(g).add_(g_prev_list[wid][name], alpha=-1.0)
+                        g_prev_list[wid][name] = g.clone()
 
-                    check_nan_inf(name, tmp, r)
+                elif alg == 'gt_nsgdm':
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        g = p.grad
+                        m_temp = m_list[wid][name].mul(mom).add(g, alpha=1 - mom)
+                        y_list[wid][name].add_(m_temp).add_(m_list[wid][name], alpha=-1.0)
+                        m_list[wid][name] = m_temp
 
-        # --- model parameter consensus (communication round for X) ---
-        if args.n_workers > 1:
-            mix_params(model_ls, mixing)
-            comm_rounds_count += 1
+                elif alg == 'sen':
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        g = p.grad
+                        m = m_list[wid][name]
+                        temp = sclip(g.add(m, alpha=-1.0), args.phi, r, args.tau)
+                        m.mul_(mom / r ** 0.5).add_(temp, alpha=1 - mom / r ** 0.5)
+                        m_list[wid][name] = m
+                        p.data -= lr / r ** 0.2 * m
 
+        # ===== mixing / communication =====
+        if alg == 'demuon':
+            if args.n_workers > 1:
+                y_list = mix_y_list(y_list, mixing)
+                comm_rounds_count += 1
+
+            if args.lr_schedule == 1:
+                tmp_lr = lr * (1 - r / total_rounds)
+            elif args.lr_schedule == 2:
+                tmp_lr = lr / math.sqrt(r)
+            else:
+                tmp_lr = lr
+
+            for wid, model in enumerate(model_ls):
+                with torch.no_grad():
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        tmp_shape = y_list[wid][name].shape
+                        tmp = y_list[wid][name].squeeze()
+                        if tmp.ndim == 0:
+                            p.data -= tmp_lr * tmp.reshape(tmp_shape) / torch.abs(tmp)
+                        elif tmp.ndim == 1:
+                            p.data -= tmp_lr * tmp.reshape(tmp_shape) / torch.norm(tmp)
+                        elif tmp.ndim == 2:
+                            if args.msgn == 0:
+                                p.data -= tmp_lr * y_list[wid][name]
+                            elif args.msgn == 1:
+                                update = zeropower_via_newtonschulz5(tmp, steps=args.ns_steps)
+                                p.data -= tmp_lr * update.reshape(tmp_shape)
+                            elif args.msgn == 2:
+                                U, S, Vt = torch.linalg.svd(tmp, full_matrices=False)
+                                p.data -= tmp_lr * (U @ Vt)
+                        else:
+                            jwp(f'{name}, error, {tmp}')
+                            1 / 0
+                        check_nan_inf(name, tmp, r)
+
+            if args.n_workers > 1:
+                mix_params(model_ls, mixing)
+                comm_rounds_count += 1
+
+        elif alg in ('dsgd', 'dsgd_gclip_decay', 'sen'):
+            if args.n_workers > 1:
+                mix_params(model_ls, mixing)
+                comm_rounds_count += 1
+
+        elif alg == 'gt_dsgd':
+            if args.n_workers > 1:
+                y_list = mix_y_list(y_list, mixing)
+                comm_rounds_count += 1
+            for wid, model in enumerate(model_ls):
+                with torch.no_grad():
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        p.data -= lr * y_list[wid][name]
+            if args.n_workers > 1:
+                mix_params(model_ls, mixing)
+                comm_rounds_count += 1
+
+        elif alg == 'gt_nsgdm':
+            if args.n_workers > 1:
+                y_list = mix_y_list(y_list, mixing)
+                comm_rounds_count += 1
+            for wid, model in enumerate(model_ls):
+                normalized_y = normalize_tensor_dict(y_list[wid])
+                with torch.no_grad():
+                    for (name, p) in model.named_parameters():
+                        if p.grad is None:
+                            continue
+                        p.data -= lr * normalized_y[name]
+            if args.n_workers > 1:
+                mix_params(model_ls, mixing)
+                comm_rounds_count += 1
+
+        # ===== logging =====
         t_elapsed = time.perf_counter() - t_start
         iteration_times.append(t_elapsed)
         cumul_time += t_elapsed
@@ -232,11 +319,11 @@ def run_single_seed(args, seed):
 
     final_metrics = {
         "seed": seed,
+        "algorithm": alg,
         "final_avg_val_loss": round(final_avg_val, 6),
         "final_avg_val_ppl": round(final_ppl, 4),
         "final_consensus_err": round(final_cons_err, 6),
         "data_heterogeneity_kl": round(het_kl, 6),
-        "ns_steps": args.ns_steps,
         "total_comm_rounds": comm_rounds_count,
         "total_train_sec": round(cumul_time, 4),
         "bytes_per_round": bytes_per_round,
@@ -266,13 +353,22 @@ if __name__ == '__main__':
     parser.add_argument("--msgn", type=int, default=1,
                         help="0=raw gradient, 1=Newton-Schulz msgn, 2=exact SVD msgn")
     parser.add_argument("--ns_steps", type=int, default=5,
-                        help="Number of Newton-Schulz iterations for msgn (only used when --msgn=1)")
+                        help="Newton-Schulz iterations (only for --msgn=1)")
 
     parser.add_argument("--lr_schedule", type=int, default=3,
                         help="1=linear decay, 2=1/sqrt(t), 3=constant")
     parser.add_argument("--network", type=str, default='ring',
                         choices=['ring', 'exp', 'complete'])
-    parser.add_argument("--alg", type=str, default='demuon')
+    parser.add_argument("--alg", type=str, default='demuon',
+                        choices=SUPPORTED_ALGS)
+
+    # baseline-specific args
+    parser.add_argument("--l2_clip_bd", type=float, default=0.1,
+                        help="Clipping bound for dsgd_gclip_decay")
+    parser.add_argument("--phi", type=float, default=1.0,
+                        help="phi parameter for sen")
+    parser.add_argument("--tau", type=float, default=1.0,
+                        help="tau parameter for sen")
 
     parser.add_argument("--seeds", type=int, nargs='+', default=[42],
                         help="List of random seeds to run (e.g. --seeds 42 123 456)")
@@ -330,8 +426,6 @@ if __name__ == '__main__':
             "algorithm": args.alg,
             "network": args.network,
             "n_workers": args.n_workers,
-            "ns_steps": args.ns_steps,
-            "msgn": args.msgn,
             "lr": args.lr,
             "mom": args.mom,
             "epochs": args.epochs,
