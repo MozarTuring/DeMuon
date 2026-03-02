@@ -35,9 +35,10 @@ def eval_loss(model, loader, loss_fn):
     return tot / ntok
 
 
-def run_single_seed(args, seed):
+def run_single_seed(args, seed, csv_path=None):
     """Run a full training loop for one seed. Returns the loss_table and
-    final metrics dict."""
+    final metrics dict.  If csv_path is given, the CSV is flushed to disk
+    after every validation evaluation."""
 
     set_random_seed(seed)
     new_g = torch.Generator()
@@ -285,6 +286,11 @@ def run_single_seed(args, seed):
                       round(cumul_time, 4),
                       round(t_elapsed, 6)])
             loss_table.append(row)
+
+            if csv_path is not None:
+                with open(csv_path, "w", newline="") as _cf:
+                    csv.writer(_cf).writerows(loss_table)
+
             jwp(f"[seed={seed}] Round {r}/{total_rounds}: "
                 f"train_loss={[round(l, 4) for l in round_losses]}, "
                 f"avg_val={avg_val:.4f}, ppl={avg_ppl:.2f}, "
@@ -397,16 +403,12 @@ if __name__ == '__main__':
         jwp(f"Running seed={seed}")
         jwp(f"{'='*60}")
 
-        loss_table, final_metrics, time_stats = run_single_seed(args, seed)
-
-        all_final_metrics.append(final_metrics)
-
-        # save per-seed CSV
         suffix = f"_seed{seed}" if len(args.seeds) > 1 else ""
         out_csv = Path(args.outdir) / f"loss{suffix}.csv"
-        with out_csv.open("w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerows(loss_table)
+
+        loss_table, final_metrics, time_stats = run_single_seed(args, seed, csv_path=str(out_csv))
+
+        all_final_metrics.append(final_metrics)
         jwp(f"[seed={seed}] Loss CSV saved to {out_csv}")
 
         if time_stats:
