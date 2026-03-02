@@ -32,3 +32,8 @@ if false; then
     rsync -av alvis1:~/project_remote_jwm/runs/DeMuon/c6e197aa99933f681dd64b87c7a3fee5de3dd464/ /Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/runs/c6e197aa99933f681dd64b87c7a3fee5de3dd464/
 fi
 
+
+if false; then
+    rsync -av alvis1:~/project_remote_jwm/runs/DeMuon/3c495b4cfba77664ece48ee295bf65defc106c81/20260302_164453/ /Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/runs/3c495b4cfba77664ece48ee295bf65defc106c81/20260302_164453
+fi
+
