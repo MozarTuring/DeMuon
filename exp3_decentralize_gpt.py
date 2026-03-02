@@ -3,19 +3,19 @@ import json
 import random
 import statistics
 import time
-
+import math
 
 from torch.utils.data import DataLoader, TensorDataset
 
+import utils as _utils_mod
+import gpt_utils as _gpt_utils_mod
 from gpt_utils import *
-
 from utils import *
 
 
 def quick2json(inp_path, inp_data):
     with open(inp_path, "w", encoding="utf8") as wf:
         wf.write(json.dumps(inp_data, ensure_ascii=False, indent=2))
-
 
 
 @torch.no_grad()
@@ -27,54 +27,47 @@ def eval_loss(model, loader, loss_fn):
         logits = model(x)
         loss   = loss_fn(logits.view(-1, logits.size(-1)), y.view(-1))
         n      = y.numel()
-        tot   += loss.item()*n
+        tot   += loss.item() * n
         ntok  += n
-    return tot/ntok
+    avg_loss = tot / ntok
+    return avg_loss
 
 
+def run_single_seed(args, seed):
+    """Run a full training loop for one seed. Returns the loss_table and
+    final metrics dict."""
 
-
-if __name__ == '__main__':
-
-    jwp("Starting training")
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--block_size",type=int, default=64)
-    parser.add_argument("--d_model",   type=int, default=256)
-    parser.add_argument("--n_layer",   type=int, default=2)
-    parser.add_argument("--n_head",    type=int, default=4)
-    parser.add_argument("--max_len",   type=int, default=128)
-    parser.add_argument("--train_batch_size",   type=int, default=64)
-    parser.add_argument("--eval_batch_size",   type=int, default=512)
-    parser.add_argument("--epochs",   type=int, default=12)
-    parser.add_argument("--log_interval",   type=int, default=100)
-    parser.add_argument("--n_workers",   type=int, default=8)
-
-    parser.add_argument("--lr",   type=float, default=1e-1)
-    parser.add_argument("--mom",   type=float, default=0.8)
-
-    parser.add_argument("--msgn",   type=int, default=1)
-
-    parser.add_argument("--lr_schedule",   type=int, default=3)
-    parser.add_argument("--network",   type=str, default='ring')
-    parser.add_argument("--alg",   type=str, default='demuon')
-
-    args = parser.parse_args()
-    JWM_COMMIT_ID=str(os.environ['JWM_COMMIT_ID'])
-
-    quick2json(os.path.join('./args.json'), vars(args))
-    jwp(args)
+    set_random_seed(seed)
+    new_g = torch.Generator()
+    new_g.manual_seed(seed)
+    _utils_mod.g = new_g
+    _gpt_utils_mod.g = new_g
 
     header = ["round"]
     header += [f"w{i}_val"   for i in range(args.n_workers)]
     header += [f"w{i}_train" for i in range(args.n_workers)]
-    header += ["time_sec"]
+    header += [f"w{i}_val_ppl" for i in range(args.n_workers)]
+    header += ["avg_val_loss", "avg_val_ppl", "consensus_err",
+               "comm_rounds", "cumul_time_sec", "iter_time_sec"]
     loss_table = [header]
 
-
-    filename = os.path.basename(__file__)
-
     loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
-    jwp(rounds_per_epoch)
+    jwp(f"[seed={seed}] rounds_per_epoch={rounds_per_epoch}")
+
+    # --- measure data heterogeneity (once per seed) ---
+    tok_tokenizer = get_tokenizer("basic_english")
+    from torchtext.datasets import Multi30k
+    partitions_tokens = []
+    all_tokens = []
+    for eng, _de in Multi30k(split="train", language_pair=("en", "de")):
+        all_tokens.extend(vocab(tok_tokenizer(eng.lower())))
+    random.shuffle(all_tokens)
+    part_len = len(all_tokens) // args.n_workers
+    for i in range(args.n_workers):
+        partitions_tokens.append(all_tokens[i * part_len:(i + 1) * part_len])
+    het_kl = measure_data_heterogeneity(partitions_tokens, vocab_size)
+    jwp(f"[seed={seed}] Data heterogeneity (mean sym-KL): {het_kl:.6f}")
+
     iter_ls = [iter(loader) for loader in loader_ls]
     max_round_per_epoch = max(rounds_per_epoch)
     total_rounds = args.epochs * max_round_per_epoch
@@ -92,12 +85,19 @@ if __name__ == '__main__':
         model_ls.append(model)
         y_list.append({name: torch.zeros_like(param) for name, param in model.named_parameters()})
         m_list.append({name: torch.zeros_like(param) for name, param in model.named_parameters()})
-    aa=[(ele[0], ele[1].shape) for ele in model.named_parameters()]
-    jwp(aa)
+
     loss_fn = nn.CrossEntropyLoss(ignore_index=vocab["<pad>"])
 
+    # --- communication cost estimate ---
+    bytes_per_round = communication_bytes_per_round(
+        model_ls[0], args.n_workers, use_msgn=(args.msgn != 0))
+    jwp(f"[seed={seed}] Estimated comm bytes/round: {bytes_per_round:,}")
+
     iteration_times = []
-    for r in range(1, total_rounds+1):
+    cumul_time = 0.0
+    comm_rounds_count = 0
+
+    for r in range(1, total_rounds + 1):
         t_start = time.perf_counter()
         round_losses = []
         for wid, model in enumerate(model_ls):
@@ -109,38 +109,37 @@ if __name__ == '__main__':
 
             batch_x, batch_y = batch_x.to(device), batch_y.to(device)
 
-            # ----- forward/backward -----
             model.train()
             logits = model(batch_x)
-            # jwp((logits.shape,batch_y.shape))
             loss   = loss_fn(logits.view(-1, logits.size(-1)), batch_y.view(-1))
             round_losses.append(loss.item())
             model.zero_grad(set_to_none=True)
             loss.backward()
-            # torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
 
             with torch.no_grad():
                 for (name, p) in model.named_parameters():
                     if p.grad is None:
                         continue
-                    m_temp = mom * m_list[wid][name]+ (1-mom) * p.grad
+                    m_temp = mom * m_list[wid][name] + (1 - mom) * p.grad
                     y_list[wid][name] = y_list[wid][name] + m_temp - m_list[wid][name]
-                    # if name == 'pos_emb' and r > 1430:
-                    #     jwp(f'{p.grad}, {p.data}')
-
                     m_list[wid][name] = m_temp
 
-        
+        # --- gradient tracking consensus (communication round for V) ---
         if args.n_workers > 1:
             y_list = mix_y_list(y_list, mixing)
+            comm_rounds_count += 1
+
+        # --- learning rate schedule ---
         if args.lr_schedule == 1:
-            tmp_lr = lr * (1-r/total_rounds)
+            tmp_lr = lr * (1 - r / total_rounds)
         elif args.lr_schedule == 2:
             tmp_lr = lr / math.sqrt(r)
         elif args.lr_schedule == 3:
             tmp_lr = lr
         else:
-            pass
+            tmp_lr = lr
+
+        # --- local update (msgn or other normalization) ---
         for wid, model in enumerate(model_ls):
             with torch.no_grad():
                 for (name, p) in model.named_parameters():
@@ -151,65 +150,207 @@ if __name__ == '__main__':
                     if tmp.ndim == 0:
                         denominator = torch.abs(tmp)
                         assert denominator != 0
-                        p.data -= tmp_lr  * tmp.reshape(tmp_shape)  / denominator
+                        p.data -= tmp_lr * tmp.reshape(tmp_shape) / denominator
                     elif tmp.ndim == 1:
                         denominator = torch.norm(tmp)
                         assert denominator != 0
-                        p.data -= tmp_lr  * tmp.reshape(tmp_shape)  / denominator
+                        p.data -= tmp_lr * tmp.reshape(tmp_shape) / denominator
                     elif tmp.ndim == 2:
                         if args.msgn == 0:
-                            p.data -= tmp_lr  * y_list[wid][name]
+                            p.data -= tmp_lr * y_list[wid][name]
                         elif args.msgn == 1:
-                            update = zeropower_via_newtonschulz5(tmp, steps=5)
-                            p.data -= tmp_lr  * update.reshape(tmp_shape)
-                            
+                            update = zeropower_via_newtonschulz5(tmp, steps=args.ns_steps)
+                            p.data -= tmp_lr * update.reshape(tmp_shape)
                         elif args.msgn == 2:
                             U, S, Vt = torch.linalg.svd(tmp, full_matrices=False)
                             update = U @ Vt
-                            p.data -= tmp_lr  * update
+                            p.data -= tmp_lr * update
                     else:
                         jwp(f'{name}, error, {tmp}')
-                        1/0
+                        1 / 0
 
                     check_nan_inf(name, tmp, r)
+
+        # --- model parameter consensus (communication round for X) ---
         if args.n_workers > 1:
             mix_params(model_ls, mixing)
-    
+            comm_rounds_count += 1
+
         t_elapsed = time.perf_counter() - t_start
         iteration_times.append(t_elapsed)
+        cumul_time += t_elapsed
+
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
             val_losses = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
-            loss_table.append([r] + val_losses + round_losses + [round(t_elapsed, 4)])
-            jwp(f"Round {r}/{total_rounds}: {round_losses}, time={t_elapsed:.3f}s")
-            if r > 10 and "test" in JWM_COMMIT_ID:
+            val_ppls = [math.exp(vl) for vl in val_losses]
+            avg_val = statistics.mean(val_losses)
+            avg_ppl = math.exp(avg_val)
+            cons_err = consensus_error(model_ls)
+
+            row = ([r]
+                   + val_losses
+                   + round_losses
+                   + val_ppls
+                   + [round(avg_val, 6),
+                      round(avg_ppl, 4),
+                      round(cons_err, 6),
+                      comm_rounds_count,
+                      round(cumul_time, 4),
+                      round(t_elapsed, 6)])
+            loss_table.append(row)
+            jwp(f"[seed={seed}] Round {r}/{total_rounds}: "
+                f"train_loss={[round(l, 4) for l in round_losses]}, "
+                f"avg_val={avg_val:.4f}, ppl={avg_ppl:.2f}, "
+                f"cons_err={cons_err:.4f}, "
+                f"comm_rounds={comm_rounds_count}, "
+                f"time={t_elapsed:.3f}s")
+            if r > 10 and "test" in str(os.environ.get('JWM_COMMIT_ID', '')):
                 break
 
-    # iteration time statistics (after training)
+    # --- iteration time statistics ---
+    time_stats = {}
     if iteration_times:
         n = len(iteration_times)
         time_stats = {
             "n_iterations": n,
             "mean_sec": statistics.mean(iteration_times),
             "stdev_sec": statistics.stdev(iteration_times) if n > 1 else 0.0,
-            "variance_sec2": statistics.variance(iteration_times) if n > 1 else 0.0,
             "min_sec": min(iteration_times),
             "max_sec": max(iteration_times),
             "median_sec": statistics.median(iteration_times),
+            "total_train_sec": cumul_time,
+            "total_comm_rounds": comm_rounds_count,
+            "bytes_per_round": bytes_per_round,
         }
-        if n >= 100:
-            q = statistics.quantiles(iteration_times, n=100)
-            time_stats["p5_sec"] = q[4]
-            time_stats["p95_sec"] = q[94]
-            time_stats["p99_sec"] = q[98]
-        elif n >= 20:
-            q = statistics.quantiles(iteration_times, n=20)
-            time_stats["p5_sec"] = q[0]
-            time_stats["p95_sec"] = q[18]
-        time_stats = {k: round(v, 6) if isinstance(v, float) else v for k, v in time_stats.items()}
-        jwp("Iteration time stats (after training): " + json.dumps(time_stats, indent=2))
-        quick2json(os.path.join("./time_stats.json"), time_stats)
+        time_stats = {k: round(v, 6) if isinstance(v, float) else v
+                      for k, v in time_stats.items()}
 
-    out_csv = Path(f"./loss.csv")
-    with out_csv.open("w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerows(loss_table)
+    final_val_losses = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
+    final_avg_val = statistics.mean(final_val_losses)
+    final_ppl = math.exp(final_avg_val)
+    final_cons_err = consensus_error(model_ls)
+
+    final_metrics = {
+        "seed": seed,
+        "final_avg_val_loss": round(final_avg_val, 6),
+        "final_avg_val_ppl": round(final_ppl, 4),
+        "final_consensus_err": round(final_cons_err, 6),
+        "data_heterogeneity_kl": round(het_kl, 6),
+        "ns_steps": args.ns_steps,
+        "total_comm_rounds": comm_rounds_count,
+        "total_train_sec": round(cumul_time, 4),
+        "bytes_per_round": bytes_per_round,
+    }
+
+    return loss_table, final_metrics, time_stats
+
+
+if __name__ == '__main__':
+
+    jwp("Starting training")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--block_size", type=int, default=64)
+    parser.add_argument("--d_model",    type=int, default=256)
+    parser.add_argument("--n_layer",    type=int, default=2)
+    parser.add_argument("--n_head",     type=int, default=4)
+    parser.add_argument("--max_len",    type=int, default=128)
+    parser.add_argument("--train_batch_size", type=int, default=64)
+    parser.add_argument("--eval_batch_size",  type=int, default=512)
+    parser.add_argument("--epochs",     type=int, default=12)
+    parser.add_argument("--log_interval", type=int, default=100)
+    parser.add_argument("--n_workers",  type=int, default=8)
+
+    parser.add_argument("--lr",  type=float, default=1e-1)
+    parser.add_argument("--mom", type=float, default=0.8)
+
+    parser.add_argument("--msgn", type=int, default=1,
+                        help="0=raw gradient, 1=Newton-Schulz msgn, 2=exact SVD msgn")
+    parser.add_argument("--ns_steps", type=int, default=5,
+                        help="Number of Newton-Schulz iterations for msgn (only used when --msgn=1)")
+
+    parser.add_argument("--lr_schedule", type=int, default=3,
+                        help="1=linear decay, 2=1/sqrt(t), 3=constant")
+    parser.add_argument("--network", type=str, default='ring',
+                        choices=['ring', 'exp', 'complete'])
+    parser.add_argument("--alg", type=str, default='demuon')
+
+    parser.add_argument("--seeds", type=int, nargs='+', default=[42],
+                        help="List of random seeds to run (e.g. --seeds 42 123 456)")
+    parser.add_argument("--gpu", type=int, default=None,
+                        help="CUDA device index (e.g. --gpu 0). Defaults to auto-detect.")
+    parser.add_argument("--outdir", type=str, default=".",
+                        help="Output directory for CSV/JSON files (created if needed)")
+
+    args = parser.parse_args()
+    JWM_COMMIT_ID = str(os.environ.get('JWM_COMMIT_ID', 'local'))
+
+    # --- set device from --gpu flag ---
+    if args.gpu is not None:
+        _utils_mod.device = torch.device(f'cuda:{args.gpu}')
+    device = _utils_mod.device
+    jwp(f"Using device: {device}")
+
+    os.makedirs(args.outdir, exist_ok=True)
+    quick2json(os.path.join(args.outdir, 'args.json'), vars(args))
+    jwp(args)
+
+    all_final_metrics = []
+
+    for seed in args.seeds:
+        jwp(f"\n{'='*60}")
+        jwp(f"Running seed={seed}")
+        jwp(f"{'='*60}")
+
+        loss_table, final_metrics, time_stats = run_single_seed(args, seed)
+
+        all_final_metrics.append(final_metrics)
+
+        # save per-seed CSV
+        suffix = f"_seed{seed}" if len(args.seeds) > 1 else ""
+        out_csv = Path(args.outdir) / f"loss{suffix}.csv"
+        with out_csv.open("w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerows(loss_table)
+        jwp(f"[seed={seed}] Loss CSV saved to {out_csv}")
+
+        if time_stats:
+            jwp(f"[seed={seed}] Iteration time stats: " + json.dumps(time_stats, indent=2))
+            quick2json(str(Path(args.outdir) / f"time_stats{suffix}.json"), time_stats)
+
+        quick2json(str(Path(args.outdir) / f"final_metrics{suffix}.json"), final_metrics)
+        jwp(f"[seed={seed}] Final metrics: {json.dumps(final_metrics, indent=2)}")
+
+    # --- multi-seed summary ---
+    if len(args.seeds) > 1:
+        val_losses = [m["final_avg_val_loss"] for m in all_final_metrics]
+        val_ppls   = [m["final_avg_val_ppl"]  for m in all_final_metrics]
+        cons_errs  = [m["final_consensus_err"] for m in all_final_metrics]
+
+        summary = {
+            "algorithm": args.alg,
+            "network": args.network,
+            "n_workers": args.n_workers,
+            "ns_steps": args.ns_steps,
+            "msgn": args.msgn,
+            "lr": args.lr,
+            "mom": args.mom,
+            "epochs": args.epochs,
+            "seeds": args.seeds,
+            "n_seeds": len(args.seeds),
+            "val_loss_mean": round(statistics.mean(val_losses), 6),
+            "val_loss_std":  round(statistics.stdev(val_losses), 6) if len(val_losses) > 1 else 0.0,
+            "val_ppl_mean":  round(statistics.mean(val_ppls), 4),
+            "val_ppl_std":   round(statistics.stdev(val_ppls), 4) if len(val_ppls) > 1 else 0.0,
+            "cons_err_mean": round(statistics.mean(cons_errs), 6),
+            "cons_err_std":  round(statistics.stdev(cons_errs), 6) if len(cons_errs) > 1 else 0.0,
+            "per_seed_metrics": all_final_metrics,
+        }
+        quick2json(str(Path(args.outdir) / "multi_seed_summary.json"), summary)
+        jwp(f"\n{'='*60}")
+        jwp("MULTI-SEED SUMMARY")
+        jwp(f"  Val loss: {summary['val_loss_mean']:.4f} ± {summary['val_loss_std']:.4f}")
+        jwp(f"  Val PPL:  {summary['val_ppl_mean']:.2f} ± {summary['val_ppl_std']:.2f}")
+        jwp(f"  Cons err: {summary['cons_err_mean']:.4f} ± {summary['cons_err_std']:.4f}")
+        jwp(f"{'='*60}")
+    else:
+        jwp("\nSingle seed run complete. Use --seeds 42 123 456 for multi-seed runs.")

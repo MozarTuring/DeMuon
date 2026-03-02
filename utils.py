@@ -262,13 +262,71 @@ def check_nan_inf(tensor_name, inp_tenosr, round):
         jwp(inp_tenosr)
         1/0
 
-random_seed=42
 
-random.seed(random_seed)
-np.random.seed(random_seed)
-torch.manual_seed(random_seed)
-torch.cuda.manual_seed(random_seed)
+def consensus_error(model_ls):
+    """Spectral-norm consensus error: ||X_{[N]} - 1_N otimes bar{X}||."""
+    avg_state = {}
+    N = len(model_ls)
+    for name, p in model_ls[0].named_parameters():
+        avg_state[name] = sum(m.state_dict()[name].float() for m in model_ls) / N
 
+    err_sq = 0.0
+    for name in avg_state:
+        for m in model_ls:
+            diff = m.state_dict()[name].float() - avg_state[name]
+            if diff.ndim >= 2:
+                err_sq += torch.linalg.matrix_norm(diff, ord=2).item() ** 2
+            else:
+                err_sq += diff.norm().item() ** 2
+    return math.sqrt(err_sq)
+
+
+def communication_bytes_per_round(model, n_workers, use_msgn):
+    """Estimate bytes exchanged per communication round.
+    Each node sends its params (or msgn output) to neighbours; we count
+    total elements * 4 bytes (float32) * N for the broadcast."""
+    n_params = sum(p.numel() for p in model.parameters())
+    bytes_per_elem = 2 if use_msgn else 4  # msgn uses bfloat16
+    return n_params * bytes_per_elem * n_workers
+
+
+def measure_data_heterogeneity(partitions, vocab_size):
+    """Compute pairwise average KL divergence of token frequency distributions
+    across workers. Returns mean KL and per-worker token distributions."""
+    eps = 1e-10
+    dists = []
+    for part in partitions:
+        counts = torch.zeros(vocab_size)
+        for tok_id in part:
+            counts[tok_id] += 1
+        counts = counts / counts.sum()
+        dists.append(counts)
+
+    n = len(dists)
+    kl_sum = 0.0
+    pairs = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            p, q = dists[i] + eps, dists[j] + eps
+            p, q = p / p.sum(), q / q.sum()
+            kl_ij = (p * (p / q).log()).sum().item()
+            kl_ji = (q * (q / p).log()).sum().item()
+            kl_sum += (kl_ij + kl_ji) / 2
+            pairs += 1
+    return kl_sum / max(pairs, 1)
+
+
+def set_random_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+
+# default seed (kept for backward compat with other scripts)
+random_seed = 42
+set_random_seed(random_seed)
 
 g = torch.Generator()
 g.manual_seed(random_seed)

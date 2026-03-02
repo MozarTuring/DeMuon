@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+# Copy to remote.sh and edit. remote.sh is gitignored.
+#   cp remote.sh.example remote.sh
+
+# --- Slurm resources ---
+export JWM_GPU_NUM=3
+export JWM_NODES_NUM=1
+export JWM_RUN_TIME="1-00:00:00"
+
+# --- Run tag (optional) ---
+# Distinguishes multiple runs under the same commit.
+# If unset, meta_script.sh auto-generates a timestamp.
+# export JWM_RUN_TAG="final_3topo"
+
+# --- Experiment args (used by slurm.sh) ---
+NETWORKS=(complete exp ring)
+SEEDS="42 123 456"
+COMMON_ARGS="--alg demuon --msgn 1 --seeds ${SEEDS}"
