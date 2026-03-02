@@ -3,4 +3,4 @@
 **/output*
 **/graphs
 remote.sh
-experiments.json
+experiments.toml

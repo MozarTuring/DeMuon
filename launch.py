@@ -1,20 +1,21 @@
-"""Launcher: reads experiments.json, spawns one process per experiment,
+"""Launcher: reads experiments.toml, spawns one process per experiment,
 assigns GPUs round-robin, waits for all to finish."""
 
-import json
 import os
 import subprocess
 import sys
 import time
+import tomllib
+
 
 def main():
-    config_path = "experiments.json"
+    config_path = "experiments.toml"
     if not os.path.exists(config_path):
-        print(f"ERROR: {config_path} not found. Copy experiments.json.example and edit it.")
+        print(f"ERROR: {config_path} not found. Copy experiments.toml.example and edit it.")
         sys.exit(1)
 
-    with open(config_path) as f:
-        config = json.load(f)
+    with open(config_path, "rb") as f:
+        config = tomllib.load(f)
 
     seeds = config["seeds"]
     experiments = config["experiments"]
@@ -48,7 +49,6 @@ def main():
 
     print(f"PIDs: {[p.pid for _, p, _ in processes]}")
 
-    # GPU monitoring for 5 minutes
     slurm_job_id = os.environ.get("SLURM_JOB_ID", "N/A")
     print(f"Slurm Job ID: {slurm_job_id}")
     print("Monitoring GPU for 5 minutes...")

@@ -1,0 +1,19 @@
+# Experiment configuration for DeMuon
+# Copy to experiments.toml and edit as needed.
+# Comment out experiments you don't want to run with '#'.
+
+seeds = [42]
+
+# ── DeMuon on 3 topologies ──
+
+[[experiments]]
+name = "demuon_complete"
+args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2"
+
+[[experiments]]
+name = "demuon_exp"
+args = "--network exp --alg demuon --msgn 1 --lr 0.1 --mom 0.2"
+
+[[experiments]]
+name = "demuon_ring"
+args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2"
