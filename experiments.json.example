@@ -1,0 +1,8 @@
+{
+  "seeds": [42, 123, 456],
+  "experiments": [
+    {"name": "demuon_complete", "args": "--network complete --alg demuon --msgn 1"},
+    {"name": "demuon_exp",      "args": "--network exp      --alg demuon --msgn 1"},
+    {"name": "demuon_ring",     "args": "--network ring     --alg demuon --msgn 1"}
+  ]
+}
