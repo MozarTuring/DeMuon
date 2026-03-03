@@ -51,11 +51,10 @@ def main():
 
     slurm_job_id = os.environ.get("SLURM_JOB_ID", "N/A")
     print(f"Slurm Job ID: {slurm_job_id}")
-    print("Monitoring GPU for 5 minutes...")
+    print("Sleeping 60s before GPU snapshot...")
+    time.sleep(60)
     try:
-        subprocess.run(["nvidia-smi", "-l", "10"], timeout=300)
-    except subprocess.TimeoutExpired:
-        pass
+        subprocess.run(["nvidia-smi"])
     except FileNotFoundError:
         print("nvidia-smi not found, skipping GPU monitoring")
 
