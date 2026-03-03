@@ -114,6 +114,39 @@ def run_single_seed(args, seed, csv_path=None):
     cumul_time = 0.0
     comm_rounds_count = 0
 
+    # log initial state (round 0): forward pass on first batch (no param update)
+    round0_train_losses = []
+    for wid, model in enumerate(model_ls):
+        batch_x, batch_y = next(iter_ls[wid])
+        batch_x, batch_y = batch_x.to(device), batch_y.to(device)
+        model.eval()
+        with torch.no_grad():
+            logits = model(batch_x)
+            loss = loss_fn(logits.view(-1, logits.size(-1)), batch_y.view(-1))
+        round0_train_losses.append(loss.item())
+    # reset iterators so round 1 sees the same batches
+    iter_ls = [iter(loader) for loader in loader_ls]
+
+    val_losses_0 = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
+    val_ppls_0 = [math.exp(vl) for vl in val_losses_0]
+    avg_val_0 = statistics.mean(val_losses_0)
+    avg_ppl_0 = math.exp(avg_val_0)
+    cons_err_0 = consensus_error(model_ls)
+    row_0 = ([0]
+             + val_losses_0
+             + round0_train_losses
+             + val_ppls_0
+             + [round(avg_val_0, 6),
+                round(avg_ppl_0, 4),
+                round(cons_err_0, 6),
+                0, 0.0, 0.0])
+    loss_table.append(row_0)
+    if csv_path is not None:
+        with open(csv_path, "w", newline="") as _cf:
+            csv.writer(_cf).writerows(loss_table)
+    jwp(f"[seed={seed}] Round 0 (init): train_loss={[round(l, 4) for l in round0_train_losses]}, "
+        f"avg_val={avg_val_0:.4f}, ppl={avg_ppl_0:.2f}, cons_err={cons_err_0:.6f}")
+
     for r in range(1, total_rounds + 1):
         t_start = time.perf_counter()
         round_losses = []

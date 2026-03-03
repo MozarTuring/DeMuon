@@ -15,6 +15,7 @@ Produces:
 import argparse
 import csv
 import os
+import time
 from pathlib import Path
 
 import matplotlib
@@ -58,7 +59,9 @@ MARKER_EVERY = 10
 
 
 def load_csv(path):
-    """Load a loss CSV into a dict of column_name -> list of floats."""
+    """Load a loss CSV into a dict of column_name -> list of floats.
+    If the data doesn't start at round 0, prepend a synthetic round-0 row
+    using the first row's val loss values and consensus_err = 0."""
     with open(path, newline="") as f:
         reader = csv.reader(f)
         header = next(reader)
@@ -66,20 +69,23 @@ def load_csv(path):
         for row in reader:
             for h, v in zip(header, row):
                 cols[h].append(float(v))
+
     return cols
 
 
-def find_csv(datadir, name):
-    d = Path(datadir) / name
-    for cand in ["loss.csv", "loss_seed42.csv"]:
-        p = d / cand
-        if p.exists():
-            return p
+def find_csv(datadirs, name):
+    for datadir in datadirs:
+        d = Path(datadir) / name
+        for cand in ["loss.csv", "loss_seed42.csv"]:
+            p = d / cand
+            if p.exists():
+                return p
     return None
 
 
 def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix,
-                            algorithms=ALGORITHMS, log_scale=False):
+                            algorithms=ALGORITHMS, log_scale=False,
+):
     """One figure per topology with all algorithms overlaid."""
     for topo, topo_title in TOPOLOGIES.items():
         fig, ax = plt.subplots()
@@ -193,40 +199,70 @@ def plot_wall_clock(datadir, outdir):
         print(f"  Saved {out_path}")
 
 
+def collect_used_files(datadirs):
+    """Return a list of all CSV files that were found across datadirs."""
+    used = []
+    all_names = set()
+    for alg_key in ALGORITHMS:
+        for topo in TOPOLOGIES:
+            all_names.add(f"{alg_key}_{topo}")
+    for alg_key in ABLATION_VARIANTS:
+        for topo in TOPOLOGIES:
+            all_names.add(f"{alg_key}_{topo}")
+    for name in sorted(all_names):
+        p = find_csv(datadirs, name)
+        if p is not None:
+            used.append(str(p))
+    return used
+
+
 def main():
     parser = argparse.ArgumentParser(description="Plot experiment results")
-    parser.add_argument("--datadir", type=str, required=True,
-                        help="Path to output/ directory containing experiment subdirs")
+    parser.add_argument("--datadir", type=str, nargs='+', required=True,
+                        help="One or more output/ directories (searched in order)")
     parser.add_argument("--outdir", type=str, default=None,
-                        help="Directory for figures (default: <datadir>/../figures)")
+                        help="Directory for figures (default: <first datadir>/../figures)")
     args = parser.parse_args()
 
-    outdir = args.outdir or str(Path(args.datadir).parent / "figures")
+    datadirs = args.datadir
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    default_outdir = f"/Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/draws/{timestamp}"
+    outdir = args.outdir or default_outdir
     os.makedirs(outdir, exist_ok=True)
+    print(f"Data dirs: {datadirs}")
     print(f"Figures will be saved to: {outdir}\n")
 
     print("[1/6] Training loss (avg across workers)")
-    plot_training_loss_by_topology(args.datadir, outdir)
+    plot_training_loss_by_topology(datadirs, outdir)
 
     print("[2/6] Validation loss")
-    plot_metric_by_topology(args.datadir, outdir,
+    plot_metric_by_topology(datadirs, outdir,
                             "avg_val_loss", "Validation Loss", "Validation loss")
 
     print("[3/6] Validation perplexity")
-    plot_metric_by_topology(args.datadir, outdir,
+    plot_metric_by_topology(datadirs, outdir,
                             "avg_val_ppl", "Perplexity", "perplexity",
                             log_scale=True)
 
     print("[4/6] Consensus error")
-    plot_metric_by_topology(args.datadir, outdir,
+    plot_metric_by_topology(datadirs, outdir,
                             "consensus_err", "Consensus Error", "consensus_error",
                             log_scale=True)
 
     print("[5/6] Ablation (val loss & consensus)")
-    plot_ablation(args.datadir, outdir)
+    plot_ablation(datadirs, outdir)
 
     print("[6/6] Validation loss vs wall-clock time")
-    plot_wall_clock(args.datadir, outdir)
+    plot_wall_clock(datadirs, outdir)
+
+    used_files = collect_used_files(datadirs)
+    manifest_path = Path(outdir) / "source_files.txt"
+    with open(manifest_path, "w") as f:
+        for p in used_files:
+            f.write(p + "\n")
+    print(f"\nSource CSV manifest: {manifest_path}")
+    for p in used_files:
+        print(f"  {p}")
 
     print(f"\nDone. {len(list(Path(outdir).glob('*.pdf')))} PDF figures in {outdir}")
 
