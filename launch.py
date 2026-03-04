@@ -9,6 +9,8 @@ import tomllib
 
 
 def main():
+    sys.stdout.reconfigure(line_buffering=True)
+
     config_path = "experiments.toml"
     if not os.path.exists(config_path):
         print(f"ERROR: {config_path} not found. Copy experiments.toml.example and edit it.")

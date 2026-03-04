@@ -264,20 +264,24 @@ def check_nan_inf(tensor_name, inp_tenosr, round):
 
 
 def consensus_error(model_ls):
-    """Spectral-norm consensus error: ||X_{[N]} - 1_N otimes bar{X}||."""
-    avg_state = {}
+    """Consensus error: for each parameter, stack the N workers' differences
+    from the mean vertically (along dim 0) and take the spectral norm.
+    For a matrix param (m, n), stacking gives (Nm, n); for a vector param (d,),
+    stacking gives (Nd,) whose spectral norm equals its l2 norm.
+    Returns sqrt(sum of squared spectral norms across all parameters)."""
     N = len(model_ls)
+    avg_state = {}
     for name, p in model_ls[0].named_parameters():
         avg_state[name] = sum(m.state_dict()[name].float() for m in model_ls) / N
 
     err_sq = 0.0
-    for name in avg_state:
-        for m in model_ls:
-            diff = m.state_dict()[name].float() - avg_state[name]
-            if diff.ndim >= 2:
-                err_sq += torch.linalg.matrix_norm(diff, ord=2).item() ** 2
-            else:
-                err_sq += diff.norm().item() ** 2
+    for name, avg in avg_state.items():
+        diffs = [m.state_dict()[name].float() - avg for m in model_ls]
+        stacked = torch.cat(diffs, dim=0)  # (Nm, n) for matrices, (Nd,) for vectors
+        if stacked.ndim >= 2:
+            err_sq += torch.linalg.matrix_norm(stacked, ord=2).item() ** 2
+        else:
+            err_sq += stacked.norm().item() ** 2
     return math.sqrt(err_sq)
 
 
