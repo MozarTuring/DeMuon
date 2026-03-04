@@ -276,11 +276,13 @@ def consensus_error(model_ls):
 
     err_sq = 0.0
     for name, avg in avg_state.items():
-        diffs = [m.state_dict()[name].float() - avg for m in model_ls]
-        stacked = torch.cat(diffs, dim=0)
-        if avg.ndim >= 2:
+        diffs = [m.state_dict()[name].float().squeeze() - avg.squeeze()
+                 for m in model_ls]
+        if diffs[0].ndim >= 2:
+            stacked = torch.cat(diffs, dim=0)  # (Nm, n)
             err_sq += torch.linalg.matrix_norm(stacked, ord=2).item() ** 2
         else:
+            stacked = torch.cat(diffs, dim=0)  # (Nd,)
             err_sq += stacked.norm().item() ** 2
     return math.sqrt(err_sq)
 
