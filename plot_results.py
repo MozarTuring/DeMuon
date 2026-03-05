@@ -36,10 +36,10 @@ COLORS = list(plt.cm.tab10.colors[:4])
 plt.rcParams['axes.prop_cycle'] = cycler(color=COLORS, marker=MARKERS[:4])
 
 ALGORITHMS = {
-    "dsgd":      {"label": "DSGD"},
-    "dsgd_clip": {"label": "DSGD_Clip"},
-    "gt_nsgdm":  {"label": "GT_NSGDm"},
-    "demuon":    {"label": "DeMuon"},
+    "dsgd":         {"label": "DSGD"},
+    "dsgd_clip":    {"label": "DSGD_Clip"},
+    "gt_nsgdm":     {"label": "GT_NSGDm"},
+    "demuon_decay": {"label": "DeMuon"},
 }
 
 TOPOLOGIES = {

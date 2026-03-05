@@ -249,20 +249,21 @@ def run_single_seed(args, seed, csv_path=None):
                         m_list[wid][name] = m
                         p.data -= lr / r**0.2 * m
 
+        # ===== stepsize schedule =====
+        if args.lr_schedule == 1:
+            tmp_lr = lr * (1 - r / total_rounds)
+        elif args.lr_schedule == 2:
+            tmp_lr = lr / math.sqrt(r)
+        elif args.lr_schedule == 3:
+            tmp_lr = lr
+        else:
+            exit("error")
+
         # ===== mixing / communication =====
         if alg == "demuon":
             if args.n_workers > 1:
                 y_list = mix_y_list(y_list, mixing)
                 comm_rounds_count += 1
-
-            if args.lr_schedule == 1:
-                tmp_lr = lr * (1 - r / total_rounds)
-            elif args.lr_schedule == 2:
-                tmp_lr = lr / math.sqrt(r)
-            elif args.lr_schedule == 3:
-                tmp_lr = lr
-            else:
-                exit("error")
 
             for wid, model in enumerate(model_ls):
                 with torch.no_grad():
@@ -324,7 +325,7 @@ def run_single_seed(args, seed, csv_path=None):
                     for name, p in model.named_parameters():
                         if p.grad is None:
                             continue
-                        p.data -= lr * normalized_y[name]
+                        p.data -= tmp_lr * normalized_y[name]
             if args.n_workers > 1:
                 mix_params(model_ls, mixing)
                 comm_rounds_count += 1
