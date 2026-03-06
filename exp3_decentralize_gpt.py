@@ -172,6 +172,20 @@ def run_single_seed(args, seed, csv_path=None):
         t_start = time.perf_counter()
         round_losses = []
 
+        # ===== stepsize schedule =====
+        if args.lr_schedule == 1:
+            tmp_lr = lr * (1 - r / total_rounds)
+        elif args.lr_schedule == 2:
+            tmp_lr = lr / math.sqrt(r)
+        elif args.lr_schedule == 3:
+            tmp_lr = lr
+        elif args.lr_schedule == 4:
+            tmp_lr = lr / r
+        elif args.lr_schedule == 5:
+            tmp_lr = lr / (r ** 0.75)
+        else:
+            exit("error")
+
         # ===== per-worker forward/backward + local buffer update =====
         for wid, model in enumerate(model_ls):
             try:
@@ -247,20 +261,6 @@ def run_single_seed(args, seed, csv_path=None):
                         m.mul_(mom / r**0.5).add_(temp, alpha=1 - mom / r**0.5)
                         m_list[wid][name] = m
                         p.data -= lr / r**0.2 * m
-
-        # ===== stepsize schedule =====
-        if args.lr_schedule == 1:
-            tmp_lr = lr * (1 - r / total_rounds)
-        elif args.lr_schedule == 2:
-            tmp_lr = lr / math.sqrt(r)
-        elif args.lr_schedule == 3:
-            tmp_lr = lr
-        elif args.lr_schedule == 4:
-            tmp_lr = lr / r
-        elif args.lr_schedule == 5:
-            tmp_lr = lr / (r ** 0.75)
-        else:
-            exit("error")
 
         # ===== mixing / communication =====
         if alg == "demuon":
