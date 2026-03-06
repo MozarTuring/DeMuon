@@ -256,14 +256,19 @@ def run_single_seed(args, seed, csv_path=None):
             tmp_lr = lr / math.sqrt(r)
         elif args.lr_schedule == 3:
             tmp_lr = lr
+        elif args.lr_schedule == 4:
+            tmp_lr = lr / r
+        elif args.lr_schedule == 5:
+            tmp_lr = lr / (r ** 0.75)
         else:
             exit("error")
 
         # ===== mixing / communication =====
         if alg == "demuon":
             if args.n_workers > 1:
-                y_list = mix_y_list(y_list, mixing)
-                comm_rounds_count += 1
+                for _ in range(args.gossip_rounds):
+                    y_list = mix_y_list(y_list, mixing)
+                    comm_rounds_count += 1
 
             for wid, model in enumerate(model_ls):
                 with torch.no_grad():
@@ -293,8 +298,9 @@ def run_single_seed(args, seed, csv_path=None):
                         check_nan_inf(name, tmp, r)
 
             if args.n_workers > 1:
-                mix_params(model_ls, mixing)
-                comm_rounds_count += 1
+                for _ in range(args.gossip_rounds):
+                    mix_params(model_ls, mixing)
+                    comm_rounds_count += 1
 
         elif alg in ("dsgd", "dsgd_gclip_decay", "sen"):
             if args.n_workers > 1:
@@ -444,10 +450,17 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--gossip_rounds",
+        type=int,
+        default=1,
+        help="Number of gossip (mixing) rounds per iteration",
+    )
+
+    parser.add_argument(
         "--lr_schedule",
         type=int,
         default=3,
-        help="1=linear decay, 2=1/sqrt(t), 3=constant",
+        help="1=linear decay, 2=1/sqrt(t), 3=constant, 4=1/t, 5=1/t^0.75",
     )
     parser.add_argument(
         "--network", type=str, default="ring", choices=["ring", "exp", "complete"]

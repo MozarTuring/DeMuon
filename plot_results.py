@@ -31,15 +31,15 @@ plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.size"] = 18
 plt.rcParams["savefig.bbox"] = "tight"
 
-MARKERS = ["o", "s", "D", "^", "v"]
+MARKERS = ["o", "s", "D", "^"]
 COLORS = list(plt.cm.tab10.colors[:4])
 plt.rcParams['axes.prop_cycle'] = cycler(color=COLORS, marker=MARKERS[:4])
 
 ALGORITHMS = {
-    "dsgd":         {"label": "DSGD"},
-    "dsgd_clip":    {"label": "DSGD_Clip"},
-    "gt_nsgdm":     {"label": "GT_NSGDm"},
-    "demuon_decay": {"label": "DeMuon"},
+    "dsgd":              {"label": "DSGD"},
+    "dsgd_clip":         {"label": "DSGD_Clip"},
+    "gt_nsgdm_decay":    {"label": "GT_NSGDm"},
+    "demuon_decay":      {"label": "DeMuon"},
 }
 
 TOPOLOGIES = {
@@ -83,12 +83,21 @@ def find_csv(datadirs, name):
     return None
 
 
+def write_source(pdf_path, sources):
+    """Write a source.txt next to a PDF listing the CSVs it used."""
+    txt_path = pdf_path.with_suffix(".source.txt")
+    with open(txt_path, "w") as f:
+        for label, csv_path in sources:
+            f.write(f"{label}: {csv_path}\n")
+
+
 def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix,
                             algorithms=ALGORITHMS, log_scale=False,
 ):
     """One figure per topology with all algorithms overlaid."""
     for topo, topo_title in TOPOLOGIES.items():
         fig, ax = plt.subplots()
+        sources = []
         for alg_key, style in algorithms.items():
             csv_path = find_csv(datadir, f"{alg_key}_{topo}")
             if csv_path is None:
@@ -98,6 +107,7 @@ def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix
                 continue
             ax.plot(data["round"], data[metric_col],
                     markevery=MARKER_EVERY, label=style["label"])
+            sources.append((style["label"], csv_path))
 
         ax.set_xlabel("Iteration")
         ax.set_ylabel(ylabel)
@@ -109,6 +119,7 @@ def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix
         out_path = Path(outdir) / f"{topo}_{filename_suffix}.pdf"
         fig.savefig(out_path)
         plt.close(fig)
+        write_source(out_path, sources)
         print(f"  Saved {out_path}")
 
 
@@ -116,6 +127,7 @@ def plot_training_loss_by_topology(datadir, outdir):
     """Average training loss per round (mean of w0_train..w7_train)."""
     for topo, topo_title in TOPOLOGIES.items():
         fig, ax = plt.subplots()
+        sources = []
         for alg_key, style in ALGORITHMS.items():
             csv_path = find_csv(datadir, f"{alg_key}_{topo}")
             if csv_path is None:
@@ -130,6 +142,7 @@ def plot_training_loss_by_topology(datadir, outdir):
                 avg_train.append(sum(data[c][i] for c in train_cols) / len(train_cols))
             ax.plot(data["round"], avg_train,
                     markevery=MARKER_EVERY, label=style["label"])
+            sources.append((style["label"], csv_path))
 
         ax.set_xlabel("Iteration")
         ax.set_ylabel("Training loss")
@@ -139,6 +152,7 @@ def plot_training_loss_by_topology(datadir, outdir):
         out_path = Path(outdir) / f"{topo}_Training loss.pdf"
         fig.savefig(out_path)
         plt.close(fig)
+        write_source(out_path, sources)
         print(f"  Saved {out_path}")
 
 
@@ -152,6 +166,7 @@ def plot_ablation(datadir, outdir):
         for topo, topo_title in TOPOLOGIES.items():
             fig, ax = plt.subplots()
             ax.set_prop_cycle(ablation_cycle)
+            sources = []
             for alg_key, style in ABLATION_VARIANTS.items():
                 csv_path = find_csv(datadir, f"{alg_key}_{topo}")
                 if csv_path is None:
@@ -161,6 +176,7 @@ def plot_ablation(datadir, outdir):
                     continue
                 ax.plot(data["round"], data[metric_col],
                         markevery=MARKER_EVERY, label=style["label"])
+                sources.append((style["label"], csv_path))
 
             ax.set_xlabel("Iteration")
             ax.set_ylabel(ylabel)
@@ -170,6 +186,7 @@ def plot_ablation(datadir, outdir):
             out_path = Path(outdir) / f"{topo}_{suffix}.pdf"
             fig.savefig(out_path)
             plt.close(fig)
+            write_source(out_path, sources)
             print(f"  Saved {out_path}")
 
 
@@ -177,6 +194,7 @@ def plot_wall_clock(datadir, outdir):
     """Validation loss vs cumulative wall-clock time."""
     for topo, topo_title in TOPOLOGIES.items():
         fig, ax = plt.subplots()
+        sources = []
         for alg_key, style in ALGORITHMS.items():
             csv_path = find_csv(datadir, f"{alg_key}_{topo}")
             if csv_path is None:
@@ -187,6 +205,7 @@ def plot_wall_clock(datadir, outdir):
             hours = [t / 3600 for t in data["cumul_time_sec"]]
             ax.plot(hours, data["avg_val_loss"],
                     markevery=MARKER_EVERY, label=style["label"])
+            sources.append((style["label"], csv_path))
 
         ax.set_xlabel("Wall-Clock Time (hours)")
         ax.set_ylabel("Validation loss")
@@ -196,24 +215,8 @@ def plot_wall_clock(datadir, outdir):
         out_path = Path(outdir) / f"{topo}_val_loss_vs_time.pdf"
         fig.savefig(out_path)
         plt.close(fig)
+        write_source(out_path, sources)
         print(f"  Saved {out_path}")
-
-
-def collect_used_files(datadirs):
-    """Return a list of all CSV files that were found across datadirs."""
-    used = []
-    all_names = set()
-    for alg_key in ALGORITHMS:
-        for topo in TOPOLOGIES:
-            all_names.add(f"{alg_key}_{topo}")
-    for alg_key in ABLATION_VARIANTS:
-        for topo in TOPOLOGIES:
-            all_names.add(f"{alg_key}_{topo}")
-    for name in sorted(all_names):
-        p = find_csv(datadirs, name)
-        if p is not None:
-            used.append(str(p))
-    return used
 
 
 def main():
@@ -255,16 +258,8 @@ def main():
     print("[6/6] Validation loss vs wall-clock time")
     plot_wall_clock(datadirs, outdir)
 
-    used_files = collect_used_files(datadirs)
-    manifest_path = Path(outdir) / "source_files.txt"
-    with open(manifest_path, "w") as f:
-        for p in used_files:
-            f.write(p + "\n")
-    print(f"\nSource CSV manifest: {manifest_path}")
-    for p in used_files:
-        print(f"  {p}")
-
     print(f"\nDone. {len(list(Path(outdir).glob('*.pdf')))} PDF figures in {outdir}")
+    print(f"Per-figure source files: {outdir}/*.source.txt")
 
 
 if __name__ == "__main__":
