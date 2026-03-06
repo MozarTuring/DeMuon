@@ -31,15 +31,16 @@ plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.size"] = 18
 plt.rcParams["savefig.bbox"] = "tight"
 
-MARKERS = ["o", "s", "D", "^"]
-COLORS = list(plt.cm.tab10.colors[:4])
-plt.rcParams['axes.prop_cycle'] = cycler(color=COLORS, marker=MARKERS[:4])
+MARKERS = ["o", "s", "D", "^", "v"]
+COLORS = list(plt.cm.tab10.colors[:5])
+plt.rcParams['axes.prop_cycle'] = cycler(color=COLORS, marker=MARKERS[:5])
 
 ALGORITHMS = {
     "dsgd":              {"label": "DSGD"},
     "dsgd_clip":         {"label": "DSGD_Clip"},
     "gt_nsgdm_decay":    {"label": "GT_NSGDm"},
-    "demuon_decay":      {"label": "DeMuon"},
+    "demuon_decay":      {"label": r"DeMuon($\eta/\sqrt{k}$)"},
+    "demuon_inv075":     {"label": r"DeMuon($\eta/k^{0.75}$)"},
 }
 
 TOPOLOGIES = {

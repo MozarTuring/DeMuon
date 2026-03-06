@@ -204,10 +204,9 @@ def run_single_seed(args, seed, csv_path=None):
                     for name, p in model.named_parameters():
                         if p.grad is None:
                             continue
-                        p.data -= lr * p.grad
+                        p.data -= tmp_lr * p.grad
 
                 elif alg == "dsgd_gclip_decay":
-                    cur_lr = args.lr / r
                     cur_clip = args.l2_clip_bd * r**0.4
                     torch.nn.utils.clip_grad_norm_(
                         model.parameters(), max_norm=cur_clip
@@ -215,7 +214,7 @@ def run_single_seed(args, seed, csv_path=None):
                     for name, p in model.named_parameters():
                         if p.grad is None:
                             continue
-                        p.data -= cur_lr * p.grad
+                        p.data -= tmp_lr * p.grad
 
                 elif alg == "gt_dsgd":
                     for name, p in model.named_parameters():
