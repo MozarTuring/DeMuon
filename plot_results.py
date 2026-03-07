@@ -33,7 +33,9 @@ plt.rcParams["savefig.bbox"] = "tight"
 
 MARKERS = ["o", "s", "D", "^", "v"]
 COLORS = list(plt.cm.tab10.colors[:5])
-plt.rcParams['axes.prop_cycle'] = cycler(color=COLORS, marker=MARKERS[:5])
+DEFAULT_CYCLE = cycler(color=COLORS, marker=MARKERS)
+COMPLETE_CYCLE = cycler(color=COLORS[:4], marker=MARKERS[:4])
+plt.rcParams['axes.prop_cycle'] = DEFAULT_CYCLE
 
 ALGORITHMS = {
     "dsgd":              {"label": "DSGD"},
@@ -41,6 +43,14 @@ ALGORITHMS = {
     "gt_nsgdm_decay":    {"label": "GT_NSGDm"},
     "demuon_decay":      {"label": r"DeMuon($\eta/\sqrt{k}$)"},
     "demuon_inv075":     {"label": r"DeMuon($\eta/k^{0.75}$)"},
+}
+
+# On the complete graph, use constant-stepsize DeMuon/GT_NSGDm and drop DeMuon(k^0.75)
+ALGORITHMS_COMPLETE = {
+    "dsgd":       {"label": "DSGD"},
+    "dsgd_clip":  {"label": "DSGD_Clip"},
+    "gt_nsgdm":   {"label": "GT_NSGDm"},
+    "demuon":     {"label": "DeMuon"},
 }
 
 TOPOLOGIES = {
@@ -92,12 +102,24 @@ def write_source(pdf_path, sources):
             f.write(f"{label}: {csv_path}\n")
 
 
+def get_algorithms(topo):
+    """Return the algorithm dict appropriate for a given topology."""
+    return ALGORITHMS_COMPLETE if topo == "complete" else ALGORITHMS
+
+
+def get_cycle(topo):
+    """Return the color/marker cycle appropriate for a given topology."""
+    return COMPLETE_CYCLE if topo == "complete" else DEFAULT_CYCLE
+
+
 def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix,
-                            algorithms=ALGORITHMS, log_scale=False,
+                            log_scale=False,
 ):
     """One figure per topology with all algorithms overlaid."""
     for topo, topo_title in TOPOLOGIES.items():
+        algorithms = get_algorithms(topo)
         fig, ax = plt.subplots()
+        ax.set_prop_cycle(get_cycle(topo))
         sources = []
         for alg_key, style in algorithms.items():
             csv_path = find_csv(datadir, f"{alg_key}_{topo}")
@@ -127,9 +149,11 @@ def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix
 def plot_training_loss_by_topology(datadir, outdir):
     """Average training loss per round (mean of w0_train..w7_train)."""
     for topo, topo_title in TOPOLOGIES.items():
+        algorithms = get_algorithms(topo)
         fig, ax = plt.subplots()
+        ax.set_prop_cycle(get_cycle(topo))
         sources = []
-        for alg_key, style in ALGORITHMS.items():
+        for alg_key, style in algorithms.items():
             csv_path = find_csv(datadir, f"{alg_key}_{topo}")
             if csv_path is None:
                 continue
@@ -194,9 +218,11 @@ def plot_ablation(datadir, outdir):
 def plot_wall_clock(datadir, outdir):
     """Validation loss vs cumulative wall-clock time."""
     for topo, topo_title in TOPOLOGIES.items():
+        algorithms = get_algorithms(topo)
         fig, ax = plt.subplots()
+        ax.set_prop_cycle(get_cycle(topo))
         sources = []
-        for alg_key, style in ALGORITHMS.items():
+        for alg_key, style in algorithms.items():
             csv_path = find_csv(datadir, f"{alg_key}_{topo}")
             if csv_path is None:
                 continue
