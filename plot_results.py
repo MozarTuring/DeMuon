@@ -48,20 +48,20 @@ ALGORITHMS = {
 # For each method on each graph we pick the run with the lowest consensus error.
 ALG_DIR_PREFIX = {
     "complete": {
-        "dsgd":      "dsgd_dim",
-        "dsgd_clip": "dsgd_clip_dim",
-        "gt_nsgdm":  "gt_nsgdm",
-        "demuon":    "demuon",
+        "dsgd":      "dsgd_dim2",
+        "dsgd_clip": "dsgd_clip_dim2",
+        "gt_nsgdm":  "gt_nsgdm2",
+        "demuon":    "demuon2",
     },
     "exp": {
         "dsgd":      "dsgd_dim",
-        "dsgd_clip": "dsgd_clip",
-        "gt_nsgdm":  "gt_nsgdm_dim",
-        "demuon":    "demuon_inv075",
+        "dsgd_clip": "dsgd_clip_dim",
+        "gt_nsgdm":  "gt_nsgdm_dim3",
+        "demuon":    "demuon_invt2",
     },
     "ring": {
         "dsgd":      "dsgd_dim",
-        "dsgd_clip": "dsgd_clip",
+        "dsgd_clip": "dsgd_clip_dim",
         "gt_nsgdm":  "gt_nsgdm_dim",
         "demuon":    "demuon_invt",
     },
