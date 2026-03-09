@@ -51,7 +51,7 @@ ALG_DIR_PREFIX = {
         "dsgd":      "dsgd_dim2",
         "dsgd_clip": "dsgd_clip_dim2",
         "gt_nsgdm":  "gt_nsgdm2",
-        "demuon":    "demuon2",
+        "demuon":    "demuon3",
     },
     "exp": {
         "dsgd":      "dsgd_dim",
@@ -63,7 +63,7 @@ ALG_DIR_PREFIX = {
         "dsgd":      "dsgd_dim",
         "dsgd_clip": "dsgd_clip_dim",
         "gt_nsgdm":  "gt_nsgdm_dim",
-        "demuon":    "demuon_invt",
+        "demuon":    "demuon_invt3",
     },
 }
 
