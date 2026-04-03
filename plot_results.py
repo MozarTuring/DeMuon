@@ -51,19 +51,19 @@ ALG_DIR_PREFIX = {
         "dsgd":      "dsgd_dim2",
         "dsgd_clip": "dsgd_clip_dim2",
         "gt_nsgdm":  "gt_nsgdm2",
-        "demuon":    "demuon3",
+        "demuon":    "demuon_decay",
     },
     "exp": {
-        "dsgd":      "dsgd_dim",
-        "dsgd_clip": "dsgd_clip_dim",
-        "gt_nsgdm":  "gt_nsgdm_dim3",
-        "demuon":    "demuon_invt2",
+        "dsgd":      "dsgd_lin1",
+        "dsgd_clip": "dsgd_clip_lin2",
+        "gt_nsgdm":  "gt_nsgdm_lin2",
+        "demuon":    "demuon_lin1",
     },
     "ring": {
-        "dsgd":      "dsgd_dim",
-        "dsgd_clip": "dsgd_clip_dim",
-        "gt_nsgdm":  "gt_nsgdm_dim",
-        "demuon":    "demuon_invt3",
+        "dsgd":      "dsgd_lin2",
+        "dsgd_clip": "dsgd_clip_lin6",
+        "gt_nsgdm":  "gt_nsgdm_lin2",
+        "demuon":    "demuon_lin1",
     },
 }
 
