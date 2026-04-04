@@ -43,7 +43,7 @@ def main():
                f"--gpu {gpu_id} --outdir {outdir} --seeds {seeds_str} {args}")
 
         print(f"[{time.strftime('%H:%M:%S')}] Launching {name} on gpu={gpu_id} -> {outdir}/")
-        log_file = open(f"{outdir}/stdout.log", "w")
+        log_file = open(f"slurm_out_{name}.log", "w")
         proc = subprocess.Popen(
             cmd, shell=True, stdout=log_file, stderr=subprocess.STDOUT,
             env={**os.environ, "PYTHONUNBUFFERED": "1"})

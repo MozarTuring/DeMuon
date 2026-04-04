@@ -1,0 +1,481 @@
+seeds = [42]
+
+# ── DeMuon on 3 topologies (paper Table 1: lr=0.1, mom=0.2) ──
+
+# [[experiments]]
+# name = "demuon_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2"
+#
+# [[experiments]]
+# name = "demuon_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.1 --mom 0.2"
+#
+# [[experiments]]
+# name = "demuon_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2"
+#
+# # ── DSGD baseline ──
+#
+# [[experiments]]
+# name = "dsgd_complete"
+# args = "--network complete --alg dsgd --lr 0.01"
+#
+# [[experiments]]
+# name = "dsgd_exp"
+# args = "--network exp --alg dsgd --lr 0.01"
+#
+# [[experiments]]
+# name = "dsgd_ring"
+# args = "--network ring --alg dsgd --lr 0.01"
+#
+# # ── DSGD with gradient clipping + LR decay ──
+#
+# [[experiments]]
+# name = "dsgd_clip_complete"
+# args = "--network complete --alg dsgd_gclip_decay --lr 10 --l2_clip_bd 0.1"
+#
+# [[experiments]]
+# name = "dsgd_clip_exp"
+# args = "--network exp --alg dsgd_gclip_decay --lr 10 --l2_clip_bd 0.1"
+#
+# [[experiments]]
+# name = "dsgd_clip_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 10 --l2_clip_bd 0.1"
+#
+# # ── GT-NSGDm baseline (mom=0.8, i.e. θ=0.2 in paper) ──
+#
+# [[experiments]]
+# name = "gt_nsgdm_complete"
+# args = "--network complete --alg gt_nsgdm --lr 0.1 --mom 0.8"
+#
+# [[experiments]]
+# name = "gt_nsgdm_exp"
+# args = "--network exp --alg gt_nsgdm --lr 0.1 --mom 0.8"
+#
+# [[experiments]]
+# name = "gt_nsgdm_ring"
+# args = "--network ring --alg gt_nsgdm --lr 0.1 --mom 0.8"
+#
+# # ── Ablation: DeMuon without msgn (raw gradient) ──
+#
+# [[experiments]]
+# name = "ablation_complete"
+# args = "--network complete --alg demuon --msgn 0 --lr 0.1 --mom 0.2"
+#
+# [[experiments]]
+# name = "ablation_exp"
+# args = "--network exp --alg demuon --msgn 0 --lr 0.1 --mom 0.2"
+#
+# [[experiments]]
+# name = "ablation_ring"
+# args = "--network ring --alg demuon --msgn 0 --lr 0.1 --mom 0.2"
+
+# ── DeMuon with diminishing stepsize (1/sqrt(t)) ──
+
+# [[experiments]]
+# name = "demuon_decay_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 2"
+#
+# [[experiments]]
+# name = "demuon_decay_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 2"
+#
+# [[experiments]]
+# name = "demuon_decay_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 2"
+
+# ── GT-NSGDm with diminishing stepsize (1/sqrt(t)) ──
+
+# [[experiments]]
+# name = "gt_nsgdm_decay_complete"
+# args = "--network complete --alg gt_nsgdm --lr 0.1 --mom 0.8 --lr_schedule 2"
+#
+# [[experiments]]
+# name = "gt_nsgdm_decay_exp"
+# args = "--network exp --alg gt_nsgdm --lr 0.1 --mom 0.8 --lr_schedule 2"
+#
+# [[experiments]]
+# name = "gt_nsgdm_decay_ring"
+# args = "--network ring --alg gt_nsgdm --lr 0.1 --mom 0.8 --lr_schedule 2"
+
+# ── DeMuon with diminishing stepsize + multiple gossip rounds ──
+
+# [[experiments]]
+# name = "demuon_decay_gossip_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 2 --gossip_rounds 20"
+#
+# [[experiments]]
+# name = "demuon_decay_gossip_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 2 --gossip_rounds 20"
+
+# ── DeMuon with 1/t diminishing stepsize ──
+
+# [[experiments]]
+# name = "demuon_invt_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 4"
+#
+# [[experiments]]
+# name = "demuon_invt_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 4"
+#
+# [[experiments]]
+# name = "demuon_invt_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 4"
+
+# ── DeMuon with 1/t^0.75 diminishing stepsize ──
+
+# [[experiments]]
+# name = "demuon_inv075_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 5"
+#
+# [[experiments]]
+# name = "demuon_inv075_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 5"
+#
+# [[experiments]]
+# name = "demuon_inv075_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 5"
+
+# ── DSGD & DSGD_Clip with diminishing LR (complete only, target CE ~1e-5) ──
+
+# [[experiments]]
+# name = "dsgd_dim_complete"
+# args = "--network complete --alg dsgd --lr 0.01 --lr_schedule 2"
+#
+# [[experiments]]
+# name = "dsgd_clip_dim_complete"
+# args = "--network complete --alg dsgd_gclip_decay --lr 1 --l2_clip_bd 0.1 --lr_schedule 4"
+
+# ── DSGD, DSGD_Clip, GT_NSGDm with adjusted LR on exp graph (target CE ~1e-4) ──
+
+# (exp experiments done — kept for reference)
+# DSGD exp: lr=0.04/sqrt(k) gave CE=1.9e-4
+# GT_NSGDm exp: lr=0.04/sqrt(k) gave CE=3.3e-4
+
+# ── Ring graph: target CE ~1e-4 ──
+
+# DSGD: constant lr=0.01 gave CE=6.9e-3; use lr=0.02/sqrt(k)
+# [[experiments]]
+# name = "dsgd_dim_ring"
+# args = "--network ring --alg dsgd --lr 0.02 --lr_schedule 2"
+
+# GT_NSGDm: lr=0.1/sqrt(k) gave CE=2.8e-3; use lr=0.02/sqrt(k)
+# [[experiments]]
+# name = "gt_nsgdm_dim_ring"
+# args = "--network ring --alg gt_nsgdm --lr 0.02 --mom 0.8 --lr_schedule 2"
+
+# DSGD_Clip ring: already at 8.2e-4, no change needed
+
+# DeMuon: eta/sqrt(k) gave CE=1.6e-2, eta/k^0.75 gave CE=1.6e-3; use eta/k for ~1e-4
+# [[experiments]]
+# name = "demuon_invt_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 4"
+
+# ── Drive CE to ~1.xe-5 on complete (done — all at 2.2-2.3e-5) ──
+
+# [[experiments]]
+# name = "dsgd_dim2_complete"
+# args = "--network complete --alg dsgd --lr 0.006 --lr_schedule 2"
+#
+# [[experiments]]
+# name = "dsgd_clip_dim2_complete"
+# args = "--network complete --alg dsgd_gclip_decay --lr 0.6 --l2_clip_bd 0.1 --lr_schedule 4"
+#
+# [[experiments]]
+# name = "gt_nsgdm2_complete"
+# args = "--network complete --alg gt_nsgdm --lr 0.07 --mom 0.8"
+#
+# [[experiments]]
+# name = "demuon2_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.04 --mom 0.2"
+
+# ── Drive CE to ~1.xe-4 on exp/ring (done for dsgd_clip) ──
+
+# [[experiments]]
+# name = "dsgd_clip_dim_exp"
+# args = "--network exp --alg dsgd_gclip_decay --lr 2 --l2_clip_bd 0.1 --lr_schedule 4"
+#
+# [[experiments]]
+# name = "dsgd_clip_dim_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 1.5 --l2_clip_bd 0.1 --lr_schedule 4"
+
+# ── Refine GT_NSGDm & DeMuon on exp to 1.xe-4 ──
+
+# GT_NSGDm exp: lr=0.02/sqrt(k) overshot to 5.5e-5; raise lr to 0.03 for ~1.5e-4
+# [[experiments]]
+# name = "gt_nsgdm_dim3_exp"
+# args = "--network exp --alg gt_nsgdm --lr 0.03 --mom 0.8 --lr_schedule 2"
+
+# DeMuon exp: lr=0.1/k gave 9.0e-5; raise lr to 0.17/k for ~1.5e-4
+# [[experiments]]
+# name = "demuon_invt2_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.17 --mom 0.2 --lr_schedule 4"
+
+# ── Rerun all DeMuon with mom=0.8 (theta=0.2 in paper) ──
+
+# mom=0.8 round 1: exp hit (1.49e-4), complete (3.1e-5) and ring (2.39e-4) need lower lr
+# [[experiments]]
+# name = "demuon2_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.04 --mom 0.8"
+#
+# [[experiments]]
+# name = "demuon_invt2_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.17 --mom 0.8 --lr_schedule 4"
+#
+# [[experiments]]
+# name = "demuon_invt_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.8 --lr_schedule 4"
+
+# mom=0.8 round 2: lower lr for complete and ring (done)
+# [[experiments]]
+# name = "demuon3_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.02 --mom 0.8"
+#
+# [[experiments]]
+# name = "demuon_invt3_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.063 --mom 0.8 --lr_schedule 4"
+
+# mom=0.8 round 3: improve ring loss while keeping CE ~1.xe-4
+# Strategy: use slower decay schedules (1/k^0.75, 1/sqrt(k)) with smaller initial LR
+
+# round 3 results (done):
+# inv075_2 lr=0.03 → CE=9.7e-4, loss=6.452
+# inv075_3 lr=0.02 → CE=6.2e-4, loss=6.949
+# sqrt2    lr=0.002 → CE=3.8e-4, loss=7.667
+# sqrt3    lr=0.001 → CE=1.6e-4, loss=8.424
+#
+# [[experiments]]
+# name = "demuon_inv075_2_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.03 --mom 0.8 --lr_schedule 5"
+# [[experiments]]
+# name = "demuon_inv075_3_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.02 --mom 0.8 --lr_schedule 5"
+# [[experiments]]
+# name = "demuon_sqrt2_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.002 --mom 0.8 --lr_schedule 2"
+# [[experiments]]
+# name = "demuon_sqrt3_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.001 --mom 0.8 --lr_schedule 2"
+
+# round 4 results (done):
+# inv075_4 mom=0.8 lr=0.015 sched=5 → loss=7.108, CE=2.96e-4
+# inv075_5 mom=0.8 lr=0.012 sched=5 → loss=7.325, CE=2.26e-4
+# invt4    mom=0.8 lr=0.08  sched=4 → loss=6.751, CE=1.86e-4
+# invt5    mom=0.8 lr=0.1   sched=4 → loss=6.473, CE=2.39e-4
+# lin1     mom=0.8 lr=0.003 sched=1 → loss=0.258, CE=3.4e-5
+# lin2     mom=0.8 lr=0.005 sched=1 → loss=0.234, CE=4.5e-5  ★ WINNER
+# m5_invt1 mom=0.5 lr=0.1   sched=4 → loss=6.590, CE=1.95e-4
+# m5_invt2 mom=0.5 lr=0.08  sched=4 → loss=6.838, CE=1.51e-4
+# m5_inv075 mom=0.5 lr=0.025 sched=5 → loss=6.640, CE=4.64e-4
+# m3_invt1 mom=0.3 lr=0.1   sched=4 → loss=6.653, CE=1.70e-4
+# m3_inv075 mom=0.3 lr=0.03  sched=5 → loss=6.512, CE=4.96e-4
+
+# ── Round 5: drive all methods to CE ~4.5e-5 on ring using linear decay ──
+
+# DSGD (done): lin2 lr=0.03 → loss=5.632, CE=4.0e-5 ★
+# [[experiments]]
+# name = "dsgd_lin1_ring"
+# args = "--network ring --alg dsgd --lr 0.02 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_lin2_ring"
+# args = "--network ring --alg dsgd --lr 0.03 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_lin3_ring"
+# args = "--network ring --alg dsgd --lr 0.01 --lr_schedule 1"
+
+# DSGD_Clip round 1 (done): CE still ~1e-4 at lr=0.5-1.5
+# lin1 lr=1.5 → loss=0.329, CE=1.19e-4
+# lin2 lr=1.0 → loss=0.362, CE=1.10e-4
+# lin3 lr=0.5 → loss=0.579, CE=9.60e-5
+# [[experiments]]
+# name = "dsgd_clip_lin1_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 1.5 --l2_clip_bd 0.1 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_clip_lin2_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 1.0 --l2_clip_bd 0.1 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_clip_lin3_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 0.5 --l2_clip_bd 0.1 --lr_schedule 1"
+
+# DSGD_Clip round 2 (done): lin6 lr=0.1 → loss=5.538, CE=4.5e-5 ★
+# [[experiments]]
+# name = "dsgd_clip_lin4_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 0.3 --l2_clip_bd 0.1 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_clip_lin5_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 0.2 --l2_clip_bd 0.1 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_clip_lin6_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 0.1 --l2_clip_bd 0.1 --lr_schedule 1"
+
+# ── Round 6: DeMuon on exp with linear decay ──
+# Ring: lr=0.005 gave CE=4.5e-5. Exp has better mixing (λ≈0.60 vs 0.80),
+# so we can use higher LR. Try a range around 0.005-0.02.
+
+# DeMuon exp (done): lin1 lr=0.005 → loss=0.234, CE=2.6e-5 ★
+# [[experiments]]
+# name = "demuon_lin1_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.005 --mom 0.8 --lr_schedule 1"
+# [[experiments]]
+# name = "demuon_lin2_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.01 --mom 0.8 --lr_schedule 1"
+# [[experiments]]
+# name = "demuon_lin3_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.02 --mom 0.8 --lr_schedule 1"
+# [[experiments]]
+# name = "demuon_lin4_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.015 --mom 0.8 --lr_schedule 1"
+
+# ── Round 7: Drive DSGD, DSGD_Clip, GT_NSGDm to CE ~2-3e-5 on exp with linear decay ──
+# Exp (λ≈0.60) has better mixing than ring (λ≈0.80), so same LR → lower CE
+
+# Round 7 (done): all methods on exp with linear decay
+# dsgd_lin1_exp lr=0.03 → loss=5.632, CE=2.8e-5 ★
+# dsgd_clip_lin2_exp lr=0.2 → loss=4.816, CE=2.6e-5 ★
+# gt_nsgdm_lin2_exp lr=0.05 → loss=1.127, CE=3.1e-5 ★
+# demuon_lin1_exp lr=0.005 → loss=0.234, CE=2.6e-5 ★
+# [[experiments]]
+# name = "dsgd_lin1_exp"
+# args = "--network exp --alg dsgd --lr 0.03 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_lin2_exp"
+# args = "--network exp --alg dsgd --lr 0.05 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_lin3_exp"
+# args = "--network exp --alg dsgd --lr 0.04 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_clip_lin1_exp"
+# args = "--network exp --alg dsgd_gclip_decay --lr 0.1 --l2_clip_bd 0.1 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_clip_lin2_exp"
+# args = "--network exp --alg dsgd_gclip_decay --lr 0.2 --l2_clip_bd 0.1 --lr_schedule 1"
+# [[experiments]]
+# name = "dsgd_clip_lin3_exp"
+# args = "--network exp --alg dsgd_gclip_decay --lr 0.15 --l2_clip_bd 0.1 --lr_schedule 1"
+# [[experiments]]
+# name = "gt_nsgdm_lin1_exp"
+# args = "--network exp --alg gt_nsgdm --lr 0.03 --mom 0.8 --lr_schedule 1"
+# [[experiments]]
+# name = "gt_nsgdm_lin2_exp"
+# args = "--network exp --alg gt_nsgdm --lr 0.05 --mom 0.8 --lr_schedule 1"
+# [[experiments]]
+# name = "gt_nsgdm_lin3_exp"
+# args = "--network exp --alg gt_nsgdm --lr 0.04 --mom 0.8 --lr_schedule 1"
+
+# ── Round 8: Fine-tune DeMuon CE on complete (2.4e-5→≤2.2e-5) and ring (4.5e-5→≤4.0e-5) ──
+
+# Complete: current lr=0.02 constant → CE=2.4e-5. Small LR cut to reach ≤2.2e-5
+# demuon4_complete lr=0.015 → TBD
+# demuon5_complete lr=0.010 → TBD
+
+# Ring: using demuon_lin1_ring (lr=0.003, linear, mom=0.8) → loss=0.258, CE=3.4e-5 ★
+# from 68c6c43c_20260309_194335
+
+# ── Paper experiments (final) ──
+
+# Complete graph
+[[experiments]]
+name = "dsgd_dim2_complete"
+args = "--network complete --alg dsgd --lr 0.006 --lr_schedule 2"
+
+[[experiments]]
+name = "dsgd_clip_dim2_complete"
+args = "--network complete --alg dsgd_gclip_decay --lr 0.6 --l2_clip_bd 0.1 --lr_schedule 4"
+
+[[experiments]]
+name = "gt_nsgdm2_complete"
+args = "--network complete --alg gt_nsgdm --lr 0.07 --mom 0.8"
+
+# [[experiments]]
+# name = "demuon_decay_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 2"
+
+# Directed exponential graph
+# [[experiments]]
+# name = "dsgd_lin1_exp"
+# args = "--network exp --alg dsgd --lr 0.03 --lr_schedule 1"
+
+# [[experiments]]
+# name = "dsgd_clip_lin2_exp"
+# args = "--network exp --alg dsgd_gclip_decay --lr 0.2 --l2_clip_bd 0.1 --lr_schedule 1"
+
+# [[experiments]]
+# name = "gt_nsgdm_lin2_exp"
+# args = "--network exp --alg gt_nsgdm --lr 0.05 --mom 0.8 --lr_schedule 1"
+
+# [[experiments]]
+# name = "demuon_lin1_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.005 --mom 0.8 --lr_schedule 1"
+
+# Ring graph
+# [[experiments]]
+# name = "dsgd_lin2_ring"
+# args = "--network ring --alg dsgd --lr 0.03 --lr_schedule 1"
+
+# [[experiments]]
+# name = "dsgd_clip_lin6_ring"
+# args = "--network ring --alg dsgd_gclip_decay --lr 0.1 --l2_clip_bd 0.1 --lr_schedule 1"
+
+# [[experiments]]
+# name = "gt_nsgdm_lin2_ring"
+# args = "--network ring --alg gt_nsgdm --lr 0.03 --mom 0.8 --lr_schedule 1"
+
+# [[experiments]]
+# name = "demuon_lin1_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1"
+
+# GT_NSGDm (done): lin2 lr=0.03 → loss=2.035, CE=4.4e-5 ★
+# [[experiments]]
+# name = "gt_nsgdm_lin1_ring"
+# args = "--network ring --alg gt_nsgdm --lr 0.02 --mom 0.8 --lr_schedule 1"
+# [[experiments]]
+# name = "gt_nsgdm_lin2_ring"
+# args = "--network ring --alg gt_nsgdm --lr 0.03 --mom 0.8 --lr_schedule 1"
+# [[experiments]]
+# name = "gt_nsgdm_lin3_ring"
+# args = "--network ring --alg gt_nsgdm --lr 0.01 --mom 0.8 --lr_schedule 1"
+
+# Ablation experiments (not rerun — keep old mom=0.2 results from dec4c432)
+# [[experiments]]
+# name = "demuon_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.8"
+#
+# [[experiments]]
+# name = "demuon_exp"
+# args = "--network exp --alg demuon --msgn 1 --lr 0.1 --mom 0.8"
+#
+# [[experiments]]
+# name = "demuon_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.8"
+#
+# [[experiments]]
+# name = "ablation_complete"
+# args = "--network complete --alg demuon --msgn 0 --lr 0.1 --mom 0.8"
+#
+# [[experiments]]
+# name = "ablation_exp"
+# args = "--network exp --alg demuon --msgn 0 --lr 0.1 --mom 0.8"
+#
+# [[experiments]]
+# name = "ablation_ring"
+# args = "--network ring --alg demuon --msgn 0 --lr 0.1 --mom 0.8"
+
+# ── Centralized oracle baseline (single worker) ──
+
+# [[experiments]]
+# name = "centralized"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --n_workers 1"
+
+# ── NS-steps sensitivity (on ring) ──
+
+# [[experiments]]
+# name = "ns3_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --ns_steps 3"
+
+# [[experiments]]
+# name = "ns5_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --ns_steps 5"
+
+# [[experiments]]
+# name = "ns10_ring"
+# args = "--network ring --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --ns_steps 10"
