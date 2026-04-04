@@ -6,10 +6,9 @@
 module load Python/3.12.3-GCCcore-13.3.0
 source /mimer/NOBACKUP/groups/naiss2025-22-1056/pythonenv/neurips_code/bin/activate
 
-if [ ! -f remote.sh ]; then
-    echo "ERROR: remote.sh not found. Copy remote.sh.example to remote.sh and edit it."
+if [ ! -f jwm_configs/remote.sh ]; then
+    echo "ERROR: jwm_configs/remote.sh not found. Copy remote.sh.example to jwm_configs/remote.sh and edit it."
     exit 1
 fi
-source remote.sh
 
 python launch.py
