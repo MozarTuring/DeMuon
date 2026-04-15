@@ -1,6 +1,11 @@
 # Decentralized GPT Training Experiment
 
-This repository implements decentralized training of a small GPT model (MiniGPT) on the Multi30k English–German translation corpus. Workers communicate via gossip-based mixing over configurable graph topologies (ring, exponential, complete) and use the DeMuon optimizer with Newton-Schulz orthogonalization.
+This repository contains the simulation code for the paper:
+
+> **DeMuon: Decentralized Matrix Optimization with Newton-Schulz Orthogonalization**
+> [[arXiv:2510.01377]](https://arxiv.org/abs/2510.01377)
+
+The code implements decentralized training of a small GPT model (MiniGPT) on the Multi30k English–German translation corpus. Workers communicate via gossip-based mixing over configurable graph topologies (ring, exponential, complete) and use the DeMuon optimizer with Newton-Schulz orthogonalization.
 
 ## Prerequisites
 
@@ -48,3 +53,17 @@ To generate figures from the results:
 ```bash
 python plot_results.py --datadir output/
 ```
+
+## Results
+
+### Validation Loss
+
+| Complete Graph | Directed Exponential Graph | Ring Graph |
+|---|---|---|
+| ![](figures/complete_Validation%20loss.png) | ![](figures/exp_Validation%20loss.png) | ![](figures/ring_Validation%20loss.png) |
+
+### Consensus Error
+
+| Complete Graph | Directed Exponential Graph | Ring Graph |
+|---|---|---|
+| ![](figures/complete_consensus_error.png) | ![](figures/exp_consensus_error.png) | ![](figures/ring_consensus_error.png) |

@@ -108,12 +108,13 @@ def find_csv(datadirs, name):
     return None
 
 
-def write_source(pdf_path, sources):
-    """Write a source.txt next to a PDF listing the CSVs it used."""
-    txt_path = pdf_path.with_suffix(".source.txt")
-    with open(txt_path, "w") as f:
+def write_source(pdf_path, sources, merged_file):
+    """Append this figure's sources to the merged source file."""
+    with open(merged_file, "a") as f:
+        f.write(f"[{pdf_path.name}]\n")
         for label, csv_path in sources:
-            f.write(f"{label}: {csv_path}\n")
+            f.write(f"  {label}: {csv_path}\n")
+        f.write("\n")
 
 
 def get_dir_name(alg_key, topo):
@@ -123,7 +124,7 @@ def get_dir_name(alg_key, topo):
 
 
 def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix,
-                            log_scale=False,
+                            log_scale=False, merged_file=None,
 ):
     """One figure per topology with all algorithms overlaid."""
     for topo, topo_title in TOPOLOGIES.items():
@@ -151,11 +152,11 @@ def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix
         out_path = Path(outdir) / f"{topo}_{filename_suffix}.pdf"
         fig.savefig(out_path)
         plt.close(fig)
-        write_source(out_path, sources)
+        write_source(out_path, sources, merged_file)
         print(f"  Saved {out_path}")
 
 
-def plot_training_loss_by_topology(datadir, outdir):
+def plot_training_loss_by_topology(datadir, outdir, merged_file=None):
     """Average training loss per round (mean of w0_train..w7_train)."""
     for topo, topo_title in TOPOLOGIES.items():
         fig, ax = plt.subplots()
@@ -185,11 +186,11 @@ def plot_training_loss_by_topology(datadir, outdir):
         out_path = Path(outdir) / f"{topo}_Training loss.pdf"
         fig.savefig(out_path)
         plt.close(fig)
-        write_source(out_path, sources)
+        write_source(out_path, sources, merged_file)
         print(f"  Saved {out_path}")
 
 
-def plot_ablation(datadir, outdir):
+def plot_ablation(datadir, outdir, merged_file=None):
     """Ablation figures: DeMuon w/ vs w/o msgn for val loss and consensus error."""
     ablation_cycle = cycler(color=ABLATION_COLORS, marker=ABLATION_MARKERS)
     for metric_col, ylabel, suffix in [
@@ -219,11 +220,11 @@ def plot_ablation(datadir, outdir):
             out_path = Path(outdir) / f"{topo}_{suffix}.pdf"
             fig.savefig(out_path)
             plt.close(fig)
-            write_source(out_path, sources)
+            write_source(out_path, sources, merged_file)
             print(f"  Saved {out_path}")
 
 
-def plot_wall_clock(datadir, outdir):
+def plot_wall_clock(datadir, outdir, merged_file=None):
     """Validation loss vs cumulative wall-clock time."""
     for topo, topo_title in TOPOLOGIES.items():
         fig, ax = plt.subplots()
@@ -249,7 +250,7 @@ def plot_wall_clock(datadir, outdir):
         out_path = Path(outdir) / f"{topo}_val_loss_vs_time.pdf"
         fig.savefig(out_path)
         plt.close(fig)
-        write_source(out_path, sources)
+        write_source(out_path, sources, merged_file)
         print(f"  Saved {out_path}")
 
 
@@ -266,34 +267,37 @@ def main():
     default_outdir = f"/Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/draws/{timestamp}"
     outdir = args.outdir or default_outdir
     os.makedirs(outdir, exist_ok=True)
+    merged_file = Path(outdir) / "sources.txt"
+    merged_file.unlink(missing_ok=True)  # start fresh
     print(f"Data dirs: {datadirs}")
     print(f"Figures will be saved to: {outdir}\n")
 
     print("[1/6] Training loss (avg across workers)")
-    plot_training_loss_by_topology(datadirs, outdir)
+    plot_training_loss_by_topology(datadirs, outdir, merged_file)
 
     print("[2/6] Validation loss")
     plot_metric_by_topology(datadirs, outdir,
-                            "avg_val_loss", "Validation Loss", "Validation loss")
+                            "avg_val_loss", "Validation Loss", "Validation loss",
+                            merged_file=merged_file)
 
     print("[3/6] Validation perplexity")
     plot_metric_by_topology(datadirs, outdir,
                             "avg_val_ppl", "Perplexity", "perplexity",
-                            log_scale=True)
+                            log_scale=True, merged_file=merged_file)
 
     print("[4/6] Consensus error")
     plot_metric_by_topology(datadirs, outdir,
                             "consensus_err", "Consensus Error", "consensus_error",
-                            log_scale=True)
+                            log_scale=True, merged_file=merged_file)
 
     print("[5/6] Ablation (val loss & consensus)")
-    plot_ablation(datadirs, outdir)
+    plot_ablation(datadirs, outdir, merged_file)
 
     print("[6/6] Validation loss vs wall-clock time")
-    plot_wall_clock(datadirs, outdir)
+    plot_wall_clock(datadirs, outdir, merged_file)
 
     print(f"\nDone. {len(list(Path(outdir).glob('*.pdf')))} PDF figures in {outdir}")
-    print(f"Per-figure source files: {outdir}/*.source.txt")
+    print(f"Sources: {merged_file}")
 
 
 if __name__ == "__main__":
