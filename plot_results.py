@@ -2,6 +2,7 @@
 
 Usage:
     python plot_results.py --datadir <path-to-output-dir> [--outdir <figure-dir>]
+    python plot_results.py --sources <sources.txt> [--outdir <figure-dir>]
 
 Produces:
   1. Training loss   (per topology, all algorithms)
@@ -39,8 +40,8 @@ plt.rcParams['axes.prop_cycle'] = DEFAULT_CYCLE
 # Unified 4-algorithm labels (same for all topologies)
 ALGORITHMS = {
     "dsgd":      {"label": "DSGD"},
-    "dsgd_clip": {"label": "DSGD_Clip"},
-    "gt_nsgdm":  {"label": "GT_NSGDm"},
+    "dsgd_clip": {"label": "DSGD-C"},
+    "gt_nsgdm":  {"label": "DSGD-N"},
     "demuon":    {"label": "DeMuon"},
 }
 
@@ -96,6 +97,28 @@ def load_csv(path):
                 cols[h].append(float(v))
 
     return cols
+
+
+def extract_datadirs_from_sources(sources_path):
+    """Extract unique data directories from a sources.txt file.
+    Each CSV path like .../output/subdir/loss.csv implies datadir = .../output/."""
+    datadirs = []
+    seen = set()
+    with open(sources_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("["):
+                continue
+            if ":" not in line:
+                continue
+            csv_path = line.split(":", 1)[1].strip()
+            if not csv_path:
+                continue
+            datadir = str(Path(csv_path).parent.parent)
+            if datadir not in seen:
+                seen.add(datadir)
+                datadirs.append(datadir)
+    return datadirs
 
 
 def find_csv(datadirs, name):
@@ -179,7 +202,7 @@ def plot_training_loss_by_topology(datadir, outdir, merged_file=None):
             sources.append((style["label"], csv_path))
 
         ax.set_xlabel("Iteration")
-        ax.set_ylabel("Training loss")
+        ax.set_ylabel("Training Loss")
         ax.legend(fontsize=12, loc='upper right')
         ax.grid(True)
 
@@ -214,7 +237,7 @@ def plot_ablation(datadir, outdir, merged_file=None):
 
             ax.set_xlabel("Iteration")
             ax.set_ylabel(ylabel)
-            ax.legend(fontsize=12, loc='upper right')
+            ax.legend(fontsize=14, loc='upper right')
             ax.grid(True)
 
             out_path = Path(outdir) / f"{topo}_{suffix}.pdf"
@@ -256,21 +279,31 @@ def plot_wall_clock(datadir, outdir, merged_file=None):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot experiment results")
-    parser.add_argument("--datadir", type=str, nargs='+', required=True,
-                        help="One or more output/ directories (searched in order)")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--datadir", type=str, nargs='+',
+                       help="One or more output/ directories (searched in order)")
+    group.add_argument("--sources", type=str,
+                       help="Path to a sources.txt file to replay plots from")
     parser.add_argument("--outdir", type=str, default=None,
-                        help="Directory for figures (default: <first datadir>/../figures)")
+                        help="Directory for figures (default: timestamped dir)")
     args = parser.parse_args()
 
-    datadirs = args.datadir
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     default_outdir = f"/Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/draws/{timestamp}"
     outdir = args.outdir or default_outdir
     os.makedirs(outdir, exist_ok=True)
     merged_file = Path(outdir) / "sources.txt"
     merged_file.unlink(missing_ok=True)  # start fresh
-    print(f"Data dirs: {datadirs}")
     print(f"Figures will be saved to: {outdir}\n")
+
+    if args.sources:
+        datadirs = extract_datadirs_from_sources(args.sources)
+        print(f"Extracted data dirs from {args.sources}:")
+        for d in datadirs:
+            print(f"  {d}")
+    else:
+        datadirs = args.datadir
+    print(f"\nData dirs: {datadirs}\n")
 
     print("[1/6] Training loss (avg across workers)")
     plot_training_loss_by_topology(datadirs, outdir, merged_file)
@@ -302,3 +335,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+"""
+cd /Users/maojingwei/baidu/project && python DeMuon/plot_results.py --sources /Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/draws/20260407_111213/sources.txt
+"""
