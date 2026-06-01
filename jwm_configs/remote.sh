@@ -21,7 +21,9 @@ else
     python3 -m venv "$VENV_DIR"
     source "${VENV_DIR}/bin/activate"
     pip install --upgrade pip
+    pip install torch triton --index-url https://download.pytorch.org/whl/cu128
     pip install -r "$_REQ_FILE"
     echo "$_REQ_HASH" > "$_STAMP_FILE"
 fi
 JWM_RUN_COMMAND=(python launch.py)
+        "${JWM_RUN_COMMAND[@]}"  > job_out.log 2>&1 &

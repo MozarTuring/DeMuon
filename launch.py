@@ -39,13 +39,14 @@ def main():
         outdir = f"output/{name}"
         os.makedirs(outdir, exist_ok=True)
 
-        cmd = (f"python exp3_decentralize_gpt.py "
-               f"--gpu {gpu_id} --outdir {outdir} --seeds {seeds_str} {args}")
+        cmd = ["python", "exp3_decentralize_gpt.py",
+               "--gpu", str(gpu_id), "--outdir", outdir,
+               "--seeds"] + seeds_str.split() + args.split()
 
         print(f"[{time.strftime('%H:%M:%S')}] Launching {name} on gpu={gpu_id} -> {outdir}/")
         log_file = open(f"slurm_out_{name}.log", "w")
         proc = subprocess.Popen(
-            cmd, shell=True, stdout=log_file, stderr=subprocess.STDOUT,
+            cmd, stdout=log_file, stderr=subprocess.STDOUT,
             env={**os.environ, "PYTHONUNBUFFERED": "1"})
         processes.append((name, proc, log_file))
 
