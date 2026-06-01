@@ -19,10 +19,13 @@ import os
 import time
 from pathlib import Path
 
+import math
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 from cycler import cycler
 
 # ── style (matching draw_jw.py) ──
@@ -131,6 +134,32 @@ def find_csv(datadirs, name):
     return None
 
 
+def validate_datadirs(datadirs):
+    """Check that at least some CSVs can be found. Abort early with a clear
+    error message if none of the data directories contain readable data."""
+    found_any = False
+    for topo in TOPOLOGIES:
+        for alg_key in ALGORITHMS:
+            csv_path = find_csv(datadirs, get_dir_name(alg_key, topo))
+            if csv_path is not None:
+                found_any = True
+                break
+        if found_any:
+            break
+
+    if not found_any:
+        print("\nERROR: No CSV data files found in any of these directories:")
+        for d in datadirs:
+            print(f"  {d}")
+        print("\nLooked for sub-directories like:")
+        for topo in TOPOLOGIES:
+            for alg_key in ALGORITHMS:
+                print(f"  {get_dir_name(alg_key, topo)}/loss.csv")
+        print("\nPlease check that --datadir / --sources points to the correct "
+              "output directory on this machine.")
+        raise SystemExit(1)
+
+
 def write_source(pdf_path, sources, merged_file):
     """Append this figure's sources to the merged source file."""
     with open(merged_file, "a") as f:
@@ -147,7 +176,7 @@ def get_dir_name(alg_key, topo):
 
 
 def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix,
-                            log_scale=False, merged_file=None,
+                            log_scale=False, neg_log_ticks=False, merged_file=None,
 ):
     """One figure per topology with all algorithms overlaid."""
     for topo, topo_title in TOPOLOGIES.items():
@@ -157,18 +186,38 @@ def plot_metric_by_topology(datadir, outdir, metric_col, ylabel, filename_suffix
         for alg_key, style in ALGORITHMS.items():
             csv_path = find_csv(datadir, get_dir_name(alg_key, topo))
             if csv_path is None:
+                print(f"  WARNING: no CSV for {style['label']} / {topo} "
+                      f"(looked for {get_dir_name(alg_key, topo)}/loss.csv)")
                 continue
             data = load_csv(csv_path)
             if metric_col not in data:
+                print(f"  WARNING: column '{metric_col}' not found in {csv_path}")
                 continue
             ax.plot(data["round"], data[metric_col],
                     markevery=MARKER_EVERY, label=style["label"])
             sources.append((style["label"], csv_path))
 
+        if not sources:
+            plt.close(fig)
+            print(f"  SKIPPED {topo}_{filename_suffix}.pdf (no data found)")
+            continue
+
         ax.set_xlabel("Iteration")
-        ax.set_ylabel(ylabel)
         if log_scale:
             ax.set_yscale("log")
+        if neg_log_ticks:
+            def _exp_fmt(y, _):
+                if y <= 0:
+                    return ''
+                exp = -math.log10(y)
+                if abs(exp - round(exp)) < 0.01:
+                    return f'{int(round(exp))}'
+                return ''
+            ax.yaxis.set_major_formatter(ticker.FuncFormatter(_exp_fmt))
+            ax.yaxis.set_minor_formatter(ticker.NullFormatter())
+            ax.set_ylabel(f"{ylabel} " + r"$(-\log_{10})$")
+        else:
+            ax.set_ylabel(ylabel)
         ax.legend(fontsize=12, loc='upper right')
         ax.grid(True)
 
@@ -188,6 +237,7 @@ def plot_training_loss_by_topology(datadir, outdir, merged_file=None):
         for alg_key, style in ALGORITHMS.items():
             csv_path = find_csv(datadir, get_dir_name(alg_key, topo))
             if csv_path is None:
+                print(f"  WARNING: no CSV for {style['label']} / {topo}")
                 continue
             data = load_csv(csv_path)
             train_cols = [c for c in data if c.endswith("_train")]
@@ -200,6 +250,11 @@ def plot_training_loss_by_topology(datadir, outdir, merged_file=None):
             ax.plot(data["round"], avg_train,
                     markevery=MARKER_EVERY, label=style["label"])
             sources.append((style["label"], csv_path))
+
+        if not sources:
+            plt.close(fig)
+            print(f"  SKIPPED {topo}_Training loss.pdf (no data found)")
+            continue
 
         ax.set_xlabel("Iteration")
         ax.set_ylabel("Training Loss")
@@ -235,6 +290,11 @@ def plot_ablation(datadir, outdir, merged_file=None):
                         markevery=MARKER_EVERY, label=style["label"])
                 sources.append((style["label"], csv_path))
 
+            if not sources:
+                plt.close(fig)
+                print(f"  SKIPPED {topo}_{suffix}.pdf (no data found)")
+                continue
+
             ax.set_xlabel("Iteration")
             ax.set_ylabel(ylabel)
             ax.legend(fontsize=14, loc='upper right')
@@ -265,6 +325,11 @@ def plot_wall_clock(datadir, outdir, merged_file=None):
                     markevery=MARKER_EVERY, label=style["label"])
             sources.append((style["label"], csv_path))
 
+        if not sources:
+            plt.close(fig)
+            print(f"  SKIPPED {topo}_val_loss_vs_time.pdf (no data found)")
+            continue
+
         ax.set_xlabel("Wall-Clock Time (hours)")
         ax.set_ylabel("Validation loss")
         ax.legend(fontsize=12, loc='upper right')
@@ -289,7 +354,7 @@ def main():
     args = parser.parse_args()
 
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    default_outdir = f"/Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/draws/{timestamp}"
+    default_outdir = f"/Users/jinma63/project/zzzjwmoutput/DeMuon/draws/{timestamp}"
     outdir = args.outdir or default_outdir
     os.makedirs(outdir, exist_ok=True)
     merged_file = Path(outdir) / "sources.txt"
@@ -304,6 +369,8 @@ def main():
     else:
         datadirs = args.datadir
     print(f"\nData dirs: {datadirs}\n")
+
+    validate_datadirs(datadirs)
 
     print("[1/6] Training loss (avg across workers)")
     plot_training_loss_by_topology(datadirs, outdir, merged_file)
@@ -321,7 +388,7 @@ def main():
     print("[4/6] Consensus error")
     plot_metric_by_topology(datadirs, outdir,
                             "consensus_err", "Consensus Error", "consensus_error",
-                            log_scale=True, merged_file=merged_file)
+                            log_scale=True, neg_log_ticks=True, merged_file=merged_file)
 
     print("[5/6] Ablation (val loss & consensus)")
     plot_ablation(datadirs, outdir, merged_file)
@@ -337,5 +404,5 @@ if __name__ == "__main__":
     main()
 
 """
-cd /Users/maojingwei/baidu/project && python DeMuon/plot_results.py --sources /Users/maojingwei/baidu/project/zzzjwmoutput/DeMuon/draws/20260407_111213/sources.txt
+cd /Users/jinma63/project && python DeMuon/plot_results.py --sources /Users/jinma63/project/zzzjwmoutput/DeMuon/draws/20260407_111213/sources.txt
 """
