@@ -2,6 +2,7 @@
 import re
 import os
 import gzip
+import ssl
 import urllib.request
 from collections import Counter
 
@@ -61,12 +62,17 @@ def build_vocab_from_iterator(iterator, specials=None):
 
 def _download_and_cache(url, local_path):
     os.makedirs(os.path.dirname(local_path), exist_ok=True)
-    if not os.path.exists(local_path):
-        gz_path = local_path + ".gz"
-        urllib.request.urlretrieve(url, gz_path)
-        with gzip.open(gz_path, "rb") as f_in, open(local_path, "wb") as f_out:
-            f_out.write(f_in.read())
-        os.remove(gz_path)
+    if os.path.exists(local_path) and os.path.getsize(local_path) > 0:
+        return local_path
+
+    gz_path = local_path + ".gz"
+    ctx = ssl.create_default_context()
+    with urllib.request.urlopen(url, context=ctx) as resp, open(gz_path, "wb") as f:
+        f.write(resp.read())
+
+    with gzip.open(gz_path, "rb") as f_in, open(local_path, "wb") as f_out:
+        f_out.write(f_in.read())
+    os.remove(gz_path)
     return local_path
 
 
