@@ -64,7 +64,7 @@ def run_single_seed(args, seed, csv_path=None):
 
     # --- measure data heterogeneity (once per seed) ---
     tok_tokenizer = get_tokenizer("basic_english")
-    from torchtext.datasets import Multi30k
+    from torchtext_compat import Multi30k
 
     partitions_tokens = []
     all_tokens = []

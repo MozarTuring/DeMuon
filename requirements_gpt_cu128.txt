@@ -1,7 +1,5 @@
 --index-url https://download.pytorch.org/whl/cu128
 torch
-torchdata
-torchtext
 triton
 
 --index-url https://pypi.org/simple

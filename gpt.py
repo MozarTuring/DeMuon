@@ -6,9 +6,7 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
-from torchtext.datasets import Multi30k
-from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator
+from torchtext_compat import Multi30k, get_tokenizer, build_vocab_from_iterator
 
 
 
