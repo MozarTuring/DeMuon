@@ -1,19 +1,15 @@
 """Drop-in replacements for the deprecated torchtext utilities used in this project."""
 import re
 import os
-import io
+import gzip
 import urllib.request
-import tarfile
-from collections import Counter, OrderedDict
+from collections import Counter
+
+_MULTI30K_BASE = "https://raw.githubusercontent.com/multi30k/dataset/master/data/task1/raw"
 
 _MULTI30K_URLS = {
-    "train": "http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/training.tar.gz",
-    "valid": "http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/validation.tar.gz",
-}
-
-_MULTI30K_FILENAMES = {
-    "train": {"en": "train.en", "de": "train.de"},
-    "valid": {"en": "val.en", "de": "val.de"},
+    "train": {"en": f"{_MULTI30K_BASE}/train.en.gz", "de": f"{_MULTI30K_BASE}/train.de.gz"},
+    "valid": {"en": f"{_MULTI30K_BASE}/val.en.gz", "de": f"{_MULTI30K_BASE}/val.de.gz"},
 }
 
 _BASIC_ENGLISH_RE = re.compile(r"[A-Za-z]+|[0-9]+|[^\s]")
@@ -63,28 +59,29 @@ def build_vocab_from_iterator(iterator, specials=None):
     return v
 
 
-def _download_and_cache(url, cache_dir):
-    os.makedirs(cache_dir, exist_ok=True)
-    fname = os.path.basename(url)
-    local_path = os.path.join(cache_dir, fname)
+def _download_and_cache(url, local_path):
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
     if not os.path.exists(local_path):
-        urllib.request.urlretrieve(url, local_path)
+        gz_path = local_path + ".gz"
+        urllib.request.urlretrieve(url, gz_path)
+        with gzip.open(gz_path, "rb") as f_in, open(local_path, "wb") as f_out:
+            f_out.write(f_in.read())
+        os.remove(gz_path)
     return local_path
 
 
 def Multi30k(split="train", language_pair=("en", "de")):
     cache_dir = os.path.join(os.path.expanduser("~"), ".cache", "multi30k")
     src_lang, tgt_lang = language_pair
-    src_file = _MULTI30K_FILENAMES[split][src_lang]
-    tgt_file = _MULTI30K_FILENAMES[split][tgt_lang]
 
-    src_path = os.path.join(cache_dir, src_file)
-    tgt_path = os.path.join(cache_dir, tgt_file)
-
-    if not (os.path.exists(src_path) and os.path.exists(tgt_path)):
-        tar_path = _download_and_cache(_MULTI30K_URLS[split], cache_dir)
-        with tarfile.open(tar_path, "r:gz") as tf:
-            tf.extractall(cache_dir)
+    src_path = _download_and_cache(
+        _MULTI30K_URLS[split][src_lang],
+        os.path.join(cache_dir, f"{split}.{src_lang}"),
+    )
+    tgt_path = _download_and_cache(
+        _MULTI30K_URLS[split][tgt_lang],
+        os.path.join(cache_dir, f"{split}.{tgt_lang}"),
+    )
 
     with open(src_path, encoding="utf-8") as sf, open(tgt_path, encoding="utf-8") as tf:
         for src_line, tgt_line in zip(sf, tf):
