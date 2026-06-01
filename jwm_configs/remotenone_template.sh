@@ -12,6 +12,7 @@ else
     python3 -m venv "$VENV_DIR"
     source "${VENV_DIR}/bin/activate"
     pip install --upgrade pip
+    pip install torch triton --index-url https://download.pytorch.org/whl/cu128
     pip install -r "$_REQ_FILE"
     echo "$_REQ_HASH" > "$_STAMP_FILE"
 fi
