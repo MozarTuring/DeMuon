@@ -109,8 +109,8 @@ def run_single_seed(args, seed, csv_path=None):
             model.load_state_dict(model_ls[0].state_dict())
         model.to(device)
         model_ls.append(model)
-    model_ls = [torch.compile(m) for m in model_ls]
-    jwp(f"[seed={seed}] All {args.n_workers} models created and torch.compiled")
+    model_ls = [torch.compile(m, dynamic=False) for m in model_ls]
+    jwp(f"[seed={seed}] All {args.n_workers} models created and torch.compiled (dynamic=False)")
 
     ref_model = model_ls[-1]
 
