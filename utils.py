@@ -243,7 +243,7 @@ def zeropower_via_newtonschulz5(G, steps=3, eps=1e-7):
     """
     assert G.ndim >= 2
     a, b, c = (3.4445, -4.7750,  2.0315)
-    X = G.bfloat16()
+    X = G.float()
     X /= (X.norm(dim=(-2, -1), keepdim=True) + eps)
     if G.size(-2) > G.size(-1):
         X = X.mT
