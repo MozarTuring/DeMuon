@@ -241,18 +241,18 @@ def zeropower_via_newtonschulz5(G, steps=3, eps=1e-7):
     where S' is diagonal with S_{ii}' \sim Uniform(0.5, 1.5), which turns out not to hurt model
     performance at all relative to UV^T, where USV^T = G is the SVD.
     """
-    assert len(G.shape) == 2
+    assert G.ndim >= 2
     a, b, c = (3.4445, -4.7750,  2.0315)
     X = G.bfloat16()
-    X /= (X.norm() + eps) # ensure top singular value <= 1
-    if G.size(0) > G.size(1):
-        X = X.T
+    X /= (X.norm(dim=(-2, -1), keepdim=True) + eps)
+    if G.size(-2) > G.size(-1):
+        X = X.mT
     for _ in range(steps):
-        A = X @ X.T
+        A = X @ X.mT
         B = b * A + c * A @ A
         X = a * X + B @ X
-    if G.size(0) > G.size(1):
-        X = X.T
+    if G.size(-2) > G.size(-1):
+        X = X.mT
     return X
 
 
@@ -276,14 +276,9 @@ def consensus_error(model_ls):
 
     err_sq = 0.0
     for name, avg in avg_state.items():
-        diffs = [m.state_dict()[name].float().squeeze() - avg.squeeze()
-                 for m in model_ls]
-        if diffs[0].ndim >= 2:
-            stacked = torch.cat(diffs, dim=0)  # (Nm, n)
-            err_sq += torch.linalg.matrix_norm(stacked, ord=2).item() ** 2
-        else:
-            stacked = torch.cat(diffs, dim=0)  # (Nd,)
-            err_sq += stacked.norm().item() ** 2
+        diffs = [m.state_dict()[name].float() - avg for m in model_ls]
+        flat = torch.cat([d.reshape(-1) for d in diffs], dim=0)
+        err_sq += flat.norm().item() ** 2
     return math.sqrt(err_sq)
 
 

@@ -314,7 +314,7 @@ def run_single_seed(args, seed, csv_path=None):
                             p.data -= tmp_lr * tmp.reshape(tmp_shape) / torch.abs(tmp)
                         elif tmp.ndim == 1:
                             p.data -= tmp_lr * tmp.reshape(tmp_shape) / torch.norm(tmp)
-                        elif tmp.ndim == 2:
+                        elif tmp.ndim >= 2:
                             if args.msgn == 0:
                                 p.data -= tmp_lr * y_list[wid][name]
                             elif args.msgn == 1:
@@ -324,10 +324,7 @@ def run_single_seed(args, seed, csv_path=None):
                                 p.data -= tmp_lr * update.reshape(tmp_shape)
                             elif args.msgn == 2:
                                 U, S, Vt = torch.linalg.svd(tmp, full_matrices=False)
-                                p.data -= tmp_lr * (U @ Vt)
-                        else:
-                            jwp(f"{name}, error, {tmp}")
-                            1 / 0
+                                p.data -= tmp_lr * (U @ Vt).reshape(tmp_shape)
                         check_nan_inf(name, tmp, r)
 
             if args.n_workers > 1:
