@@ -26,4 +26,4 @@ else
     echo "$_REQ_HASH" > "$_STAMP_FILE"
 fi
 JWM_RUN_COMMAND=(python launch.py)
-        "${JWM_RUN_COMMAND[@]}"  > job_out.log 2>&1 &
+"${JWM_RUN_COMMAND[@]}"  > job_out.log 2>&1 &

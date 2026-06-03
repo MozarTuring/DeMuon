@@ -3,21 +3,21 @@ seeds = [42]
 # ── Paper experiments (final) ──
 
 # Complete graph
-[[experiments]]
-name = "dsgd_dim2_complete"
-args = "--network complete --alg dsgd --lr 0.006 --lr_schedule 2"
-
-[[experiments]]
-name = "dsgd_clip_dim2_complete"
-args = "--network complete --alg dsgd_gclip_decay --lr 0.6 --l2_clip_bd 0.1 --lr_schedule 4"
-
-[[experiments]]
-name = "gt_nsgdm2_complete"
-args = "--network complete --alg gt_nsgdm --lr 0.07 --mom 0.8"
-
-[[experiments]]
-name = "demuon_decay_complete"
-args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 2"
+# [[experiments]]
+# name = "dsgd_dim2_complete"
+# args = "--network complete --alg dsgd --lr 0.006 --lr_schedule 2"
+#
+# [[experiments]]
+# name = "dsgd_clip_dim2_complete"
+# args = "--network complete --alg dsgd_gclip_decay --lr 0.6 --l2_clip_bd 0.1 --lr_schedule 4"
+#
+# [[experiments]]
+# name = "gt_nsgdm2_complete"
+# args = "--network complete --alg gt_nsgdm --lr 0.07 --mom 0.8"
+#
+# [[experiments]]
+# name = "demuon_decay_complete"
+# args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedule 2"
 
 # # Directed exponential graph
 # [[experiments]]
@@ -37,20 +37,20 @@ args = "--network complete --alg demuon --msgn 1 --lr 0.1 --mom 0.2 --lr_schedul
 # args = "--network exp --alg demuon --msgn 1 --lr 0.005 --mom 0.8 --lr_schedule 1"
 #
 # # Ring graph
-# [[experiments]]
-# name = "dsgd_lin2_ring"
-# args = "--network ring --alg dsgd --lr 0.03 --lr_schedule 1"
-#
-# [[experiments]]
-# name = "dsgd_clip_lin6_ring"
-# args = "--network ring --alg dsgd_gclip_decay --lr 0.1 --l2_clip_bd 0.1 --lr_schedule 1"
-#
-# [[experiments]]
-# name = "gt_nsgdm_lin2_ring"
-# args = "--network ring --alg gt_nsgdm --lr 0.03 --mom 0.8 --lr_schedule 1"
-#
-# [[experiments]]
-# name = "demuon_lin1_ring"
-# args = "--network ring --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1"
-#
+[[experiments]]
+name = "dsgd_lin2_ring"
+args = "--network ring --alg dsgd --lr 0.03 --lr_schedule 1"
+
+[[experiments]]
+name = "dsgd_clip_lin6_ring"
+args = "--network ring --alg dsgd_gclip_decay --lr 0.1 --l2_clip_bd 0.1 --lr_schedule 1"
+
+[[experiments]]
+name = "gt_nsgdm_lin2_ring"
+args = "--network ring --alg gt_nsgdm --lr 0.03 --mom 0.8 --lr_schedule 1"
+
+[[experiments]]
+name = "demuon_lin1_ring"
+args = "--network ring --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1"
+
 
