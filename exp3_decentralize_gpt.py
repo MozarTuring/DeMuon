@@ -35,7 +35,7 @@ def eval_loss(model, loader, sliding_window_num_blocks):
             n = yi.numel()
             tot += loss.item() * n
             ntok += n
-        if batch_idx % 10 == 0 or batch_idx == num_batches - 1:
+        if batch_idx % 100 == 0 or batch_idx == num_batches - 1:
             jwp(f"  eval_loss progress: batch {batch_idx+1}/{num_batches}, ntok={ntok}")
     return tot / ntok
 
