@@ -55,28 +55,25 @@ class CausalSelfAttention(nn.Module):
         self.num_heads = num_heads
         self.head_dim = head_dim
         hdim = num_heads * head_dim
-        # merged QKV weights: suggested by many, implemented by @fernbear.bsky.social, and further improved by @YouJiacheng
-        # https://x.com/hi_tysam/status/1879699187107033311
         self.qkvo_w = nn.Parameter(init_linear(torch.empty(4, hdim, dim)).bfloat16())
-        self.qkvo_w.detach()[3].zero_() # out zero init suggested by @Grad62304977
+        self.qkvo_w.detach()[3].zero_()
         self.rotary = Rotary(head_dim, max_seq_len)
-        # scale the attention logits by given constant, instead of the default head_dim**-0.5, by @leloykun
-        # inspired by learnable scalars used by @brendanh0gan https://x.com/hi_tysam/status/1879693583898591283
         self.attn_scale = 0.12
+        self.lambdas = nn.Parameter(torch.tensor([0.5, 0.5]))
 
-    def forward(self, x: Tensor, ve: Tensor | None, block_mask: BlockMask, lambdas: Tensor):
-        B, T = x.size(0), x.size(1) # batch size, sequence length
+    def forward(self, x: Tensor, ve: Tensor | None, block_mask: BlockMask):
+        B, T = x.size(0), x.size(1)
         assert B == 1, "Must use batch size = 1 for FlexAttention"
         q, k, v = F.linear(x, self.qkvo_w[:3].flatten(end_dim=1)).view(B, T, 3 * self.num_heads, self.head_dim).chunk(3, dim=-2)
-        q, k = norm(q), norm(k) # QK norm @Grad62304977
+        q, k = norm(q), norm(k)
         q, k = self.rotary(q), self.rotary(k)
         v = norm(v)
         if ve is not None:
-            v = lambdas[0] * v + lambdas[1] * ve.view_as(v) # @KoszarskyB & @Grad62304977
-        else: # skip mid-layers token value embeddings by @YouJiacheng
-            v = lambdas[0] * v
+            v = self.lambdas[0] * v + self.lambdas[1] * ve.view_as(v)
+        else:
+            v = self.lambdas[0] * v
         y = flex_attention(q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2), block_mask=block_mask, scale=self.attn_scale).transpose(1, 2)
-        y = y.contiguous().view(B, T, self.num_heads * self.head_dim) # re-assemble all head outputs side by side
+        y = y.contiguous().view(B, T, self.num_heads * self.head_dim)
         y = F.linear(y, self.qkvo_w[3])
         return y
 
@@ -102,11 +99,12 @@ class Block(nn.Module):
         super().__init__()
         self.attn = CausalSelfAttention(dim, num_heads, max_seq_len)
         self.mlp = MLP(dim)
+        self.lambdas = nn.Parameter(torch.tensor([1.0, 0.0]))
 
-    def forward(self, x: Tensor, ve: Tensor | None, x0: Tensor, block_mask: BlockMask, lambdas: Tensor, sa_lambdas: Tensor):
-        x = lambdas[0] * x + lambdas[1] * x0
+    def forward(self, x: Tensor, ve: Tensor | None, x0: Tensor, block_mask: BlockMask):
+        x = self.lambdas[0] * x + self.lambdas[1] * x0
         if self.attn is not None:
-            x = x + self.attn(x, ve, block_mask, sa_lambdas)
+            x = x + self.attn(norm(x), ve, block_mask)
         x = x + self.mlp(norm(x))
         return x
 
@@ -119,11 +117,7 @@ class GPT(nn.Module):
         self.blocks = nn.ModuleList([Block(model_dim, num_heads, max_seq_len, i) for i in range(num_layers)])
         self.lm_head_w = nn.Parameter(torch.zeros(next_multiple_of_n(vocab_size, n=128), model_dim))
         assert num_layers % 2 == 0
-        self.scalars = nn.Parameter(torch.cat([
-            torch.ones(num_layers),
-            *[torch.tensor([1.0, 0.0]) for _ in range(num_layers)],
-            *[torch.tensor([0.5, 0.5]) for _ in range(num_layers)],
-        ]))
+        self.skip_weights = nn.Parameter(torch.ones(num_layers))
 
     def create_blockmasks(self, input_seq: Tensor, sliding_window_num_blocks: Tensor):
         BLOCK_SIZE = 128
@@ -172,7 +166,6 @@ class GPT(nn.Module):
         assert input_seq.ndim == 1
 
         ve = [value_embed(input_seq) for value_embed in self.value_embeds]
-        # 前3层和后3层使用value embeds
         ve = [ve[0], ve[1], ve[2]] + [None] * (len(self.blocks) - 6) + [ve[0], ve[1], ve[2]]
         assert len(ve) == len(self.blocks)
 
@@ -188,18 +181,12 @@ class GPT(nn.Module):
         x = x0 = norm(self.embed(input_seq)[None])
 
         skip_connections = []
-        skip_map = {
-            6: 3,
-            7: 0
-        }
-        skip_weights = self.scalars[:len(self.blocks)]
-        lambdas = self.scalars[1 * len(self.blocks): 3 * len(self.blocks)].view(-1, 2)
-        sa_lambdas = self.scalars[3 * len(self.blocks): 5 * len(self.blocks)].view(-1, 2)
+        skip_map = {6: 3, 7: 0}
 
         for i in range(len(self.blocks)):
             if i in skip_map:
-                x = x + skip_weights[skip_map[i]] * skip_connections[skip_map[i]]
-            x = self.blocks[i](x, ve[i], x0, block_masks[i], lambdas[i], sa_lambdas[i])
+                x = x + self.skip_weights[skip_map[i]] * skip_connections[skip_map[i]]
+            x = self.blocks[i](x, ve[i], x0, block_masks[i])
             skip_connections.append(x)
 
         x = norm(x)

@@ -311,9 +311,13 @@ def run_single_seed(args, seed, csv_path=None):
                         tmp_shape = y_list[wid][name].shape
                         tmp = y_list[wid][name].squeeze()
                         if tmp.ndim == 0:
-                            p.data -= tmp_lr * tmp.reshape(tmp_shape) / torch.abs(tmp)
+                            tmp_abs = torch.abs(tmp)
+                            if tmp_abs > 0:
+                                p.data -= tmp_lr * tmp.reshape(tmp_shape) / tmp_abs
                         elif tmp.ndim == 1:
-                            p.data -= tmp_lr * tmp.reshape(tmp_shape) / torch.norm(tmp)
+                            tmp_norm = torch.norm(tmp)
+                            if tmp_norm > 0:
+                                p.data -= tmp_lr * tmp.reshape(tmp_shape) / tmp_norm
                         elif tmp.ndim >= 2:
                             if args.msgn == 0:
                                 p.data -= tmp_lr * y_list[wid][name]
