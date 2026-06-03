@@ -68,9 +68,12 @@ def run_single_seed(args, seed, csv_path=None):
     loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
     jwp(f"[seed={seed}] rounds_per_epoch={rounds_per_epoch}")
 
-    # sliding window covers the full sequence (block_size / 128 blocks)
-    sliding_window_num_blocks = torch.tensor(
-        args.block_size // 128, dtype=torch.int32, device=device
+    # separate sliding windows for train (1024/128=8 blocks) and eval (5120/128=40 blocks)
+    train_sliding_window = torch.tensor(
+        args.train_seq_len // 128, dtype=torch.int32, device=device
+    )
+    val_sliding_window = torch.tensor(
+        args.val_seq_len // 128, dtype=torch.int32, device=device
     )
 
     # --- measure data heterogeneity (once per seed) ---
@@ -159,7 +162,7 @@ def run_single_seed(args, seed, csv_path=None):
         with torch.no_grad():
             # Process first sequence in batch (model requires 1D input)
             t0 = time.perf_counter()
-            loss = model(batch_x[0], batch_y[0], sliding_window_num_blocks)
+            loss = model(batch_x[0], batch_y[0], train_sliding_window)
             dt = time.perf_counter() - t0
             jwp(f"[seed={seed}] Worker {wid} round0 forward done in {dt:.2f}s, loss={loss.item():.4f}")
         round0_train_losses.append(loss.item())
@@ -170,7 +173,7 @@ def run_single_seed(args, seed, csv_path=None):
     val_losses_0 = []
     for vi, m in enumerate(model_ls):
         t0 = time.perf_counter()
-        vl = eval_loss(m, val_loader, sliding_window_num_blocks)
+        vl = eval_loss(m, val_loader, val_sliding_window)
         dt = time.perf_counter() - t0
         jwp(f"[seed={seed}] Worker {vi} eval_loss done in {dt:.2f}s, val_loss={vl:.4f}")
         val_losses_0.append(vl)
@@ -228,7 +231,7 @@ def run_single_seed(args, seed, csv_path=None):
             total_loss = torch.tensor(0.0, device=device)
             for seq_idx in range(batch_x.size(0)):
                 total_loss = total_loss + model(
-                    batch_x[seq_idx], batch_y[seq_idx], sliding_window_num_blocks
+                    batch_x[seq_idx], batch_y[seq_idx], train_sliding_window
                 )
             loss = total_loss / batch_x.size(0)
             round_losses.append(loss.item())
@@ -396,7 +399,7 @@ def run_single_seed(args, seed, csv_path=None):
 
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
             jwp(f"[seed={seed}] Round {r}: starting validation eval...")
-            val_losses = [eval_loss(m, val_loader, sliding_window_num_blocks) for m in model_ls]
+            val_losses = [eval_loss(m, val_loader, val_sliding_window) for m in model_ls]
             val_ppls = [math.exp(vl) for vl in val_losses]
             avg_val = statistics.mean(val_losses)
             avg_ppl = math.exp(avg_val)
@@ -452,7 +455,7 @@ def run_single_seed(args, seed, csv_path=None):
             k: round(v, 6) if isinstance(v, float) else v for k, v in time_stats.items()
         }
 
-    final_val_losses = [eval_loss(m, val_loader, sliding_window_num_blocks) for m in model_ls]
+    final_val_losses = [eval_loss(m, val_loader, val_sliding_window) for m in model_ls]
     final_avg_val = statistics.mean(final_val_losses)
     final_ppl = math.exp(final_avg_val)
     final_cons_err = consensus_error(model_ls)
@@ -476,11 +479,12 @@ if __name__ == "__main__":
 
     jwp("Starting training")
     parser = argparse.ArgumentParser()
-    parser.add_argument("--block_size", type=int, default=128)
+    parser.add_argument("--train_seq_len", type=int, default=1024)
+    parser.add_argument("--val_seq_len", type=int, default=5120)
     parser.add_argument("--d_model", type=int, default=512)
     parser.add_argument("--n_layer", type=int, default=8)
     parser.add_argument("--n_head", type=int, default=8)
-    parser.add_argument("--max_len", type=int, default=128)
+    parser.add_argument("--max_len", type=int, default=5120)
     parser.add_argument("--train_batch_size", type=int, default=4)
     parser.add_argument("--eval_batch_size", type=int, default=32)
     parser.add_argument("--epochs", type=int, default=12)

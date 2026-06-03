@@ -78,7 +78,7 @@ def get_loaders(args):
     partitions = [tokens[i*part_len:(i+1)*part_len] for i in range(args.n_workers)]
 
     jwp(f"total val tokens = {len(val_tokens)}")
-    val_ds     = SeqDataset(val_tokens, args.block_size)
+    val_ds     = SeqDataset(val_tokens, args.val_seq_len)
     val_loader = DataLoader(val_ds,
                             batch_size=args.eval_batch_size,
                             shuffle=False,
@@ -88,7 +88,7 @@ def get_loaders(args):
     loader_ls = []
     rounds_per_epoch = []
     for partid, part in enumerate(partitions):
-        ds = SeqDataset(part, args.block_size)
+        ds = SeqDataset(part, args.train_seq_len)
         loader_ls.append(DataLoader(ds, batch_size=args.train_batch_size, shuffle=True,generator=g))
         rounds_per_epoch.append(len(loader_ls[partid]))
 
