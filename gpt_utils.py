@@ -35,14 +35,19 @@ class MiniGPT(nn.Module):
 
 # ---------- dataset ------------------------------------------
 class SeqDataset(Dataset):
-    """return (input, target) where target is input shifted left"""
-    def __init__(self, tokens, block_size):
-        self.tokens     = tokens
-        self.block_size = block_size
+    """Non-overlapping contiguous chunks (like train_gpt.py's data generator).
+    Returns (input, target) where target is input shifted by 1."""
+    def __init__(self, tokens, seq_len):
+        self.tokens = tokens
+        self.seq_len = seq_len
+        self.n_chunks = len(tokens) // (seq_len + 1)
+
     def __len__(self):
-        return len(self.tokens) - self.block_size
+        return self.n_chunks
+
     def __getitem__(self, i):
-        chunk = self.tokens[i : i+self.block_size+1]
+        start = i * (self.seq_len + 1)
+        chunk = self.tokens[start : start + self.seq_len + 1]
         x = torch.tensor(chunk[:-1], dtype=torch.long)
         y = torch.tensor(chunk[1:],  dtype=torch.long)
         return x, y
@@ -79,6 +84,7 @@ def get_loaders(args):
 
     jwp(f"total val tokens = {len(val_tokens)}")
     val_ds     = SeqDataset(val_tokens, args.val_seq_len)
+    jwp(f"val chunks = {len(val_ds)} (non-overlapping, seq_len={args.val_seq_len})")
     val_loader = DataLoader(val_ds,
                             batch_size=args.eval_batch_size,
                             shuffle=False,
@@ -91,5 +97,6 @@ def get_loaders(args):
         ds = SeqDataset(part, args.train_seq_len)
         loader_ls.append(DataLoader(ds, batch_size=args.train_batch_size, shuffle=True,generator=g))
         rounds_per_epoch.append(len(loader_ls[partid]))
+    jwp(f"train chunks per worker = {len(loader_ls[0].dataset)} (non-overlapping, seq_len={args.train_seq_len})")
 
     return loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab
