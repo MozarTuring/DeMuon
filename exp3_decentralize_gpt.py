@@ -11,6 +11,7 @@ import utils as _utils_mod
 import gpt_utils as _gpt_utils_mod
 from gpt_utils import *
 from utils import *
+from gpt60m import GPT as GPT60M
 
 SUPPORTED_ALGS = ["demuon", "dsgd", "dsgd_gclip_decay", "gt_dsgd", "gt_nsgdm", "sen"]
 
@@ -21,16 +22,18 @@ def quick2json(inp_path, inp_data):
 
 
 @torch.no_grad()
-def eval_loss(model, loader, loss_fn):
+def eval_loss(model, loader, sliding_window_num_blocks):
     model.eval()
     tot, ntok = 0.0, 0
     for x, y in loader:
         x, y = x.to(device), y.to(device)
-        logits = model(x)
-        loss = loss_fn(logits.view(-1, logits.size(-1)), y.view(-1))
-        n = y.numel()
-        tot += loss.item() * n
-        ntok += n
+        # Process each sequence individually (model requires 1D input)
+        for i in range(x.size(0)):
+            xi, yi = x[i], y[i]
+            loss = model(xi, yi, sliding_window_num_blocks)
+            n = yi.numel()
+            tot += loss.item() * n
+            ntok += n
     return tot / ntok
 
 
@@ -62,6 +65,11 @@ def run_single_seed(args, seed, csv_path=None):
     loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
     jwp(f"[seed={seed}] rounds_per_epoch={rounds_per_epoch}")
 
+    # sliding window covers the full sequence (block_size / 128 blocks)
+    sliding_window_num_blocks = torch.tensor(
+        args.block_size // 128, dtype=torch.int32, device=device
+    )
+
     # --- measure data heterogeneity (once per seed) ---
     tok_tokenizer = get_tokenizer("basic_english")
     from torchtext_compat import Multi30k
@@ -86,8 +94,9 @@ def run_single_seed(args, seed, csv_path=None):
 
     model_ls = list()
     for i in range(args.n_workers):
-        model = MiniGPT(
-            vocab_size, args.d_model, args.n_layer, args.n_head, args.max_len
+        model = GPT60M(
+            vocab_size, num_layers=args.n_layer, num_heads=args.n_head,
+            model_dim=args.d_model, max_seq_len=args.max_len
         )
         if len(model_ls) > 0:
             model.load_state_dict(model_ls[0].state_dict())
@@ -95,7 +104,6 @@ def run_single_seed(args, seed, csv_path=None):
         model_ls.append(model)
 
     ref_model = model_ls[-1]
-    loss_fn = nn.CrossEntropyLoss(ignore_index=vocab["<pad>"])
 
     # --- algorithm-specific buffer init ---
     alg = args.alg
@@ -141,13 +149,13 @@ def run_single_seed(args, seed, csv_path=None):
         batch_x, batch_y = batch_x.to(device), batch_y.to(device)
         model.eval()
         with torch.no_grad():
-            logits = model(batch_x)
-            loss = loss_fn(logits.view(-1, logits.size(-1)), batch_y.view(-1))
+            # Process first sequence in batch (model requires 1D input)
+            loss = model(batch_x[0], batch_y[0], sliding_window_num_blocks)
         round0_train_losses.append(loss.item())
     # reset iterators so round 1 sees the same batches
     iter_ls = [iter(loader) for loader in loader_ls]
 
-    val_losses_0 = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
+    val_losses_0 = [eval_loss(m, val_loader, sliding_window_num_blocks) for m in model_ls]
     val_ppls_0 = [math.exp(vl) for vl in val_losses_0]
     avg_val_0 = statistics.mean(val_losses_0)
     avg_ppl_0 = math.exp(avg_val_0)
@@ -197,8 +205,13 @@ def run_single_seed(args, seed, csv_path=None):
             batch_x, batch_y = batch_x.to(device), batch_y.to(device)
 
             model.train()
-            logits = model(batch_x)
-            loss = loss_fn(logits.view(-1, logits.size(-1)), batch_y.view(-1))
+            # Accumulate loss over sequences in the batch (model requires 1D input)
+            total_loss = torch.tensor(0.0, device=device)
+            for seq_idx in range(batch_x.size(0)):
+                total_loss = total_loss + model(
+                    batch_x[seq_idx], batch_y[seq_idx], sliding_window_num_blocks
+                )
+            loss = total_loss / batch_x.size(0)
             round_losses.append(loss.item())
             model.zero_grad(set_to_none=True)
             loss.backward()
@@ -341,7 +354,7 @@ def run_single_seed(args, seed, csv_path=None):
         cumul_time += t_elapsed
 
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
-            val_losses = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
+            val_losses = [eval_loss(m, val_loader, sliding_window_num_blocks) for m in model_ls]
             val_ppls = [math.exp(vl) for vl in val_losses]
             avg_val = statistics.mean(val_losses)
             avg_ppl = math.exp(avg_val)
@@ -397,7 +410,7 @@ def run_single_seed(args, seed, csv_path=None):
             k: round(v, 6) if isinstance(v, float) else v for k, v in time_stats.items()
         }
 
-    final_val_losses = [eval_loss(m, val_loader, loss_fn) for m in model_ls]
+    final_val_losses = [eval_loss(m, val_loader, sliding_window_num_blocks) for m in model_ls]
     final_avg_val = statistics.mean(final_val_losses)
     final_ppl = math.exp(final_avg_val)
     final_cons_err = consensus_error(model_ls)
@@ -421,13 +434,13 @@ if __name__ == "__main__":
 
     jwp("Starting training")
     parser = argparse.ArgumentParser()
-    parser.add_argument("--block_size", type=int, default=64)
-    parser.add_argument("--d_model", type=int, default=256)
-    parser.add_argument("--n_layer", type=int, default=2)
-    parser.add_argument("--n_head", type=int, default=4)
+    parser.add_argument("--block_size", type=int, default=128)
+    parser.add_argument("--d_model", type=int, default=512)
+    parser.add_argument("--n_layer", type=int, default=8)
+    parser.add_argument("--n_head", type=int, default=8)
     parser.add_argument("--max_len", type=int, default=128)
-    parser.add_argument("--train_batch_size", type=int, default=64)
-    parser.add_argument("--eval_batch_size", type=int, default=512)
+    parser.add_argument("--train_batch_size", type=int, default=4)
+    parser.add_argument("--eval_batch_size", type=int, default=32)
     parser.add_argument("--epochs", type=int, default=12)
     parser.add_argument("--log_interval", type=int, default=100)
     parser.add_argument("--n_workers", type=int, default=8)
