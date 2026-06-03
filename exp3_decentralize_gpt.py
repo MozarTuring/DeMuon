@@ -22,22 +22,16 @@ def quick2json(inp_path, inp_data):
 
 
 @torch.no_grad()
-def eval_loss(model, loader, sliding_window_num_blocks):
+def eval_loss(model, val_gen, sliding_window_num_blocks, val_tokens, val_seq_len):
+    """Evaluate model on val_tokens total tokens from the val generator."""
     model.eval()
-    tot, ntok = 0.0, 0
-    num_batches = len(loader)
-    for batch_idx, (x, y) in enumerate(loader):
-        x, y = x.to(device), y.to(device)
-        # Process each sequence individually (model requires 1D input)
-        for i in range(x.size(0)):
-            xi, yi = x[i], y[i]
-            loss = model(xi, yi, sliding_window_num_blocks)
-            n = yi.numel()
-            tot += loss.item() * n
-            ntok += n
-        if batch_idx % 100 == 0 or batch_idx == num_batches - 1:
-            jwp(f"  eval_loss progress: batch {batch_idx+1}/{num_batches}, ntok={ntok}")
-    return tot / ntok
+    val_steps = val_tokens // val_seq_len
+    tot = 0.0
+    for step in range(val_steps):
+        inputs, targets = next(val_gen)
+        loss = model(inputs, targets, sliding_window_num_blocks)
+        tot += loss.item()
+    return tot / val_steps
 
 
 def run_single_seed(args, seed, csv_path=None):
@@ -65,8 +59,8 @@ def run_single_seed(args, seed, csv_path=None):
     ]
     loss_table = [header]
 
-    loader_ls, val_loader, vocab_size, rounds_per_epoch, vocab = get_loaders(args)
-    jwp(f"[seed={seed}] rounds_per_epoch={rounds_per_epoch}")
+    loader_ls, val_gen, vocab_size, rounds_per_epoch_est = get_loaders_fineweb(args, device)
+    jwp(f"[seed={seed}] estimated rounds_per_epoch={rounds_per_epoch_est}")
 
     # separate sliding windows for train (1024/128=8 blocks) and eval (5120/128=40 blocks)
     train_sliding_window = torch.tensor(
@@ -76,24 +70,7 @@ def run_single_seed(args, seed, csv_path=None):
         args.val_seq_len // 128, dtype=torch.int32, device=device
     )
 
-    # --- measure data heterogeneity (once per seed) ---
-    tok_tokenizer = get_tokenizer("basic_english")
-    from torchtext_compat import Multi30k
-
-    partitions_tokens = []
-    all_tokens = []
-    for eng, _de in Multi30k(split="train", language_pair=("en", "de")):
-        all_tokens.extend(vocab(tok_tokenizer(eng.lower())))
-    random.shuffle(all_tokens)
-    part_len = len(all_tokens) // args.n_workers
-    for i in range(args.n_workers):
-        partitions_tokens.append(all_tokens[i * part_len : (i + 1) * part_len])
-    het_kl = measure_data_heterogeneity(partitions_tokens, vocab_size)
-    jwp(f"[seed={seed}] Data heterogeneity (mean sym-KL): {het_kl:.6f}")
-
-    iter_ls = [iter(loader) for loader in loader_ls]
-    max_round_per_epoch = max(rounds_per_epoch)
-    total_rounds = args.epochs * max_round_per_epoch
+    total_rounds = args.num_iterations
 
     lr, mom = args.lr, args.mom
     mixing, _ = get_graph(args, device)
@@ -156,24 +133,20 @@ def run_single_seed(args, seed, csv_path=None):
     jwp(f"[seed={seed}] NOTE: first forward pass will be slow due to torch.compile warmup")
     round0_train_losses = []
     for wid, model in enumerate(model_ls):
-        batch_x, batch_y = next(iter_ls[wid])
-        batch_x, batch_y = batch_x.to(device), batch_y.to(device)
+        inputs, targets = next(loader_ls[wid])
         model.eval()
         with torch.no_grad():
-            # Process first sequence in batch (model requires 1D input)
             t0 = time.perf_counter()
-            loss = model(batch_x[0], batch_y[0], train_sliding_window)
+            loss = model(inputs, targets, train_sliding_window)
             dt = time.perf_counter() - t0
             jwp(f"[seed={seed}] Worker {wid} round0 forward done in {dt:.2f}s, loss={loss.item():.4f}")
         round0_train_losses.append(loss.item())
-    # reset iterators so round 1 sees the same batches
-    iter_ls = [iter(loader) for loader in loader_ls]
 
     jwp(f"[seed={seed}] Starting round 0 validation eval for {args.n_workers} workers...")
     val_losses_0 = []
     for vi, m in enumerate(model_ls):
         t0 = time.perf_counter()
-        vl = eval_loss(m, val_loader, val_sliding_window)
+        vl = eval_loss(m, val_gen, val_sliding_window, args.val_tokens, args.val_seq_len)
         dt = time.perf_counter() - t0
         jwp(f"[seed={seed}] Worker {vi} eval_loss done in {dt:.2f}s, val_loss={vl:.4f}")
         val_losses_0.append(vl)
@@ -218,22 +191,13 @@ def run_single_seed(args, seed, csv_path=None):
 
         # ===== per-worker forward/backward + local buffer update =====
         for wid, model in enumerate(model_ls):
-            try:
-                batch_x, batch_y = next(iter_ls[wid])
-            except StopIteration:
-                iter_ls[wid] = iter(loader_ls[wid])
-                batch_x, batch_y = next(iter_ls[wid])
-
-            batch_x, batch_y = batch_x.to(device), batch_y.to(device)
-
+            # Accumulate gradients over train_batch_size sequences
             model.train()
-            # Accumulate loss over sequences in the batch (model requires 1D input)
             total_loss = torch.tensor(0.0, device=device)
-            for seq_idx in range(batch_x.size(0)):
-                total_loss = total_loss + model(
-                    batch_x[seq_idx], batch_y[seq_idx], train_sliding_window
-                )
-            loss = total_loss / batch_x.size(0)
+            for _ in range(args.train_batch_size):
+                inputs, targets = next(loader_ls[wid])
+                total_loss = total_loss + model(inputs, targets, train_sliding_window)
+            loss = total_loss / args.train_batch_size
             round_losses.append(loss.item())
             model.zero_grad(set_to_none=True)
             loss.backward()
@@ -399,7 +363,7 @@ def run_single_seed(args, seed, csv_path=None):
 
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
             jwp(f"[seed={seed}] Round {r}: starting validation eval...")
-            val_losses = [eval_loss(m, val_loader, val_sliding_window) for m in model_ls]
+            val_losses = [eval_loss(m, val_gen, val_sliding_window, args.val_tokens, args.val_seq_len) for m in model_ls]
             val_ppls = [math.exp(vl) for vl in val_losses]
             avg_val = statistics.mean(val_losses)
             avg_ppl = math.exp(avg_val)
@@ -455,7 +419,7 @@ def run_single_seed(args, seed, csv_path=None):
             k: round(v, 6) if isinstance(v, float) else v for k, v in time_stats.items()
         }
 
-    final_val_losses = [eval_loss(m, val_loader, val_sliding_window) for m in model_ls]
+    final_val_losses = [eval_loss(m, val_gen, val_sliding_window, args.val_tokens, args.val_seq_len) for m in model_ls]
     final_avg_val = statistics.mean(final_val_losses)
     final_ppl = math.exp(final_avg_val)
     final_cons_err = consensus_error(model_ls)
@@ -466,7 +430,6 @@ def run_single_seed(args, seed, csv_path=None):
         "final_avg_val_loss": round(final_avg_val, 6),
         "final_avg_val_ppl": round(final_ppl, 4),
         "final_consensus_err": round(final_cons_err, 6),
-        "data_heterogeneity_kl": round(het_kl, 6),
         "total_comm_rounds": comm_rounds_count,
         "total_train_sec": round(cumul_time, 4),
         "bytes_per_round": bytes_per_round,
@@ -485,9 +448,16 @@ if __name__ == "__main__":
     parser.add_argument("--n_layer", type=int, default=8)
     parser.add_argument("--n_head", type=int, default=8)
     parser.add_argument("--max_len", type=int, default=5120)
+    parser.add_argument("--vocab_size", type=int, default=50257)
+    parser.add_argument("--train_files", type=str,
+                        default="/home/jinma/project_remote_jwm/remote_data/Low-rank-Muon/fineweb10B/fineweb_train_*.bin")
+    parser.add_argument("--val_files", type=str,
+                        default="/home/jinma/project_remote_jwm/remote_data/Low-rank-Muon/fineweb10B/fineweb_val_*.bin")
+    parser.add_argument("--val_tokens", type=int, default=102400,
+                        help="Total tokens to evaluate on (default 100k)")
     parser.add_argument("--train_batch_size", type=int, default=4)
-    parser.add_argument("--eval_batch_size", type=int, default=32)
-    parser.add_argument("--epochs", type=int, default=12)
+    parser.add_argument("--num_iterations", type=int, default=500,
+                        help="Total training iterations per worker")
     parser.add_argument("--log_interval", type=int, default=100)
     parser.add_argument("--n_workers", type=int, default=8)
 
@@ -609,7 +579,7 @@ if __name__ == "__main__":
             "n_workers": args.n_workers,
             "lr": args.lr,
             "mom": args.mom,
-            "epochs": args.epochs,
+            "num_iterations": args.num_iterations,
             "seeds": args.seeds,
             "n_seeds": len(args.seeds),
             "val_loss_mean": round(statistics.mean(val_losses), 6),

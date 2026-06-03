@@ -1,18 +1,18 @@
 seeds = [42]
 
-# 60M GPT model config: 8 layers, 8 heads, 512 dim
-# train_seq_len=1024, val_seq_len=5120, max_len=5120
+# 60M GPT model on FineWeb10B
+# train_seq_len=1024, val_seq_len=5120, max_len=5120, vocab_size=50257
 
-# ── DeMuon on all 3 graphs (60M GPT, 3 epochs) ──
+# ── DeMuon on all 3 graphs (60M GPT, 500 iterations) ──
 
-# [[experiments]]
-# name = "demuon_60m_ring"
-# args = "--network ring --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --epochs 3 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --eval_batch_size 2"
-#
-# [[experiments]]
-# name = "demuon_60m_exp"
-# args = "--network exp --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --epochs 3 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --eval_batch_size 2"
+[[experiments]]
+name = "demuon_60m_ring"
+args = "--network ring --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --num_iterations 500 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --val_tokens 102400"
+
+[[experiments]]
+name = "demuon_60m_exp"
+args = "--network exp --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --num_iterations 500 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --val_tokens 102400"
 
 [[experiments]]
 name = "demuon_60m_complete"
-args = "--network complete --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --epochs 3 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --eval_batch_size 2"
+args = "--network complete --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --num_iterations 500 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --val_tokens 102400"

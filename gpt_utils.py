@@ -2,8 +2,10 @@
 
 import torch
 import torch.nn as nn
+from pathlib import Path
 from torch.utils.data import DataLoader, Dataset
 from torchtext_compat import Multi30k, get_tokenizer, build_vocab_from_iterator
+import itertools
 
 
 
@@ -33,7 +35,77 @@ class MiniGPT(nn.Module):
         logits = self.head(x)
         return logits
 
-# ---------- dataset ------------------------------------------
+# ---------- FineWeb binary data loading (matches train_gpt_tiny.py format) ------
+
+def _load_data_shard(file: Path):
+    header = torch.from_file(str(file), False, 256, dtype=torch.int32)
+    assert header[0] == 20240520, "magic number mismatch in the data .bin file"
+    assert header[1] == 1, "unsupported version"
+    num_tokens = int(header[2])
+    with file.open("rb", buffering=0) as f:
+        tokens = torch.empty(num_tokens, dtype=torch.uint16, pin_memory=True)
+        f.seek(256 * 4)
+        nbytes = f.readinto(tokens.numpy())
+        assert nbytes == 2 * num_tokens, "number of tokens read does not match header"
+    return tokens
+
+
+def fineweb_data_generator(files: list, seq_len: int, device: str = "cuda"):
+    """Yields non-overlapping (input, target) pairs of length seq_len from binary shards."""
+    file_iter = itertools.cycle(files)
+    tokens, pos = _load_data_shard(next(file_iter)), 0
+    while True:
+        if pos + seq_len + 1 > len(tokens):
+            tokens, pos = _load_data_shard(next(file_iter)), 0
+        buf = tokens[pos : pos + seq_len + 1]
+        inputs = buf[:-1].to(device=device, dtype=torch.int32, non_blocking=True)
+        targets = buf[1:].to(device=device, dtype=torch.int64, non_blocking=True)
+        pos += seq_len + 1
+        yield inputs, targets
+
+
+def get_loaders_fineweb(args, device):
+    """Set up data generators for FineWeb binary shards.
+    Returns (train_generators, val_generator, vocab_size, rounds_per_epoch)."""
+    import glob
+
+    train_files = sorted(Path(f) for f in glob.glob(args.train_files))
+    val_files = sorted(Path(f) for f in glob.glob(args.val_files))
+    assert len(train_files) > 0, f"No train files found matching {args.train_files}"
+    assert len(val_files) > 0, f"No val files found matching {args.val_files}"
+
+    jwp(f"FineWeb train shards: {len(train_files)}, val shards: {len(val_files)}")
+
+    # Partition train files among workers (round-robin)
+    worker_files = [[] for _ in range(args.n_workers)]
+    for i, f in enumerate(train_files):
+        worker_files[i % args.n_workers].append(f)
+
+    for i in range(args.n_workers):
+        jwp(f"  Worker {i}: {len(worker_files[i])} train shards")
+
+    # Create per-worker training generators
+    train_generators = []
+    for wid in range(args.n_workers):
+        gen = fineweb_data_generator(worker_files[wid], args.train_seq_len, device)
+        train_generators.append(gen)
+
+    # Validation generator
+    val_gen = fineweb_data_generator(val_files, args.val_seq_len, device)
+
+    # Estimate rounds per epoch (tokens per worker / seq_len)
+    # Each shard is ~100M tokens; approximate
+    first_shard_tokens = int(torch.from_file(str(train_files[0]), False, 256, dtype=torch.int32)[2])
+    tokens_per_worker = first_shard_tokens * len(worker_files[0])
+    rounds_per_epoch = tokens_per_worker // (args.train_seq_len + 1)
+    jwp(f"  Estimated tokens per worker: ~{tokens_per_worker:,}")
+    jwp(f"  Estimated rounds per epoch: ~{rounds_per_epoch:,}")
+
+    vocab_size = args.vocab_size
+    return train_generators, val_gen, vocab_size, rounds_per_epoch
+
+
+# ---------- Multi30k dataset (legacy) ------------------------------------------
 class SeqDataset(Dataset):
     """Non-overlapping contiguous chunks (like train_gpt.py's data generator).
     Returns (input, target) where target is input shifted by 1."""
