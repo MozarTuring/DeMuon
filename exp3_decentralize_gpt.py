@@ -98,6 +98,7 @@ def run_single_seed(args, seed, csv_path=None):
             vocab_size, num_layers=args.n_layer, num_heads=args.n_head,
             model_dim=args.d_model, max_seq_len=args.max_len
         )
+        model.float()
         if len(model_ls) > 0:
             model.load_state_dict(model_ls[0].state_dict())
         model.to(device)
