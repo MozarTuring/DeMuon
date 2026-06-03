@@ -321,16 +321,32 @@ def run_single_seed(args, seed, csv_path=None):
                                 update = zeropower_via_newtonschulz5(
                                     tmp, steps=args.ns_steps
                                 )
+                                if r <= 2 and wid == 0:
+                                    has_nan = torch.isnan(update).any().item()
+                                    has_inf = torch.isinf(update).any().item()
+                                    if has_nan or has_inf:
+                                        jwp(f"[DEBUG] NS output NaN/Inf for {name} shape={tmp.shape} "
+                                            f"input_norm={tmp.norm().item():.6e} "
+                                            f"output_norm={update.norm().item():.6e}")
                                 p.data -= tmp_lr * update.reshape(tmp_shape)
                             elif args.msgn == 2:
                                 U, S, Vt = torch.linalg.svd(tmp, full_matrices=False)
                                 p.data -= tmp_lr * (U @ Vt).reshape(tmp_shape)
+                        if r <= 2 and wid == 0:
+                            if torch.isnan(p.data).any() or torch.isinf(p.data).any():
+                                jwp(f"[DEBUG] Param NaN/Inf AFTER update: {name} shape={p.shape} "
+                                    f"y_norm={tmp.norm().item():.6e} p_max={p.data.abs().max().item():.6e}")
                         check_nan_inf(name, tmp, r)
 
             if args.n_workers > 1:
                 for _ in range(args.gossip_rounds):
                     mix_params(model_ls, mixing)
                     comm_rounds_count += 1
+
+            if r <= 2:
+                for name, p in model_ls[0].named_parameters():
+                    if torch.isnan(p.data).any() or torch.isinf(p.data).any():
+                        jwp(f"[DEBUG] After full DeMuon step r={r}: NaN/Inf in {name}")
 
         elif alg in ("dsgd", "dsgd_gclip_decay", "sen"):
             if args.n_workers > 1:
