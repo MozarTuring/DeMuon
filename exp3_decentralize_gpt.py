@@ -70,7 +70,12 @@ def run_single_seed(args, seed, csv_path=None):
         args.val_seq_len // 128, dtype=torch.int32, device=device
     )
 
-    total_rounds = args.num_iterations
+    if args.epochs is not None:
+        total_rounds = args.epochs * rounds_per_epoch_est
+        jwp(f"[seed={seed}] Using --epochs={args.epochs}: total_rounds={total_rounds} "
+            f"({args.epochs} * {rounds_per_epoch_est})")
+    else:
+        total_rounds = args.num_iterations
 
     lr, mom = args.lr, args.mom
     mixing, _ = get_graph(args, device)
@@ -455,9 +460,11 @@ if __name__ == "__main__":
                         default="/home/jinma/project_remote_jwm/remote_data/Low-rank-Muon/fineweb10B/fineweb_val_*.bin")
     parser.add_argument("--val_tokens", type=int, default=102400,
                         help="Total tokens to evaluate on (default 100k)")
-    parser.add_argument("--train_batch_size", type=int, default=4)
+    parser.add_argument("--train_batch_size", type=int, default=1)
     parser.add_argument("--num_iterations", type=int, default=500,
                         help="Total training iterations per worker")
+    parser.add_argument("--epochs", type=int, default=None,
+                        help="If set, overrides num_iterations with epochs * rounds_per_epoch")
     parser.add_argument("--log_interval", type=int, default=100)
     parser.add_argument("--n_workers", type=int, default=8)
 
