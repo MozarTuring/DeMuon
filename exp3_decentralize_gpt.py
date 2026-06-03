@@ -25,7 +25,8 @@ def quick2json(inp_path, inp_data):
 def eval_loss(model, loader, sliding_window_num_blocks):
     model.eval()
     tot, ntok = 0.0, 0
-    for x, y in loader:
+    num_batches = len(loader)
+    for batch_idx, (x, y) in enumerate(loader):
         x, y = x.to(device), y.to(device)
         # Process each sequence individually (model requires 1D input)
         for i in range(x.size(0)):
@@ -34,6 +35,8 @@ def eval_loss(model, loader, sliding_window_num_blocks):
             n = yi.numel()
             tot += loss.item() * n
             ntok += n
+        if batch_idx % 10 == 0 or batch_idx == num_batches - 1:
+            jwp(f"  eval_loss progress: batch {batch_idx+1}/{num_batches}, ntok={ntok}")
     return tot / ntok
 
 
@@ -102,7 +105,9 @@ def run_single_seed(args, seed, csv_path=None):
         if len(model_ls) > 0:
             model.load_state_dict(model_ls[0].state_dict())
         model.to(device)
+        model = torch.compile(model)
         model_ls.append(model)
+    jwp(f"[seed={seed}] All {args.n_workers} models created and torch.compiled")
 
     ref_model = model_ls[-1]
 
@@ -144,6 +149,8 @@ def run_single_seed(args, seed, csv_path=None):
     comm_rounds_count = 0
 
     # log initial state (round 0): forward pass on first batch (no param update)
+    jwp(f"[seed={seed}] Starting round 0 train-loss forward passes for {args.n_workers} workers...")
+    jwp(f"[seed={seed}] NOTE: first forward pass will be slow due to torch.compile warmup")
     round0_train_losses = []
     for wid, model in enumerate(model_ls):
         batch_x, batch_y = next(iter_ls[wid])
@@ -151,12 +158,22 @@ def run_single_seed(args, seed, csv_path=None):
         model.eval()
         with torch.no_grad():
             # Process first sequence in batch (model requires 1D input)
+            t0 = time.perf_counter()
             loss = model(batch_x[0], batch_y[0], sliding_window_num_blocks)
+            dt = time.perf_counter() - t0
+            jwp(f"[seed={seed}] Worker {wid} round0 forward done in {dt:.2f}s, loss={loss.item():.4f}")
         round0_train_losses.append(loss.item())
     # reset iterators so round 1 sees the same batches
     iter_ls = [iter(loader) for loader in loader_ls]
 
-    val_losses_0 = [eval_loss(m, val_loader, sliding_window_num_blocks) for m in model_ls]
+    jwp(f"[seed={seed}] Starting round 0 validation eval for {args.n_workers} workers...")
+    val_losses_0 = []
+    for vi, m in enumerate(model_ls):
+        t0 = time.perf_counter()
+        vl = eval_loss(m, val_loader, sliding_window_num_blocks)
+        dt = time.perf_counter() - t0
+        jwp(f"[seed={seed}] Worker {vi} eval_loss done in {dt:.2f}s, val_loss={vl:.4f}")
+        val_losses_0.append(vl)
     val_ppls_0 = [math.exp(vl) for vl in val_losses_0]
     avg_val_0 = statistics.mean(val_losses_0)
     avg_ppl_0 = math.exp(avg_val_0)
@@ -177,6 +194,7 @@ def run_single_seed(args, seed, csv_path=None):
         f"avg_val={avg_val_0:.4f}, ppl={avg_ppl_0:.2f}, cons_err={cons_err_0:.6f}"
     )
 
+    jwp(f"[seed={seed}] Starting training loop: total_rounds={total_rounds}, n_workers={args.n_workers}")
     for r in range(1, total_rounds + 1):
         t_start = time.perf_counter()
         round_losses = []
@@ -216,6 +234,8 @@ def run_single_seed(args, seed, csv_path=None):
             round_losses.append(loss.item())
             model.zero_grad(set_to_none=True)
             loss.backward()
+            if r <= 3:
+                jwp(f"[seed={seed}] Round {r} worker {wid} fwd+bwd done, loss={loss.item():.4f}")
 
             with torch.no_grad():
                 if alg == "demuon":
@@ -354,7 +374,11 @@ def run_single_seed(args, seed, csv_path=None):
         iteration_times.append(t_elapsed)
         cumul_time += t_elapsed
 
+        if r <= 3:
+            jwp(f"[seed={seed}] Round {r} compute+comm done in {t_elapsed:.2f}s")
+
         if r % args.log_interval == 0 or r == total_rounds or r == 1:
+            jwp(f"[seed={seed}] Round {r}: starting validation eval...")
             val_losses = [eval_loss(m, val_loader, sliding_window_num_blocks) for m in model_ls]
             val_ppls = [math.exp(vl) for vl in val_losses]
             avg_val = statistics.mean(val_losses)
