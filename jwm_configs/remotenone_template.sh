@@ -1,4 +1,4 @@
-# JWM_SERVER_NAME=
+JWM_SERVER_NAME=
 
 VENV_DIR=${RUN_DIR_PRE}/${RUN_PROJ}/venv
 _REQ_FILE=requirements_gpt_cu128.txt
@@ -25,4 +25,5 @@ else
     pip install -r "$_REQ_FILE"
     echo "$_REQ_HASH" > "$_STAMP_FILE"
 fi
-JWM_RUN_COMMAND=(python launch.py)
+GPU_IND=
+JWM_RUN_COMMAND=(CUDA_VISIBLE_DEVICES=${GPU_IND} python launch.py)

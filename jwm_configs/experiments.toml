@@ -1,18 +1,21 @@
 seeds = [42]
 
-# 60M GPT model on FineWeb10B
-# train_seq_len=1024, val_seq_len=5120, max_len=5120, vocab_size=50257
-
-# ── DeMuon on all 3 graphs (60M GPT, 500 iterations) ──
+# 60M GPT model on FineWeb10B — consistent with train_gpt_tiny.py
+# n_workers=1: equivalent to centralized Muon training
+# Optimizer: AdamW (embed lr=0.3, scalar lr=0.015, head lr=1/320) + Muon (hidden lr=0.025, wd=0.01)
+# LR schedule: stable then decay (cooldown_frac=0.7)
+# Momentum: 0.85 -> 0.95 warmup over 300 steps
+# train_batch_size=8 matches 8-GPU effective batch
+# num_iterations=5960 matches train_gpt_tiny.py default
 
 # [[experiments]]
 # name = "demuon_60m_ring"
-# args = "--network ring --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --num_iterations 500 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --val_tokens 102400"
+# args = "--network ring --n_workers 1 --alg demuon --msgn 1 --muon_lr 0.025 --muon_wd 0.01 --mom 0.95 --cooldown_frac 0.7 --num_iterations 5960 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 49152 --val_seq_len 262144 --max_len 262144 --train_batch_size 8 --val_tokens 10485760"
 #
 # [[experiments]]
 # name = "demuon_60m_exp"
-# args = "--network exp --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --num_iterations 500 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --val_tokens 102400"
+# args = "--network exp --n_workers 1 --alg demuon --msgn 1 --muon_lr 0.025 --muon_wd 0.01 --mom 0.95 --cooldown_frac 0.7 --num_iterations 5960 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 49152 --val_seq_len 262144 --max_len 262144 --train_batch_size 8 --val_tokens 10485760"
 
 [[experiments]]
 name = "demuon_60m_complete"
-args = "--network complete --alg demuon --msgn 1 --lr 0.003 --mom 0.8 --lr_schedule 1 --num_iterations 500 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 1024 --val_seq_len 5120 --max_len 5120 --train_batch_size 4 --val_tokens 102400"
+args = "--network complete --n_workers 1 --alg demuon --msgn 1 --muon_lr 0.025 --muon_wd 0.01 --mom 0.95 --cooldown_frac 0.7 --num_iterations 5960 --d_model 512 --n_layer 8 --n_head 8 --train_seq_len 49152 --val_seq_len 262144 --max_len 262144 --train_batch_size 8 --val_tokens 10485760"
