@@ -26,4 +26,4 @@ else
     echo "$_REQ_HASH" > "$_STAMP_FILE"
 fi
 GPU_IND=
-JWM_RUN_COMMAND=(CUDA_VISIBLE_DEVICES=${GPU_IND} python launch.py)
+JWM_RUN_COMMAND=(env CUDA_VISIBLE_DEVICES=${GPU_IND} python launch.py)

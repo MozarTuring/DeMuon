@@ -8,6 +8,7 @@ require_env() {
         fi
     done
 }
+JWM_SERVER_NAME=greatrawr
 
 VENV_DIR=${RUN_DIR_PRE}/${RUN_PROJ}/venv
 _REQ_FILE=requirements_gpt_cu128.txt
@@ -34,5 +35,6 @@ else
     pip install -r "$_REQ_FILE"
     echo "$_REQ_HASH" > "$_STAMP_FILE"
 fi
-JWM_RUN_COMMAND=(python launch.py)
+GPU_IND=1
+JWM_RUN_COMMAND=(env CUDA_VISIBLE_DEVICES=${GPU_IND} python launch.py)
 "${JWM_RUN_COMMAND[@]}"  > job_out.log 2>&1 &
